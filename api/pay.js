@@ -18,6 +18,14 @@ export default async function handler(req, res) {
     const release = () => kv('DEL', 'used:' + txn);
 
     o.txn = txn;
+    o.submittedAt = Date.now();
+    // Ethio Telecom's receipt service only answers Ethiopian IPs, so from Vercel we can't check it.
+    // Default: queue for manual approval (admin.html, or verifier/ running on a machine in Ethiopia).
+    if (process.env.RECEIPT_CHECK !== 'on') {
+      o.status = 'review'; o.reason = 'check the receipt and approve';
+      await saveOrder(o);
+      return send(res, 200, publicOrder(o));
+    }
     let html;
     try { html = await fetchReceipt(txn); } catch (e) {
       console.error('receipt fetch failed', e.message);
