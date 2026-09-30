@@ -6,12 +6,19 @@
 // for you to handle on /admin.html.
 //
 // Run:   DINGAY_ADMIN_PASSWORD='…' node verifier/verify.mjs
+//   or on a Mac, store the password once in Keychain (service "dingay-admin") — see verifier/install-mac.sh.
 // Needs: Node 20+.  Optional: DINGAY_SITE (default https://dingay.vercel.app)
-import { parseReceipt, parseEAT, receiverOk, fetchReceipt } from '../api/_lib.js';
+import { execFileSync } from 'node:child_process';
+import { parseReceipt, parseEAT, receiverOk, fetchReceipt, PAY_TO } from '../api/_lib.js';
 
 const SITE = process.env.DINGAY_SITE || 'https://dingay.vercel.app';
-const PW = process.env.DINGAY_ADMIN_PASSWORD;
-if (!PW) { console.error('Set DINGAY_ADMIN_PASSWORD'); process.exit(1); }
+function password() {
+  if (process.env.DINGAY_ADMIN_PASSWORD) return process.env.DINGAY_ADMIN_PASSWORD;
+  try { return execFileSync('/usr/bin/security', ['find-generic-password', '-s', 'dingay-admin', '-w'], { encoding: 'utf8' }).trim(); } catch { return ''; }
+}
+const PW = password();
+if (!PW) { console.error('No admin password: set DINGAY_ADMIN_PASSWORD or add Keychain item "dingay-admin"'); process.exit(1); }
+const phoneFmt = PAY_TO.phone.replace(/^(\d{4})(\d{3})(\d{3})$/, '$1 $2 $3');
 const skipUntil = new Map(); // txn -> time to re-check a receipt that didn't match
 
 async function admin(method, body) {
@@ -21,19 +28,22 @@ async function admin(method, body) {
   return j;
 }
 
+// Returns { approve } | { reject: note for the customer } | { problems: [...] for you to decide }
 async function check(o) {
   const html = await fetchReceipt(o.txn);
   const r = parseReceipt(html, o.txn);
+  if (!r.found) {
+    // Only treat it as a typo when telebirr explicitly says the transaction doesn't exist.
+    if (/request is not correct/i.test(html)) return { reject: `We couldn't find telebirr transaction ${o.txn}. Check the transaction number in your telebirr SMS and enter it again.` };
+    return { problems: ['receipt page looked unusual'] };
+  }
+  if (!receiverOk(r)) return { reject: `Transaction ${o.txn} wasn't sent to DINGAY. Send ${o.price} Birr to ${phoneFmt} (${PAY_TO.name}) and enter the new transaction number.` };
   const paidAt = parseEAT(r.date);
   const problems = [];
-  if (!r.found) problems.push('receipt not found');
-  else {
-    if (!/completed/i.test(r.status)) problems.push('not completed');
-    if (!receiverOk(r)) problems.push('paid to someone else: ' + r.receiver);
-    if (!(r.amount >= o.price)) problems.push(`paid ${r.amount}, price ${o.price}`);
-    if (!paidAt || paidAt < o.createdAt - 15 * 60e3) problems.push('payment older than order');
-  }
-  return problems;
+  if (!/completed/i.test(r.status)) problems.push('not completed');
+  if (!(r.amount >= o.price)) problems.push(`paid ${r.amount}, price ${o.price}`);
+  if (!paidAt || paidAt < o.createdAt - 15 * 60e3) problems.push('payment older than order');
+  return problems.length ? { problems } : { approve: true };
 }
 
 async function tick() {
@@ -41,13 +51,16 @@ async function tick() {
   for (const o of orders.filter((x) => x.status === 'review' && x.txn)) {
     if ((skipUntil.get(o.txn) || 0) > Date.now()) continue;
     try {
-      const problems = await check(o);
-      if (!problems.length) {
+      const v = await check(o);
+      if (v.approve) {
         await admin('POST', { id: o.id, action: 'approve' });
         console.log(new Date().toISOString(), 'APPROVED', o.id, o.txn);
+      } else if (v.reject) {
+        await admin('POST', { id: o.id, action: 'reject', note: v.reject });
+        console.log(new Date().toISOString(), 'REJECTED', o.id, o.txn, '—', v.reject);
       } else {
         skipUntil.set(o.txn, Date.now() + 10 * 60e3);
-        console.log(new Date().toISOString(), 'needs you', o.id, o.txn, '—', problems.join('; '));
+        console.log(new Date().toISOString(), 'needs you', o.id, o.txn, '—', v.problems.join('; '));
       }
     } catch (e) {
       console.log(new Date().toISOString(), 'could not check', o.id, e.message);
