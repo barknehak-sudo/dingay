@@ -1,7 +1,8 @@
 // Admin API. Header x-admin-password must match the ADMIN_PASSWORD env var.
 // GET  /api/admin                         → latest orders
 // POST /api/admin {id, action:'approve'|'reject', note?}
-import { kv, loadOrder, saveOrder, publish, send, sameSecret, limited, ip } from './_lib.js';
+// POST /api/admin {inquiry:id, action:'done'|'new'}
+import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip } from './_lib.js';
 
 export default async function handler(req, res) {
   try {
@@ -13,7 +14,19 @@ export default async function handler(req, res) {
       const ids = await kv('LRANGE', 'orders', 0, 199);
       const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
       const orders = raw.filter(Boolean).map((r) => { const o = JSON.parse(r); delete o.key; return o; });
-      return send(res, 200, { orders });
+      const qids = await kv('LRANGE', 'inquiries', 0, 199);
+      const qraw = qids.length ? await kv('MGET', ...qids.map((i) => 'inq:' + i)) : [];
+      const inquiries = qraw.filter(Boolean).map((r) => JSON.parse(r));
+      return send(res, 200, { orders, inquiries });
+    }
+    if (req.method === 'POST' && (req.body || {}).inquiry) {
+      const { inquiry, action } = req.body;
+      const q = /^IQ-[A-Z0-9]+$/.test(inquiry) ? await getJSON('inq:' + inquiry) : null;
+      if (!q) return send(res, 404, { error: 'Inquiry not found.' });
+      if (action !== 'done' && action !== 'new') return send(res, 400, { error: 'Unknown action.' });
+      q.status = action;
+      await setJSON('inq:' + q.id, q);
+      return send(res, 200, { inquiry: q });
     }
     if (req.method === 'POST') {
       const { id, action, note } = req.body || {};

@@ -53,22 +53,23 @@ a{color:inherit}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let pw='';try{pw=sessionStorage.getItem('dg-admin')||''}catch(e){}
-let orders=[],tab='review';
-const TABS=[['review','Needs review'],['paid','Paid'],['awaiting','Awaiting payment'],['rejected','Rejected'],['all','All']];
+let orders=[],inquiries=[],tab='review';
+const TABS=[['review','Needs review'],['paid','Paid'],['awaiting','Awaiting payment'],['rejected','Rejected'],['all','All orders'],['inq','SIDEWAYS inquiries']];
 async function api(method,body){
   const r=await fetch('/api/admin',{method,headers:{'x-admin-password':pw,'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
   const j=await r.json().catch(()=>({error:'Bad response'}));if(!r.ok)throw new Error(j.error||r.status);return j;
 }
 async function load(){
   $('#err').textContent='';
-  try{const j=await api('GET');orders=j.orders;try{sessionStorage.setItem('dg-admin',pw)}catch(e){}$('#login').hidden=true;$('#app').hidden=false;render();}
+  try{const j=await api('GET');orders=j.orders;inquiries=j.inquiries||[];try{sessionStorage.setItem('dg-admin',pw)}catch(e){}$('#login').hidden=true;$('#app').hidden=false;render();}
   catch(e){$('#err').textContent=e.message;$('#login').hidden=false;$('#app').hidden=true;}
 }
 function when(ms){return ms?new Date(ms).toLocaleString('en-GB',{timeZone:'Africa/Addis_Ababa',dateStyle:'medium',timeStyle:'short'}):'—'}
 function render(){
-  const n=k=>k==='all'?orders.length:orders.filter(o=>o.status===k).length;
+  const n=k=>k==='inq'?inquiries.filter(q=>q.status!=='done').length:k==='all'?orders.length:orders.filter(o=>o.status===k).length;
   $('#tabs').innerHTML=TABS.map(([k,l])=>`<button data-t="${k}" aria-pressed="${k===tab}">${l} (${n(k)})</button>`).join('');
   $('#count').textContent=orders.length+' latest orders';
+  if(tab==='inq'){renderInq();return;}
   const list=orders.filter(o=>tab==='all'||o.status===tab);
   $('#list').innerHTML=list.length?list.map(o=>`
     <div class="card">
@@ -89,10 +90,26 @@ function render(){
       </div>`:''}
     </div>`).join(''):'<p class="mono" style="margin-top:20px">Nothing here.</p>';
 }
+function reachLink(r){const t=String(r||'').trim();if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(t))return `<a href="mailto:${esc(t)}">${esc(t)}</a>`;const d=t.replace(/[^\d+]/g,'');return d.length>=9?`<a href="tel:${esc(d)}">${esc(t)}</a>`:esc(t);}
+function renderInq(){
+  $('#list').innerHTML=inquiries.length?inquiries.map(q=>`
+    <div class="card" style="${q.status==='done'?'opacity:.55':''}">
+      <div class="row"><span class="big">${esc(q.name)}</span><span class="pill ${q.status==='done'?'s-awaiting':'s-review'}">${q.status==='done'?'DONE':'NEW'}</span></div>
+      <dl>
+        <dt>Contact</dt><dd>${reachLink(q.reach)}</dd>
+        <dt>Needs</dt><dd>${esc(q.need)}</dd>
+        <dt>Received</dt><dd>${when(q.createdAt)}</dd>
+      </dl>
+      ${q.msg?`<p style="margin:10px 0 0;white-space:pre-wrap;font-size:15px;line-height:1.45">${esc(q.msg)}</p>`:''}
+      <div class="actions"><button class="btn ${q.status==='done'?'ghost':''}" data-q="${esc(q.id)}" data-qa="${q.status==='done'?'new':'done'}">${q.status==='done'?'MARK AS NEW':'MARK AS DONE'}</button></div>
+    </div>`).join(''):'<p class="mono" style="margin-top:20px">No inquiries yet.</p>';
+}
 $('#login').onsubmit=e=>{e.preventDefault();pw=$('#pw').value;load();};
 $('#refresh').onclick=load;
 $('#tabs').onclick=e=>{const t=e.target.closest('[data-t]');if(t){tab=t.dataset.t;render();}};
 $('#list').onclick=async e=>{
+  const qb=e.target.closest('[data-q]');
+  if(qb){qb.disabled=true;try{const j=await api('POST',{inquiry:qb.dataset.q,action:qb.dataset.qa});inquiries=inquiries.map(q=>q.id===j.inquiry.id?j.inquiry:q);render();}catch(err){alert(err.message);qb.disabled=false;}return;}
   const b=e.target.closest('[data-a]');if(!b)return;const id=b.dataset.id,a=b.dataset.a;
   let note=null;
   if(a==='approve'&&!confirm(`Approve ${id}? The customer can then download the certificate.`))return;
