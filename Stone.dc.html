@@ -94,6 +94,12 @@ function blobs(x,base,hues,n,sat,light,alpha,rad){x.fillStyle=base;x.fillRect(0,
 const texCache={};
 function texInto(T,url,rep,mat){const p=texCache[url]||(texCache[url]=new Promise(res=>new T.TextureLoader().load(url,res,undefined,()=>res(null))));
   p.then(base=>{if(!base)return;const t=base.clone();t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.MirroredRepeatWrapping;t.repeat.set(rep[0],rep[1]);t.anisotropy=4;t.needsUpdate=true;mat.map=t;mat.bumpMap=t;mat.needsUpdate=true;});}
+function simpleMat(T,kind,old,level){
+  const map=old&&old.map||null;
+  if(level===1&&(kind==='opal'||kind==='choc'))return new T.MeshPhysicalMaterial({map,color:'#ffffff',roughness:kind==='opal'?.16:.22,clearcoat:1,clearcoatRoughness:.05});
+  if(level===1&&(kind==='emerald'||kind==='diamond'))return new T.MeshStandardMaterial({color:kind==='emerald'?'#1c9a62':'#e9eef3',roughness:.08,metalness:.15,flatShading:true,envMapIntensity:2,emissive:kind==='emerald'?'#04331f':'#000000',emissiveIntensity:.4});
+  return new T.MeshStandardMaterial({map,color:kind==='choc'?'#6e4631':(kind==='emerald'?'#1c9a62':'#ffffff'),roughness:.3,metalness:0,vertexColors:!!(old&&old.vertexColors),flatShading:kind==='emerald'||kind==='diamond'});
+}
 function buildMesh(T,kind){
   let geo,mat;
   if(ROCK[kind]){const c=ROCK[kind];geo=rockGeo(T,c);
@@ -126,11 +132,24 @@ class Component extends DCLogic {
   }
   componentWillUnmount(){this.dead=true;cancelAnimationFrame(this.raf);this.io&&this.io.disconnect();this.ro&&this.ro.disconnect();clearTimeout(this.ht);
     if(this.gl){const{renderer,mesh,envT}=this.gl;mesh.geometry.dispose();mesh.material.dispose();envT&&envT.dispose();renderer.dispose();try{renderer.forceContextLoss()}catch(e){}renderer.domElement.remove();this.gl=null;}}
+  glFallback(){if(this.dead)return;if(this.gl){const{renderer}=this.gl;try{renderer.domElement.remove();renderer.dispose();}catch(e){}this.gl=null;}this.setState({glFail:true});}
+  drewOk(renderer){
+    /* read the centre pixel straight after render: catches GPUs that "succeed" but draw nothing or pure black */
+    if(this.props.kind==='blocket')return true;
+    try{const g=renderer.getContext(),c=renderer.domElement,px=new Uint8Array(4*9);let lum=0,alpha=0;
+      g.readPixels(Math.floor(c.width/2)-1,Math.floor(c.height/2)-1,3,3,g.RGBA,g.UNSIGNED_BYTE,px);
+      for(let i=0;i<9;i++){alpha=Math.max(alpha,px[i*4+3]);lum=Math.max(lum,px[i*4]+px[i*4+1]+px[i*4+2]);}
+      const k=this.props.kind;const minLum=(k==='opal'||k==='diamond')?120:(k==='choc'||k==='emerald'?12:30);
+      return alpha>40&&lum>=minLum;}catch(e){return true;}
+  }
   async initGL(){
+    if(/[?&]nogl\b/.test(location.search)){this.setState({glFail:true});return;}
     let L;try{L=await lib();}catch(e){this.setState({glFail:true});return;}if(this.dead||!this.glRef.current)return;const{T,Room}=L;
     let renderer;try{renderer=new T.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});}catch(e){this.setState({glFail:true});return;}
     renderer.setPixelRatio(Math.min(this.props.dpr||2,window.devicePixelRatio||1));renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.outputColorSpace=T.SRGBColorSpace;
+    let shaderErr=false;renderer.debug.checkShaderErrors=true;renderer.debug.onShaderError=()=>{shaderErr=true;};
     const el=renderer.domElement;el.style.cssText='width:100%;height:100%;display:block;opacity:0;transition:opacity .9s ease';this.glRef.current.appendChild(el);
+    el.addEventListener('webglcontextlost',e=>{e.preventDefault();this.glFallback();},false);
     const scene=new T.Scene();const pm=new T.PMREMGenerator(renderer);const envT=pm.fromScene(new Room(),.04).texture;scene.environment=envT;pm.dispose();
     const cam=new T.PerspectiveCamera(30,1,.1,50);cam.position.set(0,0,5.4);
     const key=new T.DirectionalLight('#fff4e6',2.4);key.position.set(3,4,5);scene.add(key);
@@ -141,11 +160,19 @@ class Component extends DCLogic {
     size();this.ro=new ResizeObserver(size);this.ro.observe(this.glRef.current);
     this.gl={T,renderer,scene,cam,grp,mesh,envT};
     this.pitch=(this.props.kind==='blocket'||this.props.kind==='emerald'||this.props.kind==='diamond')?.5:.25;this.basePitch=this.pitch;
-    renderer.render(scene,cam);
+    const kind=this.props.kind||'cobble';
+    try{renderer.render(scene,cam);}catch(e){shaderErr=true;}
+    let lv=0;
+    for(let level=1;level<=2&&(shaderErr||!this.drewOk(renderer));level++){
+      const old=mesh.material;mesh.material=simpleMat(T,kind,old,level);old.dispose();shaderErr=false;lv=level;
+      try{renderer.render(scene,cam);}catch(e){shaderErr=true;}
+    }
+    if(shaderErr||!this.drewOk(renderer)){if(this.wrapRef.current)this.wrapRef.current.dataset.gl='css';this.glFallback();return;}
+    if(this.wrapRef.current)this.wrapRef.current.dataset.gl=String(lv);
     requestAnimationFrame(()=>{el.style.opacity='1';});
   }
   glFrame(t,dt){
-    const{renderer,scene,cam,grp}=this.gl;const spin=this.reduce?0:(this.props.spin??4);
+    const{renderer,scene,cam,grp}=this.gl;if(renderer.getContext().isContextLost()){this.glFallback();return;}const spin=this.reduce?0:(this.props.spin??4);
     if(!this.dragging){this.vel*=.94;this.yaw+=spin*dt/1000*Math.PI/180*3+this.vel;this.pitch+=(this.basePitch-this.pitch)*.03;}
     let ox=0,oy=0;const r=this.wrapRef.current&&this.wrapRef.current.getBoundingClientRect();
     if(r&&this.props.scrollLink!==false){ox=((r.left+r.width/2)/window.innerWidth-.5);oy=((r.top+r.height/2)/window.innerHeight-.5);}
