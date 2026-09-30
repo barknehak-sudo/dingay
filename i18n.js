@@ -344,15 +344,23 @@
   function doEl(el) { for (var i = 0; i < ATTRS.length; i++) { var a = ATTRS[i]; if (el.hasAttribute && el.hasAttribute(a)) { var v = el.getAttribute(a), t = tr(v); if (t !== v) el.setAttribute(a, t); } } }
   function walk(root) {
     if (root.nodeType === 3) { doText(root); return; }
-    if (root.nodeType !== 1 || SKIP[root.nodeName]) return;
+    if (root.nodeType !== 1) return;
+    if (SKIP[root.nodeName]) { if (root.nodeName === 'TEXTAREA') doEl(root); return; }
     doEl(root);
     var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, {
-      acceptNode: function (n) { return n.nodeType === 1 && SKIP[n.nodeName] ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; }
+      acceptNode: function (n) {
+        if (n.nodeType === 1 && SKIP[n.nodeName]) { if (n.nodeName === 'TEXTAREA') doEl(n); return NodeFilter.FILTER_REJECT; }
+        return NodeFilter.FILTER_ACCEPT;
+      }
     });
     var n; while ((n = w.nextNode())) { if (n.nodeType === 3) doText(n); else doEl(n); }
   }
   function startTranslating() {
     document.documentElement.lang = 'am';
+    // English words with no Amharic counterpart translate to "" — hide their empty word boxes (hero headline).
+    var st = document.createElement('style');
+    st.textContent = 'h1 span:has(> span:empty){display:none}';
+    document.head.appendChild(st);
     new MutationObserver(function (ms) {
       for (var i = 0; i < ms.length; i++) {
         var m = ms[i];
