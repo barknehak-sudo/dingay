@@ -340,7 +340,17 @@
   /* ---------- live translation of the rendered page ---------- */
   var ATTRS = ['placeholder', 'aria-label', 'title'];
   var SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, 'X-DC': 1, NOSCRIPT: 1 };
-  function doText(n) { var p = n.parentNode; if (p && SKIP[p.nodeName]) return; var v = n.nodeValue, t = tr(v); if (t !== v) n.nodeValue = t; }
+  function doText(n) {
+    var p = n.parentNode; if (p && SKIP[p.nodeName]) return;
+    var v = n.nodeValue, t = tr(v); if (t === v) return;
+    n.nodeValue = t;
+    // English words with no Amharic counterpart ("A") become empty: hide their word box so no gap is left.
+    if (!t.trim() && p && p.nodeType === 1 && p.childNodes.length === 1) {
+      p.style.display = 'none';
+      var o = p.parentElement;
+      if (o && o.children.length === 1 && !o.textContent.trim()) o.style.display = 'none';
+    }
+  }
   function doEl(el) { for (var i = 0; i < ATTRS.length; i++) { var a = ATTRS[i]; if (el.hasAttribute && el.hasAttribute(a)) { var v = el.getAttribute(a), t = tr(v); if (t !== v) el.setAttribute(a, t); } } }
   function walk(root) {
     if (root.nodeType === 3) { doText(root); return; }
@@ -357,10 +367,6 @@
   }
   function startTranslating() {
     document.documentElement.lang = 'am';
-    // English words with no Amharic counterpart translate to "" — hide their empty word boxes (hero headline).
-    var st = document.createElement('style');
-    st.textContent = 'h1 span:has(> span:empty){display:none}';
-    document.head.appendChild(st);
     new MutationObserver(function (ms) {
       for (var i = 0; i < ms.length; i++) {
         var m = ms[i];
