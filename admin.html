@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>DINGAY Orders</title>
+<style>
+:root{--bg:#e6ecef;--card:#f3f5f6;--ink:#0b1720;--mut:#435f73;--line:rgba(11,23,32,.16);--ok:#1f8a55;--warn:#b7791f;--bad:#b3261e}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit;touch-action:manipulation}
+.wrap{max-width:900px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 16px max(40px,env(safe-area-inset-bottom))}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+h1{margin:6px 0 18px;font-size:40px;letter-spacing:-.04em;line-height:.95}
+.login{display:flex;gap:8px}
+input{height:48px;padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:0;font-size:16px;flex:1;min-width:0}
+.btn{min-height:44px;padding:0 16px;border:0;background:var(--ink);color:#e6ecef;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.btn.bad{background:var(--bad)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+.tabs button{min-height:44px;padding:0 14px;border:1px solid var(--ink);background:transparent;cursor:pointer;font-size:13px}
+.tabs button[aria-pressed=true]{background:var(--ink);color:#e6ecef}
+.card{background:var(--card);border:1px solid var(--line);padding:14px;margin-top:10px}
+.row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.big{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.pill{display:inline-block;padding:3px 8px;font-size:11px;font-weight:700;letter-spacing:.08em;color:#fff}
+.s-paid{background:var(--ok)}.s-review{background:var(--warn)}.s-rejected{background:var(--bad)}.s-awaiting{background:#6f8797}
+dl{display:grid;grid-template-columns:120px 1fr;gap:4px 10px;margin:10px 0 0;font-size:14px}
+dt{color:var(--mut)}dd{margin:0;overflow-wrap:anywhere}
+.reason{margin-top:8px;padding:8px 10px;background:#fff4e0;border-left:3px solid var(--warn);font-size:14px}
+.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+a{color:inherit}
+.err{color:var(--bad);margin-top:10px;min-height:1.2em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="mono">DINGAY Registration Office · Staff only</div>
+  <h1>ORDERS</h1>
+  <form class="login" id="login">
+    <input id="pw" type="password" placeholder="Admin password" autocomplete="current-password">
+    <button class="btn" type="submit">OPEN</button>
+  </form>
+  <div class="err" id="err"></div>
+  <div id="app" hidden>
+    <div class="row"><span class="mono" id="count"></span><button class="btn ghost" id="refresh">REFRESH</button></div>
+    <div class="tabs" id="tabs"></div>
+    <div id="list"></div>
+  </div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let pw='';try{pw=sessionStorage.getItem('dg-admin')||''}catch(e){}
+let orders=[],tab='review';
+const TABS=[['review','Needs review'],['paid','Paid'],['awaiting','Awaiting payment'],['rejected','Rejected'],['all','All']];
+async function api(method,body){
+  const r=await fetch('/api/admin',{method,headers:{'x-admin-password':pw,'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+  const j=await r.json().catch(()=>({error:'Bad response'}));if(!r.ok)throw new Error(j.error||r.status);return j;
+}
+async function load(){
+  $('#err').textContent='';
+  try{const j=await api('GET');orders=j.orders;try{sessionStorage.setItem('dg-admin',pw)}catch(e){}$('#login').hidden=true;$('#app').hidden=false;render();}
+  catch(e){$('#err').textContent=e.message;$('#login').hidden=false;$('#app').hidden=true;}
+}
+function when(ms){return ms?new Date(ms).toLocaleString('en-GB',{timeZone:'Africa/Addis_Ababa',dateStyle:'medium',timeStyle:'short'}):'—'}
+function render(){
+  const n=k=>k==='all'?orders.length:orders.filter(o=>o.status===k).length;
+  $('#tabs').innerHTML=TABS.map(([k,l])=>`<button data-t="${k}" aria-pressed="${k===tab}">${l} (${n(k)})</button>`).join('');
+  $('#count').textContent=orders.length+' latest orders';
+  const list=orders.filter(o=>tab==='all'||o.status===tab);
+  $('#list').innerHTML=list.length?list.map(o=>`
+    <div class="card">
+      <div class="row"><span class="big">${esc(o.id)}</span><span class="pill s-${esc(o.status)}">${esc(o.status.toUpperCase())}</span></div>
+      <dl>
+        <dt>Stone</dt><dd>${esc(o.name)} · ${esc(o.price)} Birr</dd>
+        <dt>For</dt><dd>${esc(o.to)} (from ${esc(o.by)})</dd>
+        <dt>Ordered</dt><dd>${when(o.createdAt)}</dd>
+        <dt>Transaction</dt><dd>${o.txn?`<a href="https://transactioninfo.ethiotelecom.et/receipt/${encodeURIComponent(o.txn)}" target="_blank" rel="noopener noreferrer">${esc(o.txn)} ↗</a>`:'—'}</dd>
+        ${o.payer?`<dt>Paid by</dt><dd>${esc(o.payer)}</dd>`:''}
+        ${o.paidAmount!=null?`<dt>Amount</dt><dd>${esc(o.paidAmount)} Birr · ${when(o.paidAt)}</dd>`:''}
+        ${o.approvedBy?`<dt>Approved</dt><dd>${esc(o.approvedBy)} · ${when(o.approvedAt)}</dd>`:''}
+      </dl>
+      ${o.reason&&o.status==='review'?`<div class="reason">${esc(o.reason)}</div>`:''}
+      ${o.status==='review'||o.status==='awaiting'||o.status==='rejected'?`<div class="actions">
+        <button class="btn" data-a="approve" data-id="${esc(o.id)}">APPROVE</button>
+        ${o.status!=='rejected'?`<button class="btn bad" data-a="reject" data-id="${esc(o.id)}">REJECT</button>`:''}
+      </div>`:''}
+    </div>`).join(''):'<p class="mono" style="margin-top:20px">Nothing here.</p>';
+}
+$('#login').onsubmit=e=>{e.preventDefault();pw=$('#pw').value;load();};
+$('#refresh').onclick=load;
+$('#tabs').onclick=e=>{const t=e.target.closest('[data-t]');if(t){tab=t.dataset.t;render();}};
+$('#list').onclick=async e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;const id=b.dataset.id,a=b.dataset.a;
+  let note=null;
+  if(a==='approve'&&!confirm(`Approve ${id}? The customer can then download the certificate.`))return;
+  if(a==='reject'){note=prompt(`Reject ${id}. Message shown to the customer (optional):`,'We could not confirm this payment. Please contact us.');if(note===null)return;}
+  b.disabled=true;
+  try{const j=await api('POST',{id,action:a,note});orders=orders.map(o=>o.id===id?j.order:o);render();}catch(err){alert(err.message);b.disabled=false;}
+};
+if(pw)load();
+setInterval(()=>{if(!$('#app').hidden)load()},60000);
+</script>
+</body>
+</html>

@@ -364,7 +364,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <main style="background:#e6ecef;color:#0b1720;padding-top:76px;min-height:100vh;min-height:100dvh">
   <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:32px 64px;padding:0 clamp(20px,5vw,56px) 140px">
     <div>
-      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73;padding-top:12px">Form DG/R-1 · {{ pendingNo }} · Pending</div>
+      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73;padding-top:12px">Form DG/R-1 · New registration</div>
       <h1 style="margin:12px 0 0;font-size:clamp(40px,9vw,96px);line-height:.9;letter-spacing:-.045em;font-weight:600">REGISTER YOUR DINGAY</h1>
       <div style="margin-top:22px;display:grid;grid-template-columns:72px 1fr auto;gap:14px;align-items:center;padding:12px;background:#f3f5f6;border:1px solid rgba(11,23,32,.14)">
         <div><dc-import name="Stone" kind="{{ prod.kind }}" spin="{{ spinRate }}" hint-size="72px,72px"></dc-import></div>
@@ -415,53 +415,84 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
             <span>I understand this is a symbolic digital registration.</span>
           </label>
         </div>
-        <button onClick="{{ submitReg }}" disabled="{{ regBlocked }}" style="display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer;opacity:{{ regOpacity }};transition:opacity .2s">REGISTER NOW<span>{{ prod.priceLabel }}</span></button>
-        <div style="font-size:13px;color:#435f73;margin-top:-16px">{{ regHint }}</div>
+        <button onClick="{{ submitReg }}" disabled="{{ regBlocked }}" style="display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer;opacity:{{ regOpacity }};transition:opacity .2s">{{ regBtn }}<span>{{ prod.priceLabel }}</span></button>
+        <div role="status" style="font-size:13px;color:{{ regHintColor }};margin-top:-16px">{{ regHint }}</div>
       </div>
     </div>
-    <div style="order:{{ previewOrder }};position:{{ stickyPos }};top:84px;align-self:start;padding-top:{{ previewPad }}">
-      <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73;margin-bottom:10px"><span>Live certificate preview</span><span>Updates as you type</span></div>
-      <div style="max-width:{{ previewMax }};margin:0 auto"><dc-import name="Certificate" reg="{{ previewReg }}" pending="{{ true }}" hint-size="100%,520px"></dc-import></div>
+    <div style="position:{{ stickyPos }};top:84px;align-self:start;padding-top:{{ previewPad }}">
+      <div style="position:relative;overflow:hidden;background:#0b1720;color:#e6ecef;padding:22px 20px 20px;border:1px solid rgba(11,23,32,.2)">
+        <div aria-hidden="true" style="position:absolute;right:-40px;top:-40px;width:180px;height:180px;border:1px dashed rgba(230,236,239,.25);border-radius:50%"></div>
+        <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9fb6c6">Certificate · Sealed until payment</div>
+        <p style="margin:12px 0 0;font-size:clamp(22px,3vw,30px);line-height:1.1;letter-spacing:-.02em;font-weight:600;max-width:18ch">Your certificate is issued once your telebirr payment is confirmed.</p>
+        <ul style="list-style:none;margin:18px 0 0;padding:0;border-top:1px solid rgba(230,236,239,.18)">
+          <sc-for list="{{ receive }}" as="r" hint-placeholder-count="5"><li style="display:grid;grid-template-columns:28px 1fr;gap:8px;padding:10px 0;border-bottom:1px solid rgba(230,236,239,.18);font-size:15px"><span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9fb6c6;padding-top:3px">{{ r.n }}</span><span><strong style="font-weight:600">{{ r.k }}</strong><span style="display:block;color:#b9c9d4;font-size:14px;margin-top:2px">{{ r.v }}</span></span></li></sc-for>
+        </ul>
+        <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9fb6c6"><span>Pay with telebirr</span><span style="color:#e6ecef;font-size:14px">{{ prod.priceLabel }}</span></div>
+      </div>
     </div>
   </div>
 </main>
 </sc-if>
 
-<!-- ============ CHECKOUT ============ -->
-<sc-if value="{{ isCheckout }}">
+<!-- ============ PAY ============ -->
+<sc-if value="{{ isPay }}">
 <main style="background:#e6ecef;color:#0b1720;padding:84px clamp(20px,5vw,56px) 80px;min-height:100vh;min-height:100dvh">
   <div style="max-width:640px;margin:0 auto;animation:dg-rise .6s cubic-bezier(.2,.8,.2,1)">
-    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Confirmation · {{ pendingNo }}</div>
-    <h1 style="margin:12px 0 0;font-size:clamp(44px,11vw,104px);line-height:.9;letter-spacing:-.045em;font-weight:600">ONE LAST THING.</h1>
-    <div style="margin-top:32px;display:grid;grid-template-columns:1fr 110px;gap:16px;align-items:center">
-      <div>
-        <div style="font-size:17px;color:#2c4556">You're about to register:</div>
-        <div style="font-size:clamp(28px,6vw,44px);font-weight:600;letter-spacing:-.03em;line-height:1;margin-top:6px">{{ prod.name }}</div>
-        <div style="font-size:17px;color:#2c4556;margin-top:10px">for</div>
-        <div style="font-size:clamp(28px,6vw,44px);font-weight:600;letter-spacing:-.03em;line-height:1;margin-top:6px;overflow-wrap:anywhere">{{ draft.to }}</div>
+    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Order {{ po.id }} · {{ po.statusLabel }}</div>
+    <sc-if value="{{ po.loading }}"><h1 style="margin:12px 0 0;font-size:clamp(40px,10vw,96px);line-height:.9;letter-spacing:-.045em;font-weight:600;opacity:.4">LOADING…</h1></sc-if>
+    <sc-if value="{{ po.missing }}">
+      <h1 style="margin:12px 0 0;font-size:clamp(40px,10vw,96px);line-height:.9;letter-spacing:-.045em;font-weight:600">ORDER NOT FOUND.</h1>
+      <p style="margin:16px 0 0;font-size:17px;color:#2c4556">{{ po.error }} Check that you opened the full order link.</p>
+    </sc-if>
+    <sc-if value="{{ po.ready }}">
+      <h1 style="margin:12px 0 0;font-size:clamp(44px,11vw,104px);line-height:.9;letter-spacing:-.045em;font-weight:600">PAY WITH TELEBIRR.</h1>
+      <div style="margin-top:28px;display:grid;grid-template-columns:1fr 96px;gap:16px;align-items:center">
+        <div>
+          <div style="font-size:clamp(26px,6vw,40px);font-weight:600;letter-spacing:-.03em;line-height:1">{{ po.name }}</div>
+          <div style="font-size:17px;color:#2c4556;margin-top:8px">for <strong style="color:#0b1720">{{ po.to }}</strong> · from {{ po.by }}</div>
+        </div>
+        <div><dc-import name="Stone" kind="{{ po.kind }}" spin="{{ spinRate }}" hint-size="96px,96px"></dc-import></div>
       </div>
-      <div><dc-import name="Stone" kind="{{ prod.kind }}" spin="{{ spinRate }}" hint-size="110px,110px"></dc-import></div>
-    </div>
-    <dl style="margin:32px 0 0;border-top:1px solid rgba(11,23,32,.2)">
-      <div style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(11,23,32,.2);font-size:16px"><dt>Dingay registration</dt><dd style="margin:0">{{ prod.priceLabel }}</dd></div>
-      <div style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(11,23,32,.2);font-size:16px;color:#435f73"><dt>Physical delivery</dt><dd style="margin:0">Not applicable</dd></div>
-      <div style="display:flex;justify-content:space-between;padding:16px 0;border-bottom:1.5px solid #0b1720;font-size:22px;font-weight:600"><dt>Total</dt><dd style="margin:0">{{ prod.priceLabel }}</dd></div>
-    </dl>
-    <h2 data-reveal="text" style="margin:36px 0 0;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Delivery</h2>
-    <p style="margin:8px 0 0;font-size:16px;line-height:1.45">Your certificate will be generated digitally after successful registration. You'll receive:</p>
-    <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div style="padding:14px;background:#f3f5f6;border:1px solid rgba(11,23,32,.14);font-size:12px;font-weight:600;letter-spacing:.08em">DOWNLOADABLE CERTIFICATE</div>
-      <div style="padding:14px;background:#f3f5f6;border:1px solid rgba(11,23,32,.14);font-size:12px;font-weight:600;letter-spacing:.08em">SHAREABLE REGISTRY LINK</div>
-    </div>
-    <div style="margin-top:10px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#435f73">No physical delivery.</div>
-    <h2 data-reveal="text" style="margin:36px 0 0;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Payment method</h2>
-    <div role="radiogroup" style="margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-      <sc-for list="{{ payOpts }}" as="p" hint-placeholder-count="3">
-        <button role="radio" aria-checked="{{ p.sel }}" onClick="{{ p.pick }}" style="min-height:52px;border:1px solid #0b1720;background:{{ p.bg }};color:{{ p.fg }};font-size:14px;font-weight:500;cursor:pointer">{{ p.label }}</button>
-      </sc-for>
-    </div>
-    <button onClick="{{ complete }}" style="margin-top:28px;display:flex;align-items:center;justify-content:space-between;width:100%;height:60px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">COMPLETE REGISTRATION<span>→</span></button>
-    <button onClick="{{ backToRegister }}" style="margin-top:8px;background:none;border:0;min-height:44px;padding:0;font-size:14px;text-decoration:underline;cursor:pointer;color:#0b1720">Edit registration</button>
+      <div style="margin-top:22px;display:flex;justify-content:space-between;padding:16px 0;border-top:1px solid rgba(11,23,32,.2);border-bottom:1.5px solid #0b1720;font-size:22px;font-weight:600"><span>Total</span><span>{{ po.price }} Birr</span></div>
+
+      <sc-if value="{{ po.canPay }}">
+        <sc-if value="{{ po.note }}"><div role="alert" style="margin-top:20px;padding:14px 16px;background:#fbe9e7;border-left:3px solid #b3261e;font-size:15px;line-height:1.4">{{ po.note }}</div></sc-if>
+        <section style="margin-top:32px">
+          <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Step 01 — Send the money</div>
+          <p style="margin:8px 0 0;font-size:17px;line-height:1.4">Send exactly <strong>{{ po.price }} Birr</strong> with telebirr to:</p>
+          <div style="margin-top:12px;background:#0b1720;color:#e6ecef;padding:18px 16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+              <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9fb6c6">telebirr number</div><div style="margin-top:4px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:clamp(24px,6.4vw,34px);font-weight:500;letter-spacing:.02em">{{ po.phoneFmt }}</div></div>
+              <button onClick="{{ copyPhone }}" style="flex:none;min-height:44px;padding:0 14px;background:#e6ecef;color:#0b1720;border:0;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer">COPY</button>
+            </div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(230,236,239,.18);display:flex;justify-content:space-between;gap:12px;font-size:15px"><span style="color:#b9c9d4">Name shown in telebirr</span><strong style="font-weight:600;text-align:right">{{ po.payName }}</strong></div>
+          </div>
+        </section>
+        <section style="margin-top:28px">
+          <label for="dg-txn" style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73;display:block">Step 02 — Enter your transaction number</label>
+          <p style="margin:8px 0 0;font-size:15px;line-height:1.45;color:#2c4556">After paying, telebirr sends you an SMS with a transaction number — 10 letters and numbers, like <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;color:#0b1720">DIU6AMQUGM</span>.</p>
+          <form onSubmit="{{ verifyPay }}" style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+            <input id="dg-txn" value="{{ po.txnInput }}" onChange="{{ setTxn }}" placeholder="e.g. DIU6AMQUGM" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" maxlength="14" style="display:block;width:100%;height:60px;background:#f3f5f6;border:1px solid rgba(11,23,32,.3);padding:0 16px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:22px;letter-spacing:.06em;text-transform:uppercase;outline:none;border-radius:0">
+            <button type="submit" style="display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">CONFIRM PAYMENT<span>→</span></button>
+            <div role="alert" style="min-height:1.3em;font-size:15px;line-height:1.4;color:#b3261e">{{ po.error }}</div>
+          </form>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ po.inReview }}">
+        <div role="status" style="margin-top:28px;padding:18px 16px;background:#f3f5f6;border:1px solid rgba(11,23,32,.16)">
+          <div style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span style="width:8px;height:8px;border-radius:50%;background:#b7791f;animation:dg-pulse 2s infinite"></span>Being confirmed</div>
+          <p style="margin:10px 0 0;font-size:clamp(20px,3vw,26px);line-height:1.2;letter-spacing:-.015em;font-weight:600">We’re confirming your payment by hand.</p>
+          <p style="margin:8px 0 0;font-size:15px;line-height:1.45;color:#2c4556">Transaction <span style="font-family:'IBM Plex Mono',ui-monospace,monospace">{{ po.txn }}</span> is with the registry office. This page unlocks by itself once it’s confirmed — you can close it and come back with the link below.</p>
+        </div>
+      </sc-if>
+
+      <div style="margin-top:28px;padding:14px 16px;border:1px dashed rgba(11,23,32,.35);display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div style="min-width:0"><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Your private order link</div><div style="margin-top:4px;font-size:14px;color:#2c4556">Keep it to come back to this order.</div></div>
+        <button onClick="{{ copyOrderLink }}" style="flex:none;min-height:44px;padding:0 14px;background:transparent;color:#0b1720;border:1px solid #0b1720;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer">COPY LINK</button>
+      </div>
+      <div style="margin-top:14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73;line-height:1.6">Digital registration. No physical stone included. Questions? <a href="tel:+251929415467">+251 929 415 467</a></div>
+    </sc-if>
   </div>
 </main>
 </sc-if>
@@ -553,6 +584,12 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
     <div style="flex:1;min-width:0;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2c4556">dingay.com/registry/{{ rec.no }}</div>
     <button onClick="{{ rec.share }}" style="height:48px;padding:0 18px;background:#0b1720;color:#e6ecef;border:0;font-size:11px;font-weight:600;letter-spacing:.1em;cursor:pointer;flex:none">SEND TO THEM</button>
   </div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isLoadingRec }}">
+<main style="background:#e6ecef;color:#0b1720;padding:84px clamp(20px,5vw,56px) 140px;min-height:100vh;min-height:100dvh">
+  <div style="max-width:1300px;margin:0 auto"><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">DINGAY Registration Office · Searching records</div><h1 style="margin:12px 0 0;font-size:clamp(40px,9.6vw,120px);line-height:.9;letter-spacing:-.045em;font-weight:600;opacity:.35">{{ lookupBusy }}</h1></div>
 </main>
 </sc-if>
 
@@ -815,7 +852,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <!-- PROCESSING -->
 <sc-if value="{{ processing }}">
   <div role="status" aria-live="polite" style="position:fixed;inset:0;z-index:90;background:linear-gradient(180deg,#132531 0%,#0a141b 60%,#000 100%);color:#eef2f4;display:flex;flex-direction:column;justify-content:center;padding:0 clamp(24px,8vw,120px);animation:dg-fade .3s ease">
-    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#a9bccb">Processing registration · {{ pendingNo }}</div>
+    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#a9bccb">Verifying payment · {{ procNo }}</div>
     <ol style="list-style:none;margin:24px 0 0;padding:0;display:flex;flex-direction:column;gap:14px">
       <sc-for list="{{ procSteps }}" as="s" hint-placeholder-count="4">
         <li style="display:flex;align-items:center;gap:14px;font-size:clamp(20px,4.4vw,40px);font-weight:600;letter-spacing:-.02em;opacity:{{ s.op }};transition:opacity .35s"><span style="width:12px;height:12px;border-radius:50%;border:1.5px solid #eef2f4;background:{{ s.dot }};flex:none"></span>{{ s.label }}</li>
@@ -900,9 +937,9 @@ const RVT=['DG-004281','SPECIMEN','REGISTERED','ACTIVE','F-01','L-04','SYMBOLIC'
 class Component extends DCLogic {
   heroStoneRef=React.createRef();bridgeRef=React.createRef();starRef=React.createRef();macroRef=React.createRef();bridgeTitleRef=React.createRef();capARef=React.createRef();capBRef=React.createRef();capPRef=React.createRef();carRef=React.createRef();progRef=React.createRef();zoomRef=React.createRef();parRef=React.createRef();bridgeEndRef=React.createRef();bridgeShadeRef=React.createRef();zoomDepthRef=React.createRef();zTxt=[0,1,2,3].map(()=>React.createRef());
   rv=RVT.map((t,i)=>({t,x:Math.random()*90,y:Math.random()*92,dx:(Math.random()-.5)*1400,dy:(Math.random()-.5)*1400,r:(Math.random()-.5)*180}));
-  state={route:this.parse(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false},regs:this.load(),menu:false,sheet:false,toast:'',faqOpen:0,pay:'Telebirr',proc:-1,cycleNo:'',stamped:false,archived:false,rvs:0,certOpen:false,carIndex:1,msgPick:-1,lookup:'',lastNo:'',pendingNo:this.newNo(),wide:typeof window!=='undefined'&&window.innerWidth>=900,contact:{name:'',reach:'',need:'Website',msg:''},sent:false};
+  state={pay:{id:'',key:'',loading:false,order:null,error:'',txn:''},busy:false,regErr:'',lookupBusy:'',serverRecent:[],route:this.parse(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false},regs:this.load(),menu:false,sheet:false,toast:'',faqOpen:0,proc:-1,cycleNo:'',stamped:false,archived:false,rvs:0,certOpen:false,carIndex:1,msgPick:-1,lookup:'',lastNo:'',pendingNo:this.newNo(),wide:typeof window!=='undefined'&&window.innerWidth>=900,contact:{name:'',reach:'',need:'Website',msg:''},sent:false};
 
-  parse(){const h=(location.hash||'').replace(/^#\/?/,'').replace(/\/$/,'');const p=h.split('/');return{path:h,a:p[0]||'',b:decodeURIComponent(p[1]||'')};}
+  parse(){const h=(location.hash||'').replace(/^#\/?/,'').replace(/\/$/,'');const p=h.split('/');return{path:h,a:p[0]||'',b:decodeURIComponent(p[1]||''),c:decodeURIComponent(p[2]||'')};}
   load(){try{return{...SEED,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return{...SEED}}}
   save(regs){try{const o={...regs};delete o['DG-004281'];localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
   newNo(){return'DG-'+String(4300+Math.floor(Math.random()*95000)).padStart(6,'0');}
@@ -923,15 +960,19 @@ class Component extends DCLogic {
     this.onScrollH=()=>{if(!this.tk){this.tk=true;requestAnimationFrame(()=>{this.tk=false;this.scrollFx();});}};window.addEventListener('scroll',this.onScrollH,{passive:true});
     this.onRoute(true);
   }
-  componentWillUnmount(){window.removeEventListener('hashchange',this.onHash);window.removeEventListener('resize',this.onResize);window.removeEventListener('scroll',this.onScrollH);clearInterval(this.cyc);(this.tm||[]).forEach(clearTimeout);}
+  componentWillUnmount(){clearInterval(this.poll);window.removeEventListener('hashchange',this.onHash);window.removeEventListener('resize',this.onResize);window.removeEventListener('scroll',this.onScrollH);clearInterval(this.cyc);(this.tm||[]).forEach(clearTimeout);}
   later(fn,ms){(this.tm=this.tm||[]).push(setTimeout(fn,ms));}
   onRoute(first){
     const route=this.parse();const s={route,menu:false,sheet:false,certOpen:false};
     if(route.a==='register'){const pr=P.find(p=>p.slug===route.b);if(pr&&this.state.draft.slug!==pr.slug)s.draft={...this.state.draft,slug:pr.slug};}
-    if(route.a==='checkout'&&!(this.state.draft.slug&&this.state.draft.to)){location.hash='/friend';return;}
+    if(route.a==='checkout'){location.hash='/friend';return;}
+    clearInterval(this.poll);
+    if(route.a==='pay'){s.pay={id:route.b.toUpperCase(),key:route.c,loading:true,order:null,error:'',txn:''};}
+    if(route.a==='registry'&&route.b){const no=route.b.toUpperCase();if(!this.state.regs[no])this.fetchRec(no);}
+    if(route.a==='registry'&&!route.b)this.api('registry').then(j=>this.setState({serverRecent:j.recent||[]}),()=>{});
     if(route.a==='success'&&!this.state.lastNo){location.hash='/registry/DG-004281';return;}
     if(route.a==='contact')s.sent=false;
-    this.setState(s,()=>{if(!first)window.scrollTo(0,0);if(route.a==='success')this.runSuccess();this.scrollFx();this.coverflow();this.armReveals();});
+    this.setState(s,()=>{if(!first)window.scrollTo(0,0);if(route.a==='success')this.runSuccess();if(route.a==='pay')this.loadPay();this.scrollFx();this.coverflow();this.armReveals();});
   }
   runSuccess(){
     clearInterval(this.cyc);const fin=this.state.lastNo;const t0=Date.now();
@@ -962,13 +1003,31 @@ class Component extends DCLogic {
   }
   toastMsg(t){clearTimeout(this.tt);this.setState({toast:t});this.tt=setTimeout(()=>this.setState({toast:''}),2600);}
   upd(k,v){this.setState(s=>({draft:{...s.draft,[k]:v}}));}
-  complete=()=>{
-    this.setState({proc:0});[1,2,3,4].forEach(i=>this.later(()=>this.setState({proc:i}),i*620));
-    this.later(()=>{const d=this.state.draft,pr=P.find(p=>p.slug===d.slug);const no=this.state.pendingNo;
-      const reg={no,to:d.to.trim(),by:d.by.trim(),type:pr.name,occasion:d.occasion||'—',message:d.message.trim(),date:fmt(new Date()),kind:pr.kind,ts:Date.now(),slug:pr.slug};
-      const regs={...this.state.regs,[no]:reg};this.save(regs);
-      this.setState({regs,lastNo:no,proc:-1,pendingNo:this.newNo(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false}},()=>this.go('success'));},3000);
-  };
+  api(path,opts){return fetch('/api/'+path,opts).then(async r=>{const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Network error — check your connection and try again.');return j;});}
+  post(path,body){return this.api(path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});}
+  fetchRec(no){this.setState({lookupBusy:no});this.api('registry?no='+encodeURIComponent(no)).then(rec=>{this.setState(s=>({regs:{...s.regs,[rec.no]:rec},lookupBusy:''}));},()=>this.setState({lookupBusy:''}));}
+  rememberOrder(id,key){try{const k='dingay.orders.v1';const m=JSON.parse(localStorage.getItem(k)||'{}');m[id]=key;localStorage.setItem(k,JSON.stringify(m));}catch(e){}}
+  createOrder=async()=>{const d=this.state.draft;if(this.state.busy)return;this.setState({busy:true,regErr:''});
+    try{const j=await this.post('order',{slug:d.slug,to:d.to,by:d.by,occasion:d.occasion,message:d.message});this.rememberOrder(j.id,j.key);this.setState({busy:false});this.go('pay/'+j.id+'/'+j.key);}
+    catch(e){this.setState({busy:false,regErr:e.message});}};
+  loadPay(){const p=this.state.pay;if(!p.id||!p.key){this.setState({pay:{...p,loading:false,error:'This link is incomplete.'}});return;}
+    this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{
+      if(this.state.route.a!=='pay')return;if(o.status==='paid'){this.finishPaid(o);return;}
+      this.setState(s=>({pay:{...s.pay,loading:false,order:o,error:''}}));
+      clearInterval(this.poll);if(o.status==='review')this.poll=setInterval(()=>this.refreshPay(),12000);
+    },e=>this.setState(s=>({pay:{...s.pay,loading:false,error:e.message}})));}
+  refreshPay(){const p=this.state.pay;if(this.state.route.a!=='pay'){clearInterval(this.poll);return;}
+    this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{if(o.status==='paid'){clearInterval(this.poll);this.finishPaid(o);}else if(o.status!=='review'){clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,order:o}}));}},()=>{});}
+  finishPaid(o){const reg=o.reg;const regs={...this.state.regs,[reg.no]:reg};this.save(regs);
+    this.setState({regs,lastNo:reg.no,draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false}},()=>this.go('success'));}
+  verifyPay=async e=>{e&&e.preventDefault&&e.preventDefault();const p=this.state.pay;const txn=p.txn.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+    if(txn.length<8){this.setState({pay:{...p,error:'Enter the transaction number from your telebirr SMS.'}});return;}
+    const t0=Date.now();this.setState({proc:0,pay:{...p,error:''}});this.later(()=>{if(this.state.proc===0)this.setState({proc:1});},700);
+    try{const o=await this.post('pay',{id:p.id,key:p.key,txn});await new Promise(r=>setTimeout(r,Math.max(0,1500-(Date.now()-t0))));
+      if(o.status==='paid'){this.setState({proc:3});this.later(()=>{this.setState({proc:-1});this.finishPaid(o);},900);}
+      else{this.setState(s=>({proc:-1,pay:{...s.pay,order:o}}));clearInterval(this.poll);if(o.status==='review')this.poll=setInterval(()=>this.refreshPay(),12000);}}
+    catch(err){this.setState(s=>({proc:-1,pay:{...s.pay,error:err.message}}));}};
+  copy(text,msg){const done=()=>this.toastMsg(msg);if(navigator.clipboard)navigator.clipboard.writeText(text).then(done,()=>this.toastMsg(text));else this.toastMsg(text);}
   startReveal=()=>{this.setState({menu:false,rvs:1});this.later(()=>this.setState({rvs:2}),700);this.later(()=>this.setState({rvs:3}),1500);this.later(()=>{this.go('sideways');},2500);this.later(()=>this.setState({rvs:0}),2800);};
   share(reg){const url=location.href.split('#')[0]+'#/registry/'+reg.no;const text=`${reg.to} has been registered with ${reg.type}. Registration No. ${reg.no}`;
     if(navigator.share){navigator.share({title:'DINGAY® Registry Record',text,url}).catch(()=>{});}
@@ -996,21 +1055,29 @@ class Component extends DCLogic {
     x.textAlign='center';x.font=`500 20px ${M}`;x.fillText('DG REGISTRY',0,-36);x.font=`600 34px ${M}`;x.fillText('REGISTERED',0,12);x.font=`400 18px ${M}`;x.fillText(new Date(reg.ts||Date.now()).toLocaleDateString('en-GB'),0,50);x.restore();
     const a=document.createElement('a');a.download=`DINGAY-${reg.no}.png`;a.href=c.toDataURL('image/png');document.body.appendChild(a);a.click();a.remove();this.toastMsg('Certificate downloaded.');
   }
+  payVals(){const p=this.state.pay,o=p.order;const st=o?o.status:'';
+    const labels={awaiting:'Awaiting payment',review:'Being confirmed',rejected:'Payment not confirmed',paid:'Paid'};
+    const ph=o?o.payTo.phone:'';
+    return{id:p.id||'—',loading:p.loading,missing:!p.loading&&!o,ready:!p.loading&&!!o,error:p.error,txnInput:p.txn,
+      statusLabel:p.loading?'Loading':(labels[st]||'Not found'),canPay:st==='awaiting'||st==='rejected',inReview:st==='review',note:o&&o.note||'',
+      name:o?o.name:'',to:o?o.to:'',by:o?o.by:'',kind:o?o.kind:'cobble',price:o?o.price:'',txn:o&&o.txn||'',payName:o?o.payTo.name:'',
+      phoneFmt:ph.replace(/^(\d{4})(\d{3})(\d{3})$/,'$1 $2 $3')};}
   carBy(d){const el=this.carRef.current;if(!el)return;const c=el.firstElementChild;const w=c?c.getBoundingClientRect().width+12:320;el.scrollBy({left:d*w,behavior:'smooth'});}
 
   renderVals(){
     const st=this.state,{route,draft,wide}=st,a=route.a;
     const motion=this.props.motion??true;const spinRate=motion?4:0;
     const isSW=a==='sideways'||a==='contact';
-    const prodSlug=(a==='dengay'||a==='register')?route.b:(a==='checkout'?draft.slug:'');
+    const prodSlug=(a==='dengay'||a==='register')?route.b:'';
     const pr=P.find(p=>p.slug===prodSlug);
     const isCatalog=a==='friend'||a==='loved-one';
-    const isProduct=a==='dengay'&&!!pr,isRegister=a==='register'&&!!pr,isCheckout=a==='checkout'&&!!pr;
+    const isProduct=a==='dengay'&&!!pr,isRegister=a==='register'&&!!pr,isPay=a==='pay';
     const recReg=a==='registry'&&route.b?st.regs[route.b.toUpperCase()]:null;
-    const known=['','friend','loved-one','checkout','success','faq','terms','registry','sideways','contact'].includes(a)||isProduct||isRegister;
+    const known=['','friend','loved-one','pay','success','faq','terms','registry','sideways','contact'].includes(a)||isProduct||isRegister;
     const isRecord=!!recReg,isRegistryIndex=a==='registry'&&!route.b;
     const isSuccess=a==='success'&&!!st.regs[st.lastNo];
-    const isNotFound=(!known)||(a==='registry'&&route.b&&!recReg)||((a==='dengay'||a==='register')&&!pr);
+    const isLoadingRec=a==='registry'&&!!route.b&&!recReg&&st.lookupBusy===route.b.toUpperCase();
+    const isNotFound=(!known)||(a==='registry'&&route.b&&!recReg&&!isLoadingRec)||((a==='dengay'||a==='register')&&!pr);
     const isSWHome=a==='sideways'&&!route.b,isWebsites=a==='sideways'&&route.b==='websites',isGuerrilla=a==='sideways'&&route.b==='guerrilla',isContact=a==='contact';
     const world=isCatalog?(a==='friend'?'friend':'loved'):(pr?pr.w:'friend');const T=THEME[world];
     const go=p=>()=>this.go(p);
@@ -1022,7 +1089,7 @@ class Component extends DCLogic {
     const today=fmt(new Date());
     const previewReg={no:st.pendingNo,to:draft.to,by:draft.by,type:pr?pr.name:'',occasion:draft.occasion,message:draft.message,date:today,kind:pr?pr.kind:'cobble'};
     const hasDed=!!(draft.to.trim()&&draft.by.trim());
-    const regOk=hasDed&&draft.agree;
+    const regOk=hasDed&&draft.agree&&!st.busy;
     const progress=[['Specimen selected',true],['Dedication recorded',hasDed],['Registry entry prepared',hasDed&&!!draft.message.trim()],['Certificate generated',false]].map(([label,d])=>({label,dot:d?'#0b1720':'transparent',c:d?'#0b1720':'#6f8797'}));
     const regSuggest=MSG[world].map(m=>{const sel=draft.message===m;return{text:`“${m}”`,bg:sel?'#0b1720':'#f3f5f6',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('message',m)};});
     const sreg=st.regs[st.lastNo]||SEED['DG-004281'];
@@ -1032,7 +1099,8 @@ class Component extends DCLogic {
     if(!wide&&!st.menu){if(a===''||isCatalog)showBar=true;if(isProduct){showBar=true;barLabel='BUY THIS STONE';barRight=prod.priceLabel;barAction=prod.register;}}
     const rvs=st.rvs;
     return{
-      isDingay:!isSW,isSW,isHome:a===''&&!isNotFound,isCatalog,isProduct,isRegister,isCheckout,isSuccess,isRecord,isRegistryIndex,isNotFound,isFaq:a==='faq',isTerms:a==='terms',isSWHome,isWebsites,isGuerrilla,isContact,
+      isDingay:!isSW,isSW,isHome:a===''&&!isNotFound,isCatalog,isProduct,isRegister,isPay,isLoadingRec,lookupBusy:st.lookupBusy,po:this.payVals(),setTxn:e=>{const v=e.target.value;this.setState(s=>({pay:{...s.pay,txn:v}}));},verifyPay:this.verifyPay,
+      copyPhone:()=>this.copy((st.pay.order&&st.pay.order.payTo.phone)||'0929415467','Number copied.'),copyOrderLink:()=>this.copy(location.href,'Order link copied.'),isSuccess,isRecord,isRegistryIndex,isNotFound,isFaq:a==='faq',isTerms:a==='terms',isSWHome,isWebsites,isGuerrilla,isContact,
       wide,narrow:!wide,swLabel:wide?'MADE BY SIDEWAYS':'SIDEWAYS',progRef:this.progRef,menu:st.menu,sheet:st.sheet,spinRate,heroKind:this.props.heroStone||'cobble',
       bar1:st.menu?'translateY(3.25px) rotate(45deg)':'none',bar2:st.menu?'translateY(-3.25px) rotate(-45deg)':'none',
       toggleMenu:()=>this.setState(s=>({menu:!s.menu,sheet:false})),openSheet:()=>this.setState({sheet:true,menu:false}),closeSheet:()=>this.setState({sheet:false}),
@@ -1055,16 +1123,14 @@ class Component extends DCLogic {
       msgCount:`${draft.message.length} / 140`,
       occasions:OCC.map(o=>{const sel=draft.occasion===o;return{label:o,sel,bg:sel?'#0b1720':'transparent',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('occasion',sel?'':o)};}),
       generate:()=>{const l=MSG[world].filter(m=>m!==draft.message);this.upd('message',l[Math.floor(Math.random()*l.length)]);},
-      regBlocked:!regOk,regOpacity:regOk?1:.35,regHint:regOk?'Proceeds to confirmation.':(!hasDed?'Add a recipient and your name to continue.':'Please confirm the registration type.'),
-      submitReg:()=>{if(regOk)this.go('checkout');},
-      payOpts:['Telebirr','CBE Birr','Card'].map(l=>{const sel=st.pay===l;return{label:l,sel,bg:sel?'#0b1720':'transparent',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.setState({pay:l})};}),
-      complete:this.complete,backToRegister:go('register/'+draft.slug),
-      processing:st.proc>=0,procSteps:['Specimen selected','Dedication recorded','Registry entry prepared','Certificate generated'].map((label,i)=>({label:label.toUpperCase(),op:st.proc>=i?1:.25,dot:st.proc>i?'#eef2f4':'transparent'})),
+      regBlocked:!regOk,regOpacity:regOk?1:.35,regBtn:st.busy?'CREATING ORDER…':'CONTINUE TO PAYMENT',regHintColor:st.regErr?'#b3261e':'#435f73',regHint:st.regErr||(st.busy?'Reserving your registration number…':(regOk?'Next: pay with telebirr.':(!hasDed?'Add a recipient and your name to continue.':'Please confirm the registration type.'))),
+      submitReg:()=>{if(regOk)this.createOrder();},
+      processing:st.proc>=0,procNo:st.pay.id,procSteps:['Finding your telebirr receipt','Confirming the payment','Registry entry created','Certificate issued'].map((label,i)=>({label:label.toUpperCase(),op:st.proc>=i?1:.25,dot:st.proc>i?'#eef2f4':'transparent'})),
       succ:{...sreg,reg:sreg,download:()=>this.download(sreg),view:go('registry/'+sreg.no),share:()=>this.share(sreg)},cycleNo:st.cycleNo||st.lastNo,stamped:st.stamped,archived:st.archived,
       rec,openCert:()=>this.setState({certOpen:true}),closeCert:()=>this.setState({certOpen:false}),certOpen:st.certOpen,
       lookup:st.lookup,setLookup:e=>this.setState({lookup:e.target.value}),
       doLookup:e=>{e.preventDefault();let v=st.lookup.trim().toUpperCase();if(!v)return;if(/^\d+$/.test(v))v='DG-'+v.padStart(6,'0');this.go('registry/'+v);},
-      recent:Object.values(st.regs).sort((x,y)=>(y.ts||0)-(x.ts||0)).slice(0,8).map(r=>({...r,open:go('registry/'+r.no)})),
+      recent:Object.values({...Object.fromEntries(st.serverRecent.map(r=>[r.no,r])),...st.regs}).sort((x,y)=>(y.ts||0)-(x.ts||0)).slice(0,8).map(r=>({...r,open:go('registry/'+r.no)})),
       missingId:route.b?route.b.toUpperCase():'/'+route.path,
       faq:FAQ.map(([q,ans],i)=>{const open=st.faqOpen===i;return{q,a:ans,open,rot:open?'rotate(45deg)':'none',toggle:()=>this.setState({faqOpen:open?-1:i})};}),
       terms:TERMS.map(([h,p],i)=>({n:String(i+1).padStart(2,'0'),h,p})),
@@ -1075,7 +1141,7 @@ class Component extends DCLogic {
       setCName:e=>{const v=e.target.value;this.setState(s=>({contact:{...s.contact,name:v}}))},setCReach:e=>{const v=e.target.value;this.setState(s=>({contact:{...s.contact,reach:v}}))},setCMsg:e=>{const v=e.target.value;this.setState(s=>({contact:{...s.contact,msg:v}}))},
       needOpts:['Website','Guerrilla marketing','Something unusual'].map(l=>{const sel=st.contact.need===l;return{label:l,sel,bg:sel?'#0d0d0d':'transparent',fg:sel?'#f4f4f1':'#0d0d0d',pick:()=>this.setState(s=>({contact:{...s.contact,need:l}}))};}),
       sendContact:e=>{e.preventDefault();this.setState({sent:true});},
-      showFooter:!isSW&&!isCheckout&&!isRegister,footPad:isRecord?'120px':(showBar?'110px':'40px'),
+      showFooter:!isSW&&!isPay&&!isRegister,footPad:isRecord?'120px':(showBar?'110px':'40px'),
       showBar,barLabel,barRight,barAction,
       revealing:rvs>0,rvLightOp:rvs>=2?1:0,rvWordOp:rvs>=2?1:0,rvWordT:rvs>=3?'rotate(0deg)':'rotate(90deg) scale(.8)',
       rvLabels:this.rv.map(l=>({t:l.t,style:{position:'absolute',left:l.x+'%',top:l.y+'%',fontFamily:"'IBM Plex Mono',ui-monospace,monospace",fontSize:'11px',letterSpacing:'.08em',color:rvs>=2?'#0d0d0d':'#eef2f4',opacity:rvs>=2?0:.8,transform:rvs>=2?`translate(${l.dx}px,${l.dy}px) rotate(${l.r}deg)`:'none',transition:'transform 1s cubic-bezier(.7,0,.2,1),opacity .9s',whiteSpace:'nowrap',animation:'dg-fade .4s ease both'}})),
