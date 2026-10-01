@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     const paidAt = parseEAT(r.date);
     Object.assign(o, { payer: r.payer, paidAmount: r.amount, paidAt });
     const problems = [];
-    if (rc === 'unknown') problems.push('receiver name not configured');
+    if (rc === 'unknown') problems.push(`receiver name on receipt is "${r.receiver}" — check it's your account`);
     if (!(r.amount >= o.price)) problems.push(`paid ${r.amount} Birr, price is ${o.price} Birr`);
     if (!paidAt || paidAt < o.createdAt - 15 * 60e3) problems.push('payment is older than the order');
     if (paidAt && paidAt > Date.now() + 10 * 60e3) problems.push('payment date is in the future');

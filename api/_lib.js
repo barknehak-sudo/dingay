@@ -16,7 +16,7 @@ export const OCCASIONS = ['Birthday', 'Anniversary', 'Graduation', 'Farewell', '
 // Where customers send money (shown on the pay page). Override with Vercel env vars PAY_PHONE / RECEIVER_NAME.
 export const PAY_TO = {
   phone: process.env.PAY_PHONE || '0996567218',
-  name: process.env.RECEIVER_NAME || '',
+  name: process.env.RECEIVER_NAME || 'Din',
 };
 // Accounts a receipt may be credited to: the current number, plus the old one so earlier payments still verify.
 // A receiver with an empty name can't be auto-approved — those payments go to manual review instead.
@@ -109,14 +109,16 @@ export function parseEAT(s) {
   return m ? Date.UTC(+m[3], +m[2] - 1, +m[1], +m[4] - 3, +m[5], +m[6]) : null;
 }
 const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
-// 'ok' = credited to one of our accounts; 'unknown' = right number but we don't know its name yet; 'no' = someone else.
+// 'ok' = credited to one of our accounts (last 4 digits + name match);
+// 'unknown' = last 4 digits match but the name doesn't (or isn't set) — a human decides, never auto-rejected;
+// 'no' = a different account entirely.
 export function receiverCheck(r, receivers = RECEIVERS) {
   const acct = String(r.account).replace(/\D/g, '');
   let verdict = 'no';
   for (const x of receivers) {
     if (!acct.endsWith(x.last4)) continue;
-    if (!x.name) { verdict = 'unknown'; continue; }
-    if (norm(r.receiver).startsWith(norm(x.name).slice(0, 12))) return 'ok';
+    if (x.name && norm(r.receiver).startsWith(norm(x.name).slice(0, 12))) return 'ok';
+    verdict = 'unknown';
   }
   return verdict;
 }

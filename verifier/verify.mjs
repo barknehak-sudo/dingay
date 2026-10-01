@@ -43,7 +43,7 @@ async function check(o, payTo) {
   if (rc === 'no') return { reject: `Transaction ${o.txn} wasn't sent to DINGUY. Send ${o.price} Birr to ${fmtPhone(payTo.phone)}${payTo.name ? ` (${payTo.name})` : ''} and enter the new transaction number.` };
   const paidAt = parseEAT(r.date);
   const problems = [];
-  if (rc === 'unknown') problems.push(`paid to ${r.receiver} (${r.account}) — set this account's name so it can auto-approve`);
+  if (rc === 'unknown') problems.push(`paid to "${r.receiver}" (${r.account}) — right number, unexpected name; check it's your account`);
   if (!/completed/i.test(r.status)) problems.push('not completed');
   if (!(r.amount >= o.price)) problems.push(`paid ${r.amount}, price ${o.price}`);
   if (!paidAt || paidAt < o.createdAt - 15 * 60e3) problems.push('payment older than order');
