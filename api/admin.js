@@ -1,23 +1,39 @@
 // Admin API. Header x-admin-password must match the ADMIN_PASSWORD env var.
 // GET  /api/admin                         → latest orders
 // POST /api/admin {id, action:'approve'|'reject', note?}
+// GET  /api/admin?pending=1               → only orders waiting for review (cheap; used by the verifier)
+// POST /api/admin {id, action:'remove'}   → take a paid record off the public registry
 // POST /api/admin {inquiry:id, action:'done'|'new'}
-import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip } from './_lib.js';
+import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip, RECEIVERS, PAY_TO } from './_lib.js';
+
+const strip = (o) => { delete o.key; return o; };
 
 export default async function handler(req, res) {
   try {
     if (!process.env.ADMIN_PASSWORD) return send(res, 503, { error: 'ADMIN_PASSWORD is not set in Vercel.' });
-    if (await limited('admin:' + ip(req), 60, 600)) return send(res, 429, { error: 'Slow down.' });
-    if (!sameSecret(req.headers['x-admin-password'], process.env.ADMIN_PASSWORD)) return send(res, 401, { error: 'Wrong password.' });
+    // Only wrong passwords count toward the lockout, so the verifier can poll freely.
+    if (!sameSecret(req.headers['x-admin-password'], process.env.ADMIN_PASSWORD)) {
+      if (await limited('adminfail:' + ip(req), 20, 600)) return send(res, 429, { error: 'Too many wrong passwords. Wait 10 minutes.' });
+      return send(res, 401, { error: 'Wrong password.' });
+    }
+
+    if (req.method === 'GET' && req.query.pending) {
+      const ids = await kv('SMEMBERS', 'review');
+      const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
+      const orders = raw.filter(Boolean).map((r) => strip(JSON.parse(r))).filter((o) => o.status === 'review');
+      return send(res, 200, { orders, receivers: RECEIVERS, payTo: PAY_TO });
+    }
 
     if (req.method === 'GET') {
       const ids = await kv('LRANGE', 'orders', 0, 199);
       const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
-      const orders = raw.filter(Boolean).map((r) => { const o = JSON.parse(r); delete o.key; return o; });
+      const orders = raw.filter(Boolean).map((r) => strip(JSON.parse(r)));
+      const inReview = orders.filter((o) => o.status === 'review').map((o) => o.id);
+      if (inReview.length) await kv('SADD', 'review', ...inReview);
       const qids = await kv('LRANGE', 'inquiries', 0, 199);
       const qraw = qids.length ? await kv('MGET', ...qids.map((i) => 'inq:' + i)) : [];
       const inquiries = qraw.filter(Boolean).map((r) => JSON.parse(r));
-      return send(res, 200, { orders, inquiries });
+      return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO });
     }
     if (req.method === 'POST' && (req.body || {}).inquiry) {
       const { inquiry, action } = req.body;
@@ -33,12 +49,18 @@ export default async function handler(req, res) {
       const o = await loadOrder(id);
       if (!o) return send(res, 404, { error: 'Order not found.' });
       if (action === 'approve') {
-        if (o.status !== 'paid') { o.status = 'paid'; o.approvedBy = 'admin'; o.approvedAt = Date.now(); await publish(o); }
+        if (o.status !== 'paid') { o.status = 'paid'; o.approvedBy = req.body.by === 'verifier' ? 'verifier' : 'admin'; o.approvedAt = Date.now(); await publish(o); }
       } else if (action === 'reject') {
         if (o.status === 'paid') return send(res, 400, { error: 'Already paid — cannot reject.' });
-        o.status = 'rejected'; o.customerNote = String(note || '').slice(0, 200) || null;
+        o.status = 'rejected'; o.customerNote = String(note || '').slice(0, 300) || null;
+      } else if (action === 'remove') {
+        if (o.status !== 'paid') return send(res, 400, { error: 'Only paid records are in the public registry.' });
+        await kv('DEL', 'reg:' + o.id);
+        await kv('LREM', 'recent', 0, o.id);
+        o.status = 'removed'; o.removedAt = Date.now();
       } else return send(res, 400, { error: 'Unknown action.' });
       await saveOrder(o);
+      await kv('SREM', 'review', o.id);
       delete o.key;
       return send(res, 200, { order: o });
     }

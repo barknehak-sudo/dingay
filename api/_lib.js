@@ -1,4 +1,4 @@
-// Shared helpers for the DINGAY payment API (Vercel Node functions, no dependencies).
+// Shared helpers for the DINGUY payment API (Vercel Node functions, no dependencies).
 import crypto from 'node:crypto';
 
 export const PRODUCTS = {
@@ -13,12 +13,17 @@ export const PRODUCTS = {
 };
 export const OCCASIONS = ['Birthday', 'Anniversary', 'Graduation', 'Farewell', 'Apology', 'Just because'];
 
-// Where customers send money. Override in Vercel env vars if the account changes.
+// Where customers send money (shown on the pay page). Override with Vercel env vars PAY_PHONE / RECEIVER_NAME.
 export const PAY_TO = {
-  phone: process.env.PAY_PHONE || '0929415467',
-  name: process.env.RECEIVER_NAME || 'Din Mohammed Sherif',
-  last4: process.env.RECEIVER_LAST4 || '5467',
+  phone: process.env.PAY_PHONE || '0996567218',
+  name: process.env.RECEIVER_NAME || '',
 };
+// Accounts a receipt may be credited to: the current number, plus the old one so earlier payments still verify.
+// A receiver with an empty name can't be auto-approved — those payments go to manual review instead.
+export const RECEIVERS = [
+  { name: PAY_TO.name, last4: PAY_TO.phone.slice(-4) },
+  { name: 'Din Mohammed Sherif', last4: '5467' },
+];
 const RECEIPT_URL = 'https://transactioninfo.ethiotelecom.et/receipt/';
 
 /* ---------- Upstash Redis over REST ---------- */
@@ -71,9 +76,9 @@ export async function publish(o) {
 export function publicOrder(o) {
   return {
     id: o.id, status: o.status, price: o.price, name: o.name, kind: o.kind, slug: o.slug, to: o.to, by: o.by,
-    txn: o.txn || null,
+    txn: o.txn || null, submittedAt: o.submittedAt || null,
     note: o.status === 'rejected' ? (o.customerNote || 'We could not confirm this payment.') : null,
-    payTo: { phone: PAY_TO.phone, name: PAY_TO.name },
+    payTo: { phone: PAY_TO.phone, name: PAY_TO.name || null },
     reg: o.status === 'paid' ? recordOf(o) : null,
   };
 }
@@ -104,12 +109,21 @@ export function parseEAT(s) {
   return m ? Date.UTC(+m[3], +m[2] - 1, +m[1], +m[4] - 3, +m[5], +m[6]) : null;
 }
 const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
-export function receiverOk(r) {
-  return norm(r.receiver).startsWith(norm(PAY_TO.name).slice(0, 12)) && String(r.account).replace(/\D/g, '').endsWith(PAY_TO.last4);
+// 'ok' = credited to one of our accounts; 'unknown' = right number but we don't know its name yet; 'no' = someone else.
+export function receiverCheck(r, receivers = RECEIVERS) {
+  const acct = String(r.account).replace(/\D/g, '');
+  let verdict = 'no';
+  for (const x of receivers) {
+    if (!acct.endsWith(x.last4)) continue;
+    if (!x.name) { verdict = 'unknown'; continue; }
+    if (norm(r.receiver).startsWith(norm(x.name).slice(0, 12))) return 'ok';
+  }
+  return verdict;
 }
+export const receiverOk = (r, receivers) => receiverCheck(r, receivers) === 'ok';
 export async function fetchReceipt(txn) {
   const r = await fetch(RECEIPT_URL + encodeURIComponent(txn), {
-    headers: { 'user-agent': 'Mozilla/5.0 (DINGAY registry)' },
+    headers: { 'user-agent': 'Mozilla/5.0 (DINGUY registry)' },
     signal: AbortSignal.timeout(9000),
   });
   if (!r.ok) throw new Error('receipt http ' + r.status);

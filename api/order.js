@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const p = PRODUCTS[b.slug];
     const to = clean(b.to, 28), by = clean(b.by, 28), message = clean(b.message, 140);
     const occasion = OCCASIONS.includes(b.occasion) ? b.occasion : '';
-    if (!p) return send(res, 400, { error: 'Unknown Dingay.' });
+    if (!p) return send(res, 400, { error: 'Unknown Dinguy.' });
     if (!to || !by) return send(res, 400, { error: 'Add a recipient and your name.' });
 
     let id;

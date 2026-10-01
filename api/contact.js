@@ -1,4 +1,4 @@
-// POST /api/contact — SIDEWAYS "start a project" inquiries, read in admin.html.
+// POST /api/contact — SIDEWAYS "start a project" inquiries, read on the /office page.
 import crypto from 'node:crypto';
 import { kv, setJSON, send, ip, limited } from './_lib.js';
 

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>DINGAY Orders</title>
+<title>DINGUY Orders</title>
 <style>
 :root{--bg:#e6ecef;--card:#f3f5f6;--ink:#0b1720;--mut:#435f73;--line:rgba(11,23,32,.16);--ok:#1f8a55;--warn:#b7791f;--bad:#b3261e}
 *{box-sizing:border-box}
@@ -25,7 +25,7 @@ input{height:48px;padding:0 14px;border:1px solid var(--line);background:#fff;bo
 .row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
 .big{font-size:20px;font-weight:600;letter-spacing:-.02em}
 .pill{display:inline-block;padding:3px 8px;font-size:11px;font-weight:700;letter-spacing:.08em;color:#fff}
-.s-paid{background:var(--ok)}.s-review{background:var(--warn)}.s-rejected{background:var(--bad)}.s-awaiting{background:#6f8797}
+.s-paid{background:var(--ok)}.s-removed{background:#444}.s-review{background:var(--warn)}.s-rejected{background:var(--bad)}.s-awaiting{background:#6f8797}
 dl{display:grid;grid-template-columns:120px 1fr;gap:4px 10px;margin:10px 0 0;font-size:14px}
 dt{color:var(--mut)}dd{margin:0;overflow-wrap:anywhere}
 .reason{margin-top:8px;padding:8px 10px;background:#fff4e0;border-left:3px solid var(--warn);font-size:14px}
@@ -36,7 +36,7 @@ a{color:inherit}
 </head>
 <body>
 <div class="wrap">
-  <div class="mono">DINGAY Registration Office · Staff only</div>
+  <div class="mono">DINGUY Registration Office · Staff only</div>
   <h1>ORDERS</h1>
   <form class="login" id="login">
     <input id="pw" type="password" placeholder="Admin password" autocomplete="current-password">
@@ -54,7 +54,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let pw='';try{pw=sessionStorage.getItem('dg-admin')||''}catch(e){}
 let orders=[],inquiries=[],tab='review';
-const TABS=[['review','Needs review'],['paid','Paid'],['awaiting','Awaiting payment'],['rejected','Rejected'],['all','All orders'],['inq','SIDEWAYS inquiries']];
+const TABS=[['review','Needs review'],['paid','Paid'],['awaiting','Awaiting payment'],['rejected','Rejected'],['removed','Removed'],['all','All orders'],['inq','SIDEWAYS inquiries']];
 async function api(method,body){
   const r=await fetch('/api/admin',{method,headers:{'x-admin-password':pw,'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
   const j=await r.json().catch(()=>({error:'Bad response'}));if(!r.ok)throw new Error(j.error||r.status);return j;
@@ -88,6 +88,7 @@ function render(){
         <button class="btn" data-a="approve" data-id="${esc(o.id)}">APPROVE</button>
         ${o.status!=='rejected'?`<button class="btn bad" data-a="reject" data-id="${esc(o.id)}">REJECT</button>`:''}
       </div>`:''}
+      ${o.status==='paid'?`<div class="actions"><button class="btn ghost" data-a="remove" data-id="${esc(o.id)}">REMOVE FROM PUBLIC REGISTRY</button></div>`:''}
     </div>`).join(''):'<p class="mono" style="margin-top:20px">Nothing here.</p>';
 }
 function reachLink(r){const t=String(r||'').trim();if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(t))return `<a href="mailto:${esc(t)}">${esc(t)}</a>`;const d=t.replace(/[^\d+]/g,'');return d.length>=9?`<a href="tel:${esc(d)}">${esc(t)}</a>`:esc(t);}
@@ -112,6 +113,7 @@ $('#list').onclick=async e=>{
   if(qb){qb.disabled=true;try{const j=await api('POST',{inquiry:qb.dataset.q,action:qb.dataset.qa});inquiries=inquiries.map(q=>q.id===j.inquiry.id?j.inquiry:q);render();}catch(err){alert(err.message);qb.disabled=false;}return;}
   const b=e.target.closest('[data-a]');if(!b)return;const id=b.dataset.id,a=b.dataset.a;
   let note=null;
+  if(a==='remove'&&!confirm(`Remove ${id} from the public registry? Its registry page and certificate stop working. This can't be undone.`))return;
   if(a==='approve'&&!confirm(`Approve ${id}? The customer can then download the certificate.`))return;
   if(a==='reject'){note=prompt(`Reject ${id}. Message shown to the customer (optional):`,'We could not confirm this payment. Please contact us.');if(note===null)return;}
   b.disabled=true;

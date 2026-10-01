@@ -54,11 +54,11 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 </helmet>
 <div style="font-family:'Neue Haas Grotesk Display Pro','Neue Haas Grotesk Text Pro','Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif;min-height:100vh;min-height:100dvh;background:linear-gradient(180deg,#132531 0%,#0a141b 60%,#000 100%);color:#eef2f4">
 
-<!-- DINGAY HEADER -->
-<sc-if value="{{ isDingay }}" hint-placeholder-val="{{ true }}">
+<!-- DINGUY HEADER -->
+<sc-if value="{{ isDinguy }}" hint-placeholder-val="{{ true }}">
   <header style="position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:center;padding:10px 10px 0;padding-top:max(10px,env(safe-area-inset-top));pointer-events:none">
     <div style="pointer-events:auto;position:relative;width:100%;max-width:1120px;height:58px;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;align-items:center;gap:6px;padding:0 6px 0 14px;border-radius:999px;background:rgba(19,37,49,.72);backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);border:1px solid rgba(255,255,255,.14);box-shadow:0 18px 40px -18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08);overflow:hidden">
-      <button onClick="{{ goHome }}" aria-label="DINGAY home" style="background:none;border:0;padding:8px 0;cursor:pointer;display:flex;align-items:center"><img src="assets/dingai-logo.svg" alt="DINGAY" style="height:19px;width:auto;display:block;filter:invert(1)"></button>
+      <button onClick="{{ goHome }}" aria-label="DINGUY home" style="background:none;border:0;padding:8px 0;cursor:pointer;display:flex;align-items:center"><img src="assets/dingai-logo.svg" alt="DINGUY" style="height:19px;width:auto;display:block;filter:invert(1)"></button>
       <sc-if value="{{ wide }}">
         <nav style="display:flex;justify-content:center;gap:4px;font-size:11px;font-weight:600;letter-spacing:.1em">
           <button onClick="{{ goFriend }}" style="background:none;border:0;height:44px;padding:0 14px;border-radius:999px;cursor:pointer;color:#eef2f4" style-hover="background:rgba(255,255,255,.1)">FRIEND</button>
@@ -90,7 +90,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
     <div style="pointer-events:auto;width:100%;max-width:1120px;border-radius:26px;background:rgba(11,11,11,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);color:#f4f4f1;padding:6px 6px 6px 16px;box-shadow:0 18px 40px -18px rgba(0,0,0,.6)">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;height:46px">
         <button onClick="{{ goSW }}" style="background:none;border:0;padding:8px 0;cursor:pointer;display:flex;align-items:baseline;gap:6px"><span style="font-size:18px;font-weight:800;letter-spacing:-.03em;background:linear-gradient(90deg,#ff5f6d,#ffc371,#47e5bc,#5f8bff,#c86bff,#ff5f6d);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:dg-shift 8s linear infinite">SIDEWAYS</span><span style="display:inline-block;transform:rotate(90deg);font-size:13px;color:#f4f4f1">→</span></button>
-        <button onClick="{{ goHome }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:999px;background:#f4f4f1;color:#0b0b0b;border:0;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer">← BACK TO DINGAY</button>
+        <button onClick="{{ goHome }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:999px;background:#f4f4f1;color:#0b0b0b;border:0;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer">← BACK TO DINGUY</button>
       </div>
       <nav class="dg-scroll" style="display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;font-size:11px;font-weight:700;letter-spacing:.1em;margin-top:2px">
         <button onClick="{{ goWebsites }}" style="flex:none;background:rgba(255,255,255,.08);border:0;height:44px;padding:0 14px;border-radius:999px;cursor:pointer;color:#f4f4f1">WEBSITES</button>
@@ -141,7 +141,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
     <div style="position:relative;max-width:1200px">
       <h1 style="margin:0;font-size:clamp(40px,11.4vw,148px);line-height:.9;letter-spacing:-.045em;font-weight:600;text-wrap:balance"><span style="display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em"><span style="display:inline-block;animation:dg-word 1.1s cubic-bezier(.2,.8,.2,1) 0.15s both">EVERYONE</span></span> <span style="display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em"><span style="display:inline-block;animation:dg-word 1.1s cubic-bezier(.2,.8,.2,1) 0.22s both">DESERVES</span></span> <span style="display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em"><span style="display:inline-block;animation:dg-word 1.1s cubic-bezier(.2,.8,.2,1) 0.29s both">A</span></span> <span style="display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em"><span style="display:inline-block;animation:dg-word 1.1s cubic-bezier(.2,.8,.2,1) 0.36s both">STAR.</span></span><br><span style="display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em"><span style="display:inline-block;animation:dg-word 1.1s cubic-bezier(.2,.8,.2,1) 0.43s both;color:#a9bccb">SOME</span></span> <span style="display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em"><span style="display:inline-block;animation:dg-word 1.1s cubic-bezier(.2,.8,.2,1) 0.50s both;color:#a9bccb">PEOPLE</span></span> <span style="display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em"><span style="display:inline-block;animation:dg-word 1.1s cubic-bezier(.2,.8,.2,1) 0.57s both;color:#a9bccb">DESERVE</span></span> <span style="display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em"><span style="display:inline-block;animation:dg-word 1.1s cubic-bezier(.2,.8,.2,1) 0.64s both;color:#a9bccb">A</span></span> <span style="display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em"><span style="display:inline-block;animation:dg-word 1.1s cubic-bezier(.2,.8,.2,1) 0.71s both;color:#a9bccb">STONE.</span></span></h1>
       <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px;margin-top:24px">
-        <p style="margin:0;font-size:clamp(17px,2vw,22px);line-height:1.35;max-width:26ch;color:#d3dee6">Give someone a Dingay registered in their name.</p>
+        <p style="margin:0;font-size:clamp(17px,2vw,22px);line-height:1.35;max-width:26ch;color:#d3dee6">Give someone a Dinguy registered in their name.</p>
         <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px">
           <button onClick="{{ openSheet }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:#eef2f4;color:#0b0b0a;border:0;font-size:13px;font-weight:600;letter-spacing:.1em;cursor:pointer;transition:transform .2s" style-active="transform:scale(.98)">BUY A STONE<span>→</span></button>
           <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#a9bccb">Digital registration. No physical stone included.</span>
@@ -158,7 +158,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <p data-parx="18" style="margin:0;font-size:clamp(26px,min(8.4vw,8vh),104px);font-weight:600;letter-spacing:-.045em;line-height:.95;will-change:transform;">For your friend.</p>
         <p data-parx="-14" style="margin:0;font-size:clamp(26px,min(8.4vw,8vh),104px);font-weight:600;letter-spacing:-.045em;line-height:.95;will-change:transform;align-self:flex-end;text-align:right;">For your favourite person.</p>
         <p data-parx="12" style="margin:0;font-size:clamp(26px,min(8.4vw,8vh),104px);font-weight:600;letter-spacing:-.045em;line-height:.95;will-change:transform;">For someone you love.</p>
-        <p data-parx="-10" style="margin:0;font-size:clamp(26px,min(8.4vw,8vh),104px);font-weight:600;letter-spacing:-.045em;line-height:.95;will-change:transform;align-self:flex-end;text-align:right;max-width:18ch;color:#a9bccb;font-size:clamp(22px,min(5.4vw,5.6vh),68px)">Or for someone who simply has a very Dingay Ras.</p>
+        <p data-parx="-10" style="margin:0;font-size:clamp(26px,min(8.4vw,8vh),104px);font-weight:600;letter-spacing:-.045em;line-height:.95;will-change:transform;align-self:flex-end;text-align:right;max-width:18ch;color:#a9bccb;font-size:clamp(22px,min(5.4vw,5.6vh),68px)">Or for someone who simply has a very Dinguy Ras.</p>
       </div>
     </div>
   </section>
@@ -181,7 +181,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
           <button onClick="{{ openSheet }}" style="display:flex;align-items:center;justify-content:space-between;gap:24px;height:58px;padding:0 22px;min-width:260px;background:#eef2f4;color:#0b1720;border:0;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.1em;cursor:pointer">BUY A STONE<span>→</span></button>
         </div>
         <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#b9c9d4">
-          <div style="display:grid"><span ref="{{ capARef }}" style="grid-area:1/1">Object: Star</span><span ref="{{ capBRef }}" style="grid-area:1/1;opacity:0">Object: Dingay</span></div>
+          <div style="display:grid"><span ref="{{ capARef }}" style="grid-area:1/1">Object: Star</span><span ref="{{ capBRef }}" style="grid-area:1/1;opacity:0">Object: Dinguy</span></div>
           <span ref="{{ capPRef }}">000%</span>
         </div>
       </div>
@@ -206,7 +206,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
   
 
   <section aria-labelledby="choose" style="background:linear-gradient(180deg,#132531 0%,#0a141b 60%,#000 100%)">
-    <div style="padding:28px clamp(20px,5vw,56px) 16px;display:flex;justify-content:space-between;align-items:baseline;color:#a9bccb;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase"><span id="choose">Choose your Dingay</span><span>2 collections · 8 specimens</span></div>
+    <div style="padding:28px clamp(20px,5vw,56px) 16px;display:flex;justify-content:space-between;align-items:baseline;color:#a9bccb;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase"><span id="choose">Choose your Dinguy</span><span>2 collections · 8 specimens</span></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:14px;padding:4px clamp(14px,4vw,56px) clamp(32px,6vw,64px)">
       <button data-reveal="up" onClick="{{ goFriend }}" style="position:relative;display:flex;flex-direction:column;text-align:left;background:#d6d6d2;color:#0b0b0b;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:0 0 22px;cursor:pointer;min-height:560px;overflow:hidden;box-shadow:0 30px 60px -28px rgba(0,0,0,.85),0 0 0 1px rgba(0,0,0,.25);transform:translateZ(0)">
         <div aria-hidden="true" style="width:100%;flex:none">
@@ -222,7 +222,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
             <span style="font-size:16px;line-height:1.35;max-width:22ch;color:#3b3b3b">For the friend who is built differently.</span>
             <span style="background:#0b0b0b;color:#f2c230;padding:6px 10px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:14px;font-weight:500;white-space:nowrap">89 ETB</span>
           </div>
-          <div style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 18px;background:#0b0b0b;color:#f2c230;border-radius:14px;font-size:12px;font-weight:700;letter-spacing:.12em">VIEW FRIEND DINGAYS<span>→</span></div>
+          <div style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 18px;background:#0b0b0b;color:#f2c230;border-radius:14px;font-size:12px;font-weight:700;letter-spacing:.12em">VIEW FRIEND DINGUYS<span>→</span></div>
         </div>
       </button>
       <button data-reveal="up" data-delay="120" onClick="{{ goLoved }}" style="position:relative;display:flex;flex-direction:column;text-align:left;background:radial-gradient(90% 70% at 50% 35%,#435f73 0%,#132531 50%,#000 100%);color:#f4efe9;border:1px solid rgba(207,224,234,.28);border-radius:24px;padding:22px clamp(18px,4vw,48px) 22px;cursor:pointer;min-height:560px;overflow:hidden;box-shadow:0 30px 60px -28px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.12);transform:translateZ(0)">
@@ -234,7 +234,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
           <span style="font-size:16px;line-height:1.35;max-width:26ch;color:#d3dee6">For someone who deserves something a little more beautiful.</span>
           <span style="font-size:20px;font-weight:500;white-space:nowrap">199 ETB</span>
         </div>
-        <div style="position:relative;margin-top:18px;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 22px;background:#f4efe9;color:#132531;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.1em">VIEW LOVED ONE DINGAYS<span>→</span></div>
+        <div style="position:relative;margin-top:18px;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 22px;background:#f4efe9;color:#132531;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.1em">VIEW LOVED ONE DINGUYS<span>→</span></div>
       </button>
     </div>
   </section>
@@ -243,12 +243,12 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
     <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:40px;align-items:start">
       <div>
         <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">The Registration</div>
-        <h2 data-reveal="text" style="margin:12px 0 0;font-size:clamp(34px,7vw,80px);line-height:.94;letter-spacing:-.04em;font-weight:600;text-wrap:balance">Once registered, your Dingay gets its own record.</h2>
+        <h2 data-reveal="text" style="margin:12px 0 0;font-size:clamp(34px,7vw,80px);line-height:.94;letter-spacing:-.04em;font-weight:600;text-wrap:balance">Once registered, your Dinguy gets its own record.</h2>
         <p style="margin:28px 0 0;font-size:18px;line-height:1.45;color:#2c4556;max-width:34ch">Your registration gets its own permanent page. Share the link with them. Or download the certificate and send it directly.</p>
-        <button onClick="{{ goSample }}" style="margin-top:22px;display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 16px;background:#fff;border:1px solid rgba(11,23,32,.2);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;cursor:pointer;color:#0b1720">dingay.com/registry/DG-004281 <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" style="display:block;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M7 17 17 7M8.5 7H17v8.5"></path></svg></button>
+        <button onClick="{{ goSample }}" style="margin-top:22px;display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 16px;background:#fff;border:1px solid rgba(11,23,32,.2);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;cursor:pointer;color:#0b1720">dinguy.xyz/registry/DG-004281 <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" style="display:block;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M7 17 17 7M8.5 7H17v8.5"></path></svg></button>
       </div>
       <div data-reveal="scale" style="background:#f3f5f6;border:1px solid rgba(11,23,32,.16);box-shadow:0 30px 60px -40px rgba(0,0,0,.4)">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(11,23,32,.14);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase"><span>Your Dingay</span><span style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:#3fb27a;animation:dg-pulse 2s infinite"></span>Active</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(11,23,32,.14);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase"><span>Your Dinguy</span><span style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:#3fb27a;animation:dg-pulse 2s infinite"></span>Active</span></div>
         <div style="display:grid;grid-template-columns:1fr 120px;gap:12px;padding:18px">
           <dl style="margin:0;display:grid;gap:12px">
             <sc-for list="{{ sampleRows }}" as="r" hint-placeholder-count="5">
@@ -358,7 +358,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 
       <div style="margin-top:40px;padding:18px;border:1px solid {{ prod.line }}">
         <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase">Before you register</div>
-        <p style="margin:10px 0 0;font-size:14px;line-height:1.5;color:{{ prod.sub }}">DINGAY registrations are symbolic digital registrations. No physical stone is shipped or transferred. The registration does not represent ownership of a physical stone, land, mineral deposit, gemstone, or other tangible property. See our <a href="#/terms">Terms &amp; Conditions</a> for the full details.</p>
+        <p style="margin:10px 0 0;font-size:14px;line-height:1.5;color:{{ prod.sub }}">DINGUY registrations are symbolic digital registrations. No physical stone is shipped or transferred. The registration does not represent ownership of a physical stone, land, mineral deposit, gemstone, or other tangible property. See our <a href="#/terms">Terms &amp; Conditions</a> for the full details.</p>
       </div>
     </div>
   </div>
@@ -371,7 +371,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
   <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:32px 64px;padding:0 clamp(20px,5vw,56px) 140px">
     <div>
       <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73;padding-top:12px">Form DG/R-1 · New registration</div>
-      <h1 style="margin:12px 0 0;font-size:clamp(40px,9vw,96px);line-height:.9;letter-spacing:-.045em;font-weight:600">REGISTER YOUR DINGAY</h1>
+      <h1 style="margin:12px 0 0;font-size:clamp(40px,9vw,96px);line-height:.9;letter-spacing:-.045em;font-weight:600">REGISTER YOUR DINGUY</h1>
       <div style="margin-top:22px;display:grid;grid-template-columns:72px 1fr auto;gap:14px;align-items:center;padding:12px;background:#f3f5f6;border:1px solid rgba(11,23,32,.14)">
         <div><dc-import name="Stone" kind="{{ prod.kind }}" spin="{{ spinRate }}" hint-size="72px,72px"></dc-import></div>
         <div><div style="font-size:19px;font-weight:600;letter-spacing:-.02em">{{ prod.name }}</div><div style="font-size:14px;color:#2c4556;margin-top:2px">{{ prod.sub2 }} · {{ prod.priceLabel }}</div></div>
@@ -415,7 +415,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         </div>
         <div style="padding:16px;border:1px solid rgba(11,23,32,.2)">
           <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase">Before you register</div>
-          <p style="margin:8px 0 0;font-size:14px;line-height:1.5;color:#2c4556">DINGAY registrations are symbolic digital registrations. No physical stone is shipped or transferred. The registration does not represent ownership of a physical stone, land, mineral deposit, gemstone, or other tangible property. See our <a href="#/terms">Terms &amp; Conditions</a>.</p>
+          <p style="margin:8px 0 0;font-size:14px;line-height:1.5;color:#2c4556">DINGUY registrations are symbolic digital registrations. No physical stone is shipped or transferred. The registration does not represent ownership of a physical stone, land, mineral deposit, gemstone, or other tangible property. See our <a href="#/terms">Terms &amp; Conditions</a>.</p>
           <label style="display:flex;gap:12px;align-items:flex-start;margin-top:14px;cursor:pointer;font-size:15px;line-height:1.35">
             <input type="checkbox" checked="{{ draft.agree }}" onChange="{{ toggleAgree }}" style="width:22px;height:22px;margin:0;accent-color:#0b1720;flex:none">
             <span>I understand this is a symbolic digital registration.</span>
@@ -471,14 +471,24 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
               <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9fb6c6">telebirr number</div><div style="margin-top:4px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:clamp(24px,6.4vw,34px);font-weight:500;letter-spacing:.02em">{{ po.phoneFmt }}</div></div>
               <button onClick="{{ copyPhone }}" style="flex:none;min-height:44px;padding:0 14px;background:#e6ecef;color:#0b1720;border:0;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer">COPY</button>
             </div>
-            <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(230,236,239,.18);display:flex;justify-content:space-between;gap:12px;font-size:15px"><span style="color:#b9c9d4">Name shown in telebirr</span><strong style="font-weight:600;text-align:right">{{ po.payName }}</strong></div>
+            <sc-if value="{{ po.hasName }}"><div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(230,236,239,.18);display:flex;justify-content:space-between;gap:12px;font-size:15px"><span style="color:#b9c9d4">Name shown in telebirr</span><strong style="font-weight:600;text-align:right">{{ po.payName }}</strong></div></sc-if>
           </div>
         </section>
         <section style="margin-top:28px">
           <label for="dg-txn" style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73;display:block">Step 02 — Enter your transaction number</label>
-          <p style="margin:8px 0 0;font-size:15px;line-height:1.45;color:#2c4556">After paying, telebirr sends you an SMS with a transaction number — 10 letters and numbers, like <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;color:#0b1720">DIU6AMQUGM</span>.</p>
+          <p style="margin:8px 0 0;font-size:15px;line-height:1.45;color:#2c4556">After paying, telebirr sends you an SMS with a transaction number — 10 letters and numbers, like <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;color:#0b1720">AB12CD34EF</span>.</p>
+          <div aria-hidden="true" style="margin-top:12px;max-width:360px;background:#fff;border:1px solid rgba(11,23,32,.14);border-radius:18px;padding:12px 14px;box-shadow:0 14px 30px -22px rgba(0,0,0,.45)">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#435f73"><span style="width:26px;height:26px;border-radius:50%;background:#0b1720;color:#e6ecef;display:grid;place-items:center;font-size:11px;font-weight:700">t</span><span style="font-weight:600;color:#0b1720">telebirr</span><span style="margin-left:auto">SMS</span></div>
+            <div style="margin-top:10px;background:#eceff1;border-radius:14px 14px 14px 4px;padding:11px 12px;font-size:14px;line-height:1.5;color:#2c4556">
+              <span style="display:block;height:7px;width:88%;border-radius:4px;background:rgba(11,23,32,.14)"></span>
+              <span style="display:block;height:7px;width:66%;margin-top:7px;border-radius:4px;background:rgba(11,23,32,.14)"></span>
+              <span style="display:block;margin-top:9px">transaction number is <span style="background:#ffd84d;color:#0b1720;font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:600;padding:2px 6px;border-radius:4px;box-shadow:0 0 0 2px rgba(255,216,77,.45)">AB12CD34EF</span></span>
+              <span style="display:block;height:7px;width:52%;margin-top:9px;border-radius:4px;background:rgba(11,23,32,.14)"></span>
+            </div>
+            <div style="margin-top:8px;font-size:12px;font-weight:600;color:#0b1720">↑ Copy this code into the box below</div>
+          </div>
           <form onSubmit="{{ verifyPay }}" style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
-            <input id="dg-txn" value="{{ po.txnInput }}" onChange="{{ setTxn }}" placeholder="e.g. DIU6AMQUGM" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" maxlength="14" style="display:block;width:100%;height:60px;background:#f3f5f6;border:1px solid rgba(11,23,32,.3);padding:0 16px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:22px;letter-spacing:.06em;text-transform:uppercase;outline:none;border-radius:0">
+            <input id="dg-txn" value="{{ po.txnInput }}" onChange="{{ setTxn }}" placeholder="e.g. AB12CD34EF" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" maxlength="14" style="display:block;width:100%;height:60px;background:#f3f5f6;border:1px solid rgba(11,23,32,.3);padding:0 16px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:22px;letter-spacing:.06em;text-transform:uppercase;outline:none;border-radius:0">
             <button type="submit" style="display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">CONFIRM PAYMENT<span>→</span></button>
             <div role="alert" style="min-height:1.3em;font-size:15px;line-height:1.4;color:#b3261e">{{ po.error }}</div>
           </form>
@@ -486,10 +496,23 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
       </sc-if>
 
       <sc-if value="{{ po.inReview }}">
-        <div role="status" style="margin-top:28px;padding:18px 16px;background:#f3f5f6;border:1px solid rgba(11,23,32,.16)">
-          <div style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span style="width:8px;height:8px;border-radius:50%;background:#b7791f;animation:dg-pulse 2s infinite"></span>Being confirmed</div>
-          <p style="margin:10px 0 0;font-size:clamp(20px,3vw,26px);line-height:1.2;letter-spacing:-.015em;font-weight:600">We’re confirming your payment by hand.</p>
-          <p style="margin:8px 0 0;font-size:15px;line-height:1.45;color:#2c4556">Transaction <span style="font-family:'IBM Plex Mono',ui-monospace,monospace">{{ po.txn }}</span> is with the registry office. This page unlocks by itself once it’s confirmed — you can close it and come back with the link below.</p>
+        <div role="status" style="margin-top:28px;padding:20px 16px;background:#f3f5f6;border:1px solid rgba(11,23,32,.16)">
+          <sc-if value="{{ po.waiting }}">
+            <div style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span style="width:8px;height:8px;border-radius:50%;background:#1f8a55;animation:dg-pulse 1.4s infinite"></span>Checking your payment</div>
+            <div style="margin-top:10px;display:flex;align-items:baseline;gap:10px"><span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:clamp(56px,16vw,88px);font-weight:500;letter-spacing:-.04em;line-height:1">{{ po.left }}</span><span style="font-size:15px;color:#2c4556">seconds</span></div>
+            <div style="margin-top:14px;height:4px;background:rgba(11,23,32,.12);overflow:hidden"><div style="height:100%;background:#0b1720;transform-origin:0 50%;transform:scaleX({{ po.bar }});transition:transform 1s linear"></div></div>
+            <p style="margin:12px 0 0;font-size:15px;line-height:1.45;color:#2c4556">We’re matching transaction <span style="font-family:'IBM Plex Mono',ui-monospace,monospace">{{ po.txn }}</span> with telebirr. This usually takes under 30 seconds — keep this page open.</p>
+          </sc-if>
+          <sc-if value="{{ po.late }}">
+            <div style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span style="width:8px;height:8px;border-radius:50%;background:#b7791f;animation:dg-pulse 2s infinite"></span>Taking a little longer</div>
+            <p style="margin:10px 0 0;font-size:clamp(20px,3vw,26px);line-height:1.2;letter-spacing:-.015em;font-weight:600">We’ll help you finish it.</p>
+            <p style="margin:8px 0 0;font-size:15px;line-height:1.45;color:#2c4556">Call or text us and mention order <strong style="font-family:'IBM Plex Mono',ui-monospace,monospace;color:#0b1720">{{ po.id }}</strong>. We’ll confirm your payment and unlock your certificate. This page also unlocks by itself the moment it’s confirmed.</p>
+            <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <a href="tel:+251996567218" style="display:flex;align-items:center;justify-content:center;min-height:52px;background:#0b1720;color:#e6ecef;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.1em">CALL 0996 567 218</a>
+              <a href="{{ po.smsHref }}" style="display:flex;align-items:center;justify-content:center;min-height:52px;border:1px solid #0b1720;color:#0b1720;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.1em">SEND SMS</a>
+            </div>
+            <p style="margin:10px 0 0;font-size:13px;color:#435f73">Transaction <span style="font-family:'IBM Plex Mono',ui-monospace,monospace">{{ po.txn }}</span></p>
+          </sc-if>
         </div>
       </sc-if>
 
@@ -497,7 +520,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <div style="min-width:0"><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Your private order link</div><div style="margin-top:4px;font-size:14px;color:#2c4556">Keep it to come back to this order.</div></div>
         <button onClick="{{ copyOrderLink }}" style="flex:none;min-height:44px;padding:0 14px;background:transparent;color:#0b1720;border:1px solid #0b1720;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer">COPY LINK</button>
       </div>
-      <div style="margin-top:14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73;line-height:1.6">Digital registration. No physical stone included. Questions? <a href="tel:+251929415467">+251 929 415 467</a></div>
+      <div style="margin-top:14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73;line-height:1.6">Digital registration. No physical stone included. Questions? <a href="tel:+251996567218">+251 996 567 218</a></div>
     </sc-if>
   </div>
 </main>
@@ -520,9 +543,10 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
       </div>
       <p style="margin:18px 0 0;font-size:17px">Your certificate is ready.</p>
       <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;max-width:420px">
-        <button onClick="{{ succ.download }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:#eef2f4;color:#0b0b0a;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">DOWNLOAD CERTIFICATE<span>↓</span></button>
+        <button onClick="{{ succ.download }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:#eef2f4;color:#0b0b0a;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">SAVE CERTIFICATE<span>↓</span></button>
         <button onClick="{{ succ.view }}" style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 20px;background:transparent;color:#eef2f4;border:1px solid rgba(238,242,244,.35);font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">VIEW REGISTRY PAGE<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" style="display:block;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M7 17 17 7M8.5 7H17v8.5"></path></svg></button>
         <button onClick="{{ succ.share }}" style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 20px;background:transparent;color:#eef2f4;border:1px solid rgba(238,242,244,.35);font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">SHARE WITH THEM<span>→</span></button>
+        <sc-if value="{{ isTouch }}"><div style="font-size:13px;line-height:1.4;color:#a9bccb">Tip: after tapping Save, choose “Save Image” to keep it in your Photos.</div></sc-if>
       </div>
     </div>
     <div style="max-width:520px;width:100%;justify-self:center;animation:dg-rise 1s .2s cubic-bezier(.2,.8,.2,1) both">
@@ -543,7 +567,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <sc-if value="{{ isRecord }}">
 <main style="background:#e6ecef;color:#0b1720;padding:84px clamp(20px,5vw,56px) 140px;min-height:100vh;min-height:100dvh">
   <div style="max-width:1300px;margin:0 auto">
-    <div style="display:flex;justify-content:space-between;gap:12px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>DINGAY Registration Office</span><span>Public record</span></div>
+    <div style="display:flex;justify-content:space-between;gap:12px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>DINGUY Registration Office</span><span>Public record</span></div>
     <h1 style="margin:12px 0 0;font-size:clamp(40px,9.6vw,120px);line-height:.9;letter-spacing:-.045em;font-weight:600;text-wrap:balance">OFFICIAL REGISTRY RECORD</h1>
     <div style="margin-top:32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:24px 56px;align-items:start">
       <div style="position:relative">
@@ -577,7 +601,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <div style="margin-top:10px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Tap to expand certificate</div>
       </button>
       <div style="display:flex;flex-direction:column;gap:8px;max-width:420px">
-        <button onClick="{{ rec.download }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">DOWNLOAD CERTIFICATE<span>↓</span></button>
+        <button onClick="{{ rec.download }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">SAVE CERTIFICATE<span>↓</span></button>
         <button onClick="{{ openSheet }}" style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 20px;background:transparent;color:#0b1720;border:1px solid rgba(11,23,32,.35);font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">BUY YOUR OWN STONE<span>→</span></button>
         <div style="margin-top:36px;padding-top:18px;border-top:1px solid rgba(11,23,32,.16)">
           <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Experience archived.</div>
@@ -587,7 +611,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
     </div>
   </div>
   <div style="position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px clamp(12px,4vw,40px);padding-bottom:max(16px,env(safe-area-inset-bottom));background:rgba(235,232,225,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(11,23,32,.14);display:flex;gap:8px;align-items:center">
-    <div style="flex:1;min-width:0;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2c4556">dingay.com/registry/{{ rec.no }}</div>
+    <div style="flex:1;min-width:0;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2c4556">dinguy.xyz/registry/{{ rec.no }}</div>
     <button onClick="{{ rec.share }}" style="height:48px;padding:0 18px;background:#0b1720;color:#e6ecef;border:0;font-size:11px;font-weight:600;letter-spacing:.1em;cursor:pointer;flex:none">SEND TO THEM</button>
   </div>
 </main>
@@ -595,7 +619,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 
 <sc-if value="{{ isLoadingRec }}">
 <main style="background:#e6ecef;color:#0b1720;padding:84px clamp(20px,5vw,56px) 140px;min-height:100vh;min-height:100dvh">
-  <div style="max-width:1300px;margin:0 auto"><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">DINGAY Registration Office · Searching records</div><h1 style="margin:12px 0 0;font-size:clamp(40px,9.6vw,120px);line-height:.9;letter-spacing:-.045em;font-weight:600;opacity:.35">{{ lookupBusy }}</h1></div>
+  <div style="max-width:1300px;margin:0 auto"><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">DINGUY Registration Office · Searching records</div><h1 style="margin:12px 0 0;font-size:clamp(40px,9.6vw,120px);line-height:.9;letter-spacing:-.045em;font-weight:600;opacity:.35">{{ lookupBusy }}</h1></div>
 </main>
 </sc-if>
 
@@ -603,9 +627,9 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <sc-if value="{{ isRegistryIndex }}">
 <main style="background:#e6ecef;color:#0b1720;padding:84px clamp(20px,5vw,56px) 100px;min-height:100vh;min-height:100dvh">
   <div style="max-width:900px;margin:0 auto">
-    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">DINGAY Registration Office</div>
+    <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">DINGUY Registration Office</div>
     <h1 style="margin:12px 0 0;font-size:clamp(44px,11vw,120px);line-height:.9;letter-spacing:-.045em;font-weight:600">REGISTRY</h1>
-    <p style="margin:18px 0 0;font-size:18px;color:#2c4556;max-width:34ch">Every registered Dingay has a permanent public record. Enter a registration number to view it.</p>
+    <p style="margin:18px 0 0;font-size:18px;color:#2c4556;max-width:34ch">Every registered Dinguy has a permanent public record. Enter a registration number to view it.</p>
     <form onSubmit="{{ doLookup }}" style="margin-top:28px;display:flex;gap:8px">
       <label for="dg-lookup" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Registration number</label>
       <input id="dg-lookup" value="{{ lookup }}" onChange="{{ setLookup }}" placeholder="DG-004281" autocomplete="off" style="flex:1;min-width:0;height:60px;background:#f3f5f6;border:1px solid rgba(11,23,32,.25);padding:0 16px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:20px;outline:none;border-radius:0;text-transform:uppercase">
@@ -648,7 +672,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <main style="background:#e6ecef;color:#0b1720;padding:84px clamp(20px,5vw,56px) 100px;min-height:100vh;min-height:100dvh">
   <div style="max-width:760px;margin:0 auto">
     <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Last updated: 30 September 2026</div>
-    <h1 style="margin:12px 0 0;font-size:clamp(40px,9vw,96px);line-height:.9;letter-spacing:-.045em;font-weight:600">DINGAY REGISTRATION TERMS</h1>
+    <h1 style="margin:12px 0 0;font-size:clamp(40px,9vw,96px);line-height:.9;letter-spacing:-.045em;font-weight:600">DINGUY REGISTRATION TERMS</h1>
     <div style="margin-top:28px;padding:16px;background:#0b1720;color:#e6ecef;font-size:15px;line-height:1.5">No physical stone, land, mineral deposit, gemstone, or other tangible property is included or transferred.</div>
     <sc-for list="{{ terms }}" as="t" hint-placeholder-count="9">
       <section style="padding:24px 0;border-bottom:1px solid rgba(11,23,32,.2)">
@@ -668,7 +692,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
   <div style="max-width:1000px;margin:0 auto;width:100%">
     <div style="width:min(56vw,280px);aspect-ratio:1/1;border:1px dashed rgba(238,242,244,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#a9bccb;text-align:center">Specimen<br>not found</div>
     <div style="margin-top:32px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#a9bccb">Error 404 · {{ missingId }}</div>
-    <h1 style="margin:12px 0 0;font-size:clamp(40px,10vw,120px);line-height:.9;letter-spacing:-.045em;font-weight:600;text-wrap:balance">THIS DINGAY DOES NOT EXIST.</h1>
+    <h1 style="margin:12px 0 0;font-size:clamp(40px,10vw,120px);line-height:.9;letter-spacing:-.045em;font-weight:600;text-wrap:balance">THIS DINGUY DOES NOT EXIST.</h1>
     <p style="margin:16px 0 0;font-size:20px;color:#a9bccb">At least not in our registry.</p>
     <button onClick="{{ goHome }}" style="margin-top:28px;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:360px;height:58px;padding:0 20px;background:#eef2f4;color:#0b0b0a;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">GO HOME<span>→</span></button>
   </div>
@@ -681,7 +705,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
   <div style="padding:0 clamp(20px,5vw,56px);max-width:1400px;margin:0 auto">
     <div style="font-size:12px;font-weight:700;letter-spacing:.12em;color:#9a9a9a">INDEPENDENT CREATIVE COMPANY</div>
     <h1 style="margin:14px 0 0;font-size:clamp(52px,14.5vw,210px);line-height:.84;letter-spacing:-.06em;font-weight:800;animation:dg-rise .9s cubic-bezier(.2,.8,.2,1) both">YOU'VE FOUND<br><span style="background:linear-gradient(90deg,#ff5f6d,#ffc371,#47e5bc,#5f8bff,#c86bff,#ff5f6d);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:dg-shift 8s linear infinite">SIDEWAYS.</span></h1>
-    <p data-reveal="up" style="margin:28px 0 0;font-size:clamp(20px,2.6vw,30px);line-height:1.25;letter-spacing:-.01em;max-width:26ch;color:#d6d6d6">Ideas that make people stop, look twice and remember. <strong style="color:#fff">DINGAY is one of them.</strong></p>
+    <p data-reveal="up" style="margin:28px 0 0;font-size:clamp(20px,2.6vw,30px);line-height:1.25;letter-spacing:-.01em;max-width:26ch;color:#d6d6d6">Ideas that make people stop, look twice and remember. <strong style="color:#fff">DINGUY is one of them.</strong></p>
   </div>
   <div style="margin-top:64px">
     <div aria-hidden="true" style="width:130%;margin-left:-15%;transform:rotate(-4deg);background:linear-gradient(90deg,#ff5f6d,#ffc371);color:#0b0b0b;padding:14px 0;overflow:hidden"><div style="display:flex;gap:36px;width:max-content;animation:dg-marquee 20s linear infinite normal;font-size:clamp(22px,4.4vw,44px);font-weight:800;letter-spacing:-.03em;white-space:nowrap"><span>WEBSITES ✦</span><span>CAMPAIGNS ✦</span><span>GUERRILLA ✦</span><span>INTERNET THINGS ✦</span><span>WEBSITES ✦</span><span>CAMPAIGNS ✦</span><span>GUERRILLA ✦</span><span>INTERNET THINGS ✦</span><span>WEBSITES ✦</span><span>CAMPAIGNS ✦</span><span>GUERRILLA ✦</span><span>INTERNET THINGS ✦</span><span>WEBSITES ✦</span><span>CAMPAIGNS ✦</span><span>GUERRILLA ✦</span><span>INTERNET THINGS ✦</span></div></div>
@@ -709,8 +733,8 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <span style="align-self:flex-end;max-width:78%;padding:10px 14px;border-radius:18px 18px 4px 18px;background:linear-gradient(135deg,#c86bff,#5f8bff);color:#0b0b0b;font-weight:600">Let’s make people talk.</span>
         <span style="align-self:flex-start;display:inline-flex;gap:5px;padding:12px 14px;border-radius:18px 18px 18px 4px;background:#262626"><span style="width:6px;height:6px;border-radius:50%;background:#f4f4f1;animation:sw-dots 1.2s ease-in-out infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#f4f4f1;animation:sw-dots 1.2s ease-in-out .2s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#f4f4f1;animation:sw-dots 1.2s ease-in-out .4s infinite"></span></span>
       </span>
-      <span style="position:relative;z-index:2"><span style="display:block;font-size:clamp(32px,4.6vw,54px);font-weight:800;letter-spacing:-.045em;line-height:.9">CONTACT SIDEWAYS</span><span style="display:block;margin-top:10px;font-size:16px;font-weight:500;color:#c86bff">+251 716 294 154</span></span></button>
-    <button data-reveal="up" onClick="{{ goHome }}" style="display:grid;grid-template-columns:1fr 110px;align-items:center;gap:16px;min-height:260px;padding:24px;border:1px solid rgba(255,255,255,.14);border-radius:28px;background:radial-gradient(90% 90% at 80% 50%,#435f73 0%,#132531 55%,#000 100%);color:#f4f4f1;text-align:left;cursor:pointer;transition:transform .3s cubic-bezier(.2,.8,.2,1)" style-hover="transform:translateY(-6px)"><span><span style="display:block;font-size:12px;font-weight:700;letter-spacing:.1em;color:#a9bccb">CASE 001</span><span style="display:block;margin-top:10px;font-size:clamp(32px,4.6vw,54px);font-weight:800;letter-spacing:-.045em;line-height:.9">DINGAY®</span><span style="display:block;margin-top:10px;font-size:16px;color:#d3dee6">A registry for stones. You just used it. Back to the registry →</span></span><span><dc-import name="Stone" kind="blocket" spin="{{ spinRate }}" hint-size="110px,110px"></dc-import></span></button>
+      <span style="position:relative;z-index:2"><span style="display:block;font-size:clamp(32px,4.6vw,54px);font-weight:800;letter-spacing:-.045em;line-height:.9">CONTACT SIDEWAYS</span><span style="display:block;margin-top:10px;font-size:16px;font-weight:500;color:#c86bff">+251 996 567 218</span></span></button>
+    <button data-reveal="up" onClick="{{ goHome }}" style="display:grid;grid-template-columns:1fr 110px;align-items:center;gap:16px;min-height:260px;padding:24px;border:1px solid rgba(255,255,255,.14);border-radius:28px;background:radial-gradient(90% 90% at 80% 50%,#435f73 0%,#132531 55%,#000 100%);color:#f4f4f1;text-align:left;cursor:pointer;transition:transform .3s cubic-bezier(.2,.8,.2,1)" style-hover="transform:translateY(-6px)"><span><span style="display:block;font-size:12px;font-weight:700;letter-spacing:.1em;color:#a9bccb">CASE 001</span><span style="display:block;margin-top:10px;font-size:clamp(32px,4.6vw,54px);font-weight:800;letter-spacing:-.045em;line-height:.9">DINGUY®</span><span style="display:block;margin-top:10px;font-size:16px;color:#d3dee6">A registry for stones. You just used it. Back to the registry →</span></span><span><dc-import name="Stone" kind="blocket" spin="{{ spinRate }}" hint-size="110px,110px"></dc-import></span></button>
   </div>
   <section style="padding:110px clamp(20px,5vw,56px) 110px;max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:28px 64px">
     <h2 data-reveal="text" style="margin:0;font-size:clamp(40px,7vw,96px);line-height:.88;letter-spacing:-.05em;font-weight:800">WE LIKE THE <span style="display:inline-block;transform:rotate(-6deg);background:linear-gradient(90deg,#ff5f6d,#ffc371,#47e5bc,#5f8bff,#c86bff,#ff5f6d);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:dg-shift 8s linear infinite">OTHER</span> DIRECTION.</h2>
@@ -718,7 +742,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
       <p style="margin:0">SIDEWAYS is an independent creative company making brands, digital experiences, campaigns and internet things.</p>
       <p style="margin:0">We work across ideas, design, technology and culture.</p>
       <p style="margin:0">Sometimes the most effective way to make someone remember a brand is to give them something they weren't expecting.</p>
-      <p style="margin:0;font-weight:700;color:#fff">DINGAY is a good example.</p>
+      <p style="margin:0;font-weight:700;color:#fff">DINGUY is a good example.</p>
     </div>
   </section>
 </main>
@@ -776,7 +800,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         </ul>
       </div>
       <button onClick="{{ goHome }}" style="text-align:left;background:#f4f4f1;color:#0d0d0d;border:0;padding:20px;cursor:pointer;display:grid;grid-template-columns:1fr 96px;gap:16px;align-items:center">
-        <span><span style="display:block;font-size:11px;font-weight:600;letter-spacing:.1em;color:#555">CASE 001</span><span style="display:block;margin-top:6px;font-size:28px;font-weight:700;letter-spacing:-.03em">DINGAY®</span><span style="display:block;margin-top:6px;font-size:15px;line-height:1.4;color:#333">A registry for stones. You just used it.</span></span>
+        <span><span style="display:block;font-size:11px;font-weight:600;letter-spacing:.1em;color:#555">CASE 001</span><span style="display:block;margin-top:6px;font-size:28px;font-weight:700;letter-spacing:-.03em">DINGUY®</span><span style="display:block;margin-top:6px;font-size:15px;line-height:1.4;color:#333">A registry for stones. You just used it.</span></span>
         <span><dc-import name="Stone" kind="blocket" spin="{{ spinRate }}" hint-size="96px,96px"></dc-import></span>
       </button>
     </div>
@@ -792,7 +816,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
       <div style="font-size:12px;font-weight:600;letter-spacing:.08em;color:#555">CONTACT SIDEWAYS</div>
       <h1 style="margin:10px 0 0;font-size:clamp(48px,11vw,140px);line-height:.86;letter-spacing:-.05em;font-weight:700">MAKE PEOPLE TALK.</h1>
       <dl style="margin:36px 0 0;display:grid;gap:14px">
-        <div><dt style="font-size:12px;font-weight:600;letter-spacing:.08em;color:#555">PHONE</dt><dd style="margin:4px 0 0;font-size:22px;font-weight:500"><a href="tel:+251716294154">+251 716 294 154</a></dd></div>
+        <div><dt style="font-size:12px;font-weight:600;letter-spacing:.08em;color:#555">PHONE</dt><dd style="margin:4px 0 0;font-size:22px;font-weight:500"><a href="tel:+251996567218">+251 996 567 218</a></dd></div>
         <div><dt style="font-size:12px;font-weight:600;letter-spacing:.08em;color:#555">EMAIL</dt><dd style="margin:4px 0 0;font-size:22px;font-weight:500"><a href="mailto:dinsherif@gmail.com">dinsherif@gmail.com</a></dd></div>
       </dl>
     </div>
@@ -824,7 +848,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <sc-if value="{{ showFooter }}" hint-placeholder-val="{{ true }}">
   <footer style="background:linear-gradient(180deg,#132531 0%,#0a141b 60%,#000 100%);color:#eef2f4;padding:clamp(56px,8vw,96px) clamp(20px,5vw,56px) {{ footPad }};border-top:1px solid rgba(238,242,244,.1)">
     <div style="max-width:1300px;margin:0 auto">
-      <img src="assets/dingai-logo.svg" alt="DINGAY®" style="display:block;width:min(100%,720px);height:auto;filter:invert(1)">
+      <img src="assets/dingai-logo.svg" alt="DINGUY®" style="display:block;width:min(100%,720px);height:auto;filter:invert(1)">
       <p style="margin:18px 0 0;font-size:18px;color:#b9c9d4;max-width:30ch">Registered stones for unreasonably meaningful occasions.</p>
       <div style="margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:28px">
         <nav style="display:flex;flex-direction:column;align-items:flex-start;font-size:12px;font-weight:600;letter-spacing:.1em">
@@ -834,7 +858,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
           <button onClick="{{ goFaq }}" style="background:none;border:0;padding:10px 0;cursor:pointer;color:#eef2f4">FAQ</button>
           <button onClick="{{ toggleLang }}" lang="{{ langOther }}" style="background:none;border:0;padding:10px 0;cursor:pointer;color:#eef2f4;font-family:'Noto Sans Ethiopic','Helvetica Neue',Helvetica,Arial,sans-serif;text-decoration:underline;text-underline-offset:4px">{{ langLabel }}</button>
         </nav>
-        <div style="font-size:15px;line-height:1.6;color:#b9c9d4"><div style="color:#eef2f4;font-weight:600">DINGAY®</div>An independent digital experience.<br><a href="tel:+251716294154">+251716294154</a><br><a href="mailto:dinsherif@gmail.com">dinsherif@gmail.com</a></div>
+        <div style="font-size:15px;line-height:1.6;color:#b9c9d4"><div style="color:#eef2f4;font-weight:600">DINGUY®</div>An independent digital experience.<br><a href="tel:+251996567218">+251996567218</a><br><a href="mailto:dinsherif@gmail.com">dinsherif@gmail.com</a></div>
         <div style="display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px">
           <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#a9bccb">Digital registration. No physical stone included.</span>
           <span class="sw-ring"><button onClick="{{ startReveal }}" class="sw-pill" style="display:inline-flex;align-items:center;gap:10px;height:50px;padding:0 22px;border:0;border-radius:999px;color:#0b0b0b;font-size:13px;font-weight:800;letter-spacing:.08em;cursor:pointer;box-shadow:0 12px 34px -10px rgba(200,107,255,.7);transition:transform .2s" style-hover="transform:translateY(-2px) scale(1.04)">MADE BY SIDEWAYS<span style="display:inline-block;transform:rotate(90deg)">→</span></button></span>
@@ -846,7 +870,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <sc-if value="{{ isSW }}">
   <footer style="background:#0d0d0d;color:#f4f4f1;padding:40px clamp(20px,5vw,56px);display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;font-size:13px">
     <span style="font-weight:700;letter-spacing:-.01em">SIDEWAYS <span style="font-weight:400;font-style:italic;color:#999">Independent Creative Company</span></span>
-    <span style="display:flex;gap:18px;flex-wrap:wrap;align-items:center"><button onClick="{{ goHome }}" style="background:none;border:0;padding:8px 0;cursor:pointer;color:#f4f4f1;font:inherit;text-decoration:underline">← Back to DINGAY®</button><a href="tel:+251716294154">+251716294154</a><a href="mailto:dinsherif@gmail.com">dinsherif@gmail.com</a></span>
+    <span style="display:flex;gap:18px;flex-wrap:wrap;align-items:center"><button onClick="{{ goHome }}" style="background:none;border:0;padding:8px 0;cursor:pointer;color:#f4f4f1;font:inherit;text-decoration:underline">← Back to DINGUY®</button><a href="tel:+251996567218">+251996567218</a><a href="mailto:dinsherif@gmail.com">dinsherif@gmail.com</a></span>
   </footer>
 </sc-if>
 
@@ -861,7 +885,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <sc-if value="{{ sheet }}">
   <div onClick="{{ closeSheet }}" class="dg-overlay" style="position:fixed;inset:0;z-index:70;touch-action:none;background:rgba(0,0,0,.55);animation:dg-fade .2s ease"></div>
   <div role="dialog" aria-label="Choose a collection" class="dg-overlay" style="max-height:92dvh;overflow-y:auto;position:fixed;left:0;right:0;bottom:0;z-index:71;max-width:560px;margin:0 auto;background:#eef2f4;color:#0b1720;padding:18px 16px;padding-bottom:max(18px,env(safe-area-inset-bottom));animation:dg-sheet .35s cubic-bezier(.2,.8,.2,1)">
-    <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>Who is this Dingay for?</span><button onClick="{{ closeSheet }}" aria-label="Close" style="background:none;border:0;width:44px;height:44px;font-size:20px;cursor:pointer;color:#0b1720">×</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>Who is this Dinguy for?</span><button onClick="{{ closeSheet }}" aria-label="Close" style="background:none;border:0;width:44px;height:44px;font-size:20px;cursor:pointer;color:#0b1720">×</button></div>
     <button onClick="{{ goFriend }}" style="margin-top:6px;width:100%;display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:12px;background:#c9d3d9;border:0;text-align:left;cursor:pointer;color:#0b1720"><span><dc-import name="Stone" kind="cobble" spin="{{ spinRate }}" hint-size="64px,64px"></dc-import></span><span style="font-size:15px;font-weight:600;letter-spacing:.06em">REGISTER FOR A FRIEND</span><span style="font-weight:600">89 ETB</span></button>
     <button onClick="{{ goLoved }}" style="margin-top:8px;width:100%;display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:12px;background:#f7f2ea;border:0;text-align:left;cursor:pointer;color:#17120f"><span><dc-import name="Stone" kind="emerald" spin="{{ spinRate }}" hint-size="64px,64px"></dc-import></span><span style="font-size:15px;font-weight:600;letter-spacing:.06em">REGISTER FOR SOMEONE I LOVE</span><span style="font-weight:600">199 ETB</span></button>
     <div style="margin-top:12px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#435f73;text-align:center">Digital registration. No physical stone included.</div>
@@ -911,7 +935,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <script type="text/x-dc" data-dc-script data-props="{&quot;heroStone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cobble&quot;,&quot;blocket&quot;,&quot;river&quot;,&quot;foundation&quot;,&quot;opal&quot;,&quot;choc&quot;,&quot;emerald&quot;,&quot;diamond&quot;],&quot;default&quot;:&quot;cobble&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Experience&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Experience&quot;}}">
 const P=[
  {slug:'cobblestone',w:'friend',name:'COBBLESTONE',sub:'The Urban Classic',kind:'cobble',fig:'F-01',cls:'Urban Sedimentary',
-  d:['For the friend who has survived traffic, construction, bad decisions and somehow still made it here.','A dependable Dingay with strong infrastructure energy.'],
+  d:['For the friend who has survived traffic, construction, bad decisions and somehow still made it here.','A dependable Dinguy with strong infrastructure energy.'],
   meta:[['Specimen No.','F-01'],['Classification','Urban Sedimentary'],['Origin','A road near you'],['Hardness','Reliable'],['Surface','Traffic-worn'],['Emotional weight','Moderate']]},
  {slug:'bloket',w:'friend',name:'ብሎኬት',sub:'The Load-Bearing Personality',kind:'blocket',fig:'F-02',cls:'Structural · Hollow Core',
   d:['For the friend who has never been accused of being lightweight.','Built for strength.\nBuilt for stability.\nBuilt, frankly, for absolutely no reason.'],
@@ -929,42 +953,42 @@ const P=[
   d:['Deep, warm and quietly beautiful.','For the person who makes ordinary days feel warmer.',"A romantic stone for a love that doesn't need to shout to be noticed."],
   meta:[['Specimen No.','L-02'],['Classification','Chocolate opal (symbolic)'],['Inspiration','Mezezo'],['Tone','Deep, warm'],['Volume','Does not shout'],['Effect','Warmer ordinary days']]},
  {slug:'shakiso-emerald',w:'loved',name:'SHAKISO EMERALD',sub:'The Green One',kind:'emerald',fig:'L-03',cls:'Emerald · Symbolic',
-  d:['For a love that keeps growing.',"Inspired by Ethiopia's emerald country around Shakiso, this is the Dingay for someone who brings a little colour into everything.",'Rare-looking.\nBeautiful-looking.\nVery much worth registering.'],
+  d:['For a love that keeps growing.',"Inspired by Ethiopia's emerald country around Shakiso, this is the Dinguy for someone who brings a little colour into everything.",'Rare-looking.\nBeautiful-looking.\nVery much worth registering.'],
   meta:[['Specimen No.','L-03'],['Classification','Emerald (symbolic)'],['Inspiration','Shakiso'],['Colour','Keeps growing'],['Rarity','Rare-looking'],['Worth registering','Very much']]},
  {slug:'diamond',w:'loved',name:'DIAMOND',sub:'The Forever One',kind:'diamond',fig:'L-04',cls:'Diamond · Symbolic',
   d:['For the person you would choose again.','And again.\nAnd again.','A classic for a classic.',"Because apparently saying “I love you” wasn't enough."],
   meta:[['Specimen No.','L-04'],['Classification','Diamond (symbolic)'],['Cut','Classic'],['Duration','Forever (approx.)'],['Selection','Chosen again'],['And again','Yes']]}
 ];
 const MSG={friend:['አንተ በእውነት ድንጋይ ነህ።',"For the weight you've carried and the weight you've become.",'Some people get stars. You get this.','I saw this and immediately thought of you.','በስምህ የተመዘገበ ድንጋይ እንኳን አይበቃህም።','ሁሉም ሰው ኮከብ አይኖረውም። አንተ ግን ድንጋይ አለህ። 😂','Congratulations. You are now the proud owner of absolutely nothing, but this stone has your name on it.','I spent 89 birr to make our friendship legally unnecessary.','Some people get flowers. You got a professionally registered stone.'],
- loved:['You are worth every stone in the world.',"I couldn't buy you a star, so I did the next logical thing.",'For something that lasts as long as you do.','A little piece of permanence for my favourite person.',"You're my favourite human. This is your favourite Dingay.","I couldn't give you the stars, so I gave you something a little more grounded.",'A little piece of the earth, with a little piece of my heart attached to it.','It’s just a stone, but choosing it for you felt special.','For someone who deserves something beautiful, meaningful, and slightly ridiculous.','I wanted your name on something that lasts. This seemed like a good place to start.']};
+ loved:['You are worth every stone in the world.',"I couldn't buy you a star, so I did the next logical thing.",'For something that lasts as long as you do.','A little piece of permanence for my favourite person.',"You're my favourite human. This is your favourite Dinguy.","I couldn't give you the stars, so I gave you something a little more grounded.",'A little piece of the earth, with a little piece of my heart attached to it.','It’s just a stone, but choosing it for you felt special.','For someone who deserves something beautiful, meaningful, and slightly ridiculous.','I wanted your name on something that lasts. This seemed like a good place to start.']};
 const MSG_AM={friend:['አንተ በእውነት ድንጋይ ነህ።','ለተሸከምከው ክብደትና ለሆንከው ክብደት።','አንዳንዶች ኮከብ ያገኛሉ። አንተ ይሄን አገኘህ።','ይሄን ሳይ ወዲያው አንተ ትዝ አልከኝ።','በስምህ የተመዘገበ ድንጋይ እንኳን አይበቃህም።','ሁሉም ሰው ኮከብ አይኖረውም። አንተ ግን ድንጋይ አለህ። 😂','እንኳን ደስ አለህ። አሁን የምንም ነገር ኩሩ ባለቤት ነህ፤ ግን ይህ ድንጋይ ስምህን ይዟል።','ጓደኝነታችንን በሕግ አላስፈላጊ ለማድረግ 89 ብር አውጥቻለሁ።','አንዳንዶች አበባ ይሰጣቸዋል። አንተ በባለሙያ የተመዘገበ ድንጋይ ተሰጠህ።'],
  loved:['በዓለም ላይ ያለ እያንዳንዱ ድንጋይ ይገባሻል።','ኮከብ ልገዛልሽ አልቻልኩም፤ ስለዚህ ቀጣዩን ምክንያታዊ ነገር አደረግሁ።','እንዳንቺ ለሚዘልቅ ነገር።','ለምወዳት ሰው ትንሽ ዘላቂነት።','የምወድሽ ሰው ነሽ። ይሄ የምትወጂው ድንጋይ ነው።','ከዋክብትን ልሰጥሽ አልቻልኩም፤ ስለዚህ ትንሽ መሬት ላይ ያለ ነገር ሰጠሁሽ።','ከምድር ትንሽ ቁራጭ፣ ከልቤ ትንሽ ቁራጭ ጋር ተያይዞ።','ድንጋይ ብቻ ነው፤ ግን ላንቺ መምረጡ ልዩ ስሜት ሰጠኝ።','ውብ፣ ትርጉም ያለውና ትንሽ አስቂኝ ነገር ለሚገባሽ።','ስምሽ በሚዘልቅ ነገር ላይ እንዲሆን ፈለግሁ። ይሄ ጥሩ መነሻ መሰለኝ።']};
 const LANG=(window.dgLang&&window.dgLang.lang)||'en';
 const T=s=>(window.dgLang?window.dgLang.t(s):s);
 const MS=LANG==='am'?MSG_AM:MSG;
 const THEME={
- friend:{bg:'#d6d6d2',ink:'#0b0b0b',sub:'#3b3b3b',card:'#e8e8e4',line:'rgba(0,0,0,.22)',glow:'linear-gradient(180deg,#f0f0ec,#dcdcd7)',label:'Collection A — Industrial · 89 ETB',heading:'CERTIFIED DINGAYS FOR YOUR DINGAY RAS',intro:['Some friendships need flowers.','Some need chocolate.','Some need a properly registered stone.'],suggestIntro:"We'll help you.",world:'For your friend',hf:"'Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif",hs:'normal',hw:800,hl:'-.055em',r:'0px',btnBg:'#0b0b0b',btnFg:'#f2c230',btnR:'0px',top:'repeating-linear-gradient(-45deg,#0b0b0b 0 10px,#f2c230 10px 20px)',topH:'10px',tape:true,flowers:false},
- loved:{bg:'radial-gradient(120% 70% at 50% 0%,#435f73 0%,#132531 45%,#000 100%)',ink:'#f4efe9',sub:'#b9c9d4',card:'rgba(255,255,255,.045)',line:'rgba(255,255,255,.14)',glow:'radial-gradient(60% 55% at 50% 50%,rgba(143,179,204,.35),rgba(19,37,49,0) 72%)',label:'Collection B — Precious · 199 ETB',heading:'Beautiful stones for beautiful people.',intro:["A Dingay doesn't have to be expensive to mean something.",'Sometimes you just need the right one.'],suggestIntro:'Try one of these:',world:'For your loved one',hf:"'Instrument Serif',Georgia,serif",hs:'italic',hw:400,hl:'-.02em',r:'22px',btnBg:'#f4efe9',btnFg:'#132531',btnR:'999px',top:'linear-gradient(90deg,transparent,rgba(207,224,234,.7),transparent)',topH:'1px',tape:false,flowers:true}
+ friend:{bg:'#d6d6d2',ink:'#0b0b0b',sub:'#3b3b3b',card:'#e8e8e4',line:'rgba(0,0,0,.22)',glow:'linear-gradient(180deg,#f0f0ec,#dcdcd7)',label:'Collection A — Industrial · 89 ETB',heading:'CERTIFIED DINGUYS FOR YOUR DINGUY RAS',intro:['Some friendships need flowers.','Some need chocolate.','Some need a properly registered stone.'],suggestIntro:"We'll help you.",world:'For your friend',hf:"'Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif",hs:'normal',hw:800,hl:'-.055em',r:'0px',btnBg:'#0b0b0b',btnFg:'#f2c230',btnR:'0px',top:'repeating-linear-gradient(-45deg,#0b0b0b 0 10px,#f2c230 10px 20px)',topH:'10px',tape:true,flowers:false},
+ loved:{bg:'radial-gradient(120% 70% at 50% 0%,#435f73 0%,#132531 45%,#000 100%)',ink:'#f4efe9',sub:'#b9c9d4',card:'rgba(255,255,255,.045)',line:'rgba(255,255,255,.14)',glow:'radial-gradient(60% 55% at 50% 50%,rgba(143,179,204,.35),rgba(19,37,49,0) 72%)',label:'Collection B — Precious · 199 ETB',heading:'Beautiful stones for beautiful people.',intro:["A Dinguy doesn't have to be expensive to mean something.",'Sometimes you just need the right one.'],suggestIntro:'Try one of these:',world:'For your loved one',hf:"'Instrument Serif',Georgia,serif",hs:'italic',hw:400,hl:'-.02em',r:'22px',btnBg:'#f4efe9',btnFg:'#132531',btnR:'999px',top:'linear-gradient(90deg,transparent,rgba(207,224,234,.7),transparent)',topH:'1px',tape:false,flowers:true}
 };
 const OCC=['Birthday','Anniversary','Graduation','Farewell','Apology','Just because'];
-const FAQ=[['Is DINGAY a real stone registry?','DINGAY is a private, unofficial digital registration experience created for symbolic gifting and entertainment.'],['Do I receive a physical stone?','No. DINGAY registrations are entirely digital. No physical stone is shipped.'],['Do I own the stone?','No. Your registration does not grant ownership of any physical stone, mineral, gemstone, land or other property.'],['What do I actually receive?','You receive a professionally designed digital certificate and a personal registry page with a unique registration number.'],['Can I send it to someone?','Yes. Every registration has a shareable registry link, and the certificate can be downloaded and sent to the recipient.'],['Can I choose the name?','Yes. You can register it to anyone you choose, subject to our terms.'],['Can I write my own message?','Yes. You can write your own dedication or use one of our suggestions.'],['Is this similar to naming a star?','The idea is similar in the sense that it creates a symbolic personal registration for a gift. DINGAY makes no claim to officially name or transfer ownership of a physical object.'],['Is DINGAY associated with an astronomical organization or geological authority?','No. DINGAY is an independent private service.'],['Can I get a refund?','Please see our Terms & Conditions for our refund and cancellation policy.']];
-const TERMS=[['What DINGAY provides',['DINGAY provides a digital, symbolic registration and certificate service intended primarily for gifting, entertainment and personal expression.','A completed registration creates a record within the private DINGAY Registry and generates a digital certificate.']],
- ['No physical stone is sold',['DINGAY does not sell, ship, assign or transfer ownership of a physical stone, gemstone, mineral, land or geological specimen through its digital registration service.','Purchasing a DINGAY registration does not entitle the purchaser or recipient to receive a physical object.']],
- ['No official ownership or naming rights',['A DINGAY registration is not an official scientific, geological, mineralogical, governmental or property registration.','The registration does not establish ownership, possession, title, extraction rights, intellectual property rights or any other legal interest in a physical stone or geological material.']],
- ['Private registry',['The DINGAY Registry is a privately operated database.','Registration numbers and certificates are issued by DINGAY and have no official status outside the DINGAY service.']],
+const FAQ=[['Is DINGUY a real stone registry?','DINGUY is a private, unofficial digital registration experience created for symbolic gifting and entertainment.'],['Do I receive a physical stone?','No. DINGUY registrations are entirely digital. No physical stone is shipped.'],['Do I own the stone?','No. Your registration does not grant ownership of any physical stone, mineral, gemstone, land or other property.'],['What do I actually receive?','You receive a professionally designed digital certificate and a personal registry page with a unique registration number.'],['Can I send it to someone?','Yes. Every registration has a shareable registry link, and the certificate can be downloaded and sent to the recipient.'],['Can I choose the name?','Yes. You can register it to anyone you choose, subject to our terms.'],['Can I write my own message?','Yes. You can write your own dedication or use one of our suggestions.'],['Is this similar to naming a star?','The idea is similar in the sense that it creates a symbolic personal registration for a gift. DINGUY makes no claim to officially name or transfer ownership of a physical object.'],['Is DINGUY associated with an astronomical organization or geological authority?','No. DINGUY is an independent private service.'],['Can I get a refund?','Please see our Terms & Conditions for our refund and cancellation policy.']];
+const TERMS=[['What DINGUY provides',['DINGUY provides a digital, symbolic registration and certificate service intended primarily for gifting, entertainment and personal expression.','A completed registration creates a record within the private DINGUY Registry and generates a digital certificate.']],
+ ['No physical stone is sold',['DINGUY does not sell, ship, assign or transfer ownership of a physical stone, gemstone, mineral, land or geological specimen through its digital registration service.','Purchasing a DINGUY registration does not entitle the purchaser or recipient to receive a physical object.']],
+ ['No official ownership or naming rights',['A DINGUY registration is not an official scientific, geological, mineralogical, governmental or property registration.','The registration does not establish ownership, possession, title, extraction rights, intellectual property rights or any other legal interest in a physical stone or geological material.']],
+ ['Private registry',['The DINGUY Registry is a privately operated database.','Registration numbers and certificates are issued by DINGUY and have no official status outside the DINGUY service.']],
  ['Digital delivery',['The product is delivered digitally.','After registration and successful payment, the customer receives access to a downloadable digital certificate and a shareable registry page.']],
- ['Personal messages',['Customers are responsible for the messages and names they submit.','DINGAY reserves the right to reject or remove content that is unlawful, abusive, threatening, defamatory or otherwise inappropriate.']],
- ['Accuracy',['DINGAY does not guarantee that any symbolic description, classification or creative designation represents a scientific classification of a physical stone.','Any geological or gemstone references used on the website are presented for descriptive and creative purposes and do not constitute a gemological certification.']],
- ['Entertainment and gifting',['DINGAY is intended as a symbolic gift and entertainment experience.','By purchasing a registration, the customer acknowledges the nature of the service described above.']],
- ['Changes',['DINGAY may update its registry, website, products, pricing and terms from time to time.']]];
+ ['Personal messages',['Customers are responsible for the messages and names they submit.','DINGUY reserves the right to reject or remove content that is unlawful, abusive, threatening, defamatory or otherwise inappropriate.']],
+ ['Accuracy',['DINGUY does not guarantee that any symbolic description, classification or creative designation represents a scientific classification of a physical stone.','Any geological or gemstone references used on the website are presented for descriptive and creative purposes and do not constitute a gemological certification.']],
+ ['Entertainment and gifting',['DINGUY is intended as a symbolic gift and entertainment experience.','By purchasing a registration, the customer acknowledges the nature of the service described above.']],
+ ['Changes',['DINGUY may update its registry, website, products, pricing and terms from time to time.']]];
 const TIERS=[['STARTER','45,000 ETB','For straightforward websites with a clear purpose.',['Portfolio websites','Personal brands','Small businesses','Simple company websites']],
  ['STANDARD','85,000 ETB','For businesses that need more than a few pages.',['Growing businesses','Service companies','Professional brands','Custom content structures','More advanced interactions']],
  ['EXPERIENCE','135,000 ETB','For websites that need a proper digital experience.',['Custom brand experiences','Complex websites','Interactive experiences','Campaign websites','Unusual ideas']]];
-const RECEIVE=[['Registered Name','The name you give your Dingay.'],['Dedicated By','Your name or nickname.'],['Personal Message','A message of your choice.'],['Digital Certificate','A professionally designed downloadable certificate.'],['Personal Registry Page','A permanent link you can share.']];
+const RECEIVE=[['Registered Name','The name you give your Dinguy.'],['Dedicated By','Your name or nickname.'],['Personal Message','A message of your choice.'],['Digital Certificate','A professionally designed downloadable certificate.'],['Personal Registry Page','A permanent link you can share.']];
 const SEED={'DG-004281':{no:'DG-004281',to:'Abel',type:'Certified Heavy',by:'Samuel',occasion:'Birthday',message:'For all the things you carry on your head.',date:'30 September 2026',kind:'blocket',ts:Date.parse('2026-09-30')}};
 const KEY='dingay.registry.v1';
 const fmt=d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-const RVT=['DG-004281','SPECIMEN','REGISTERED','ACTIVE','F-01','L-04','SYMBOLIC','REGISTRY','DEDICATION','No. 000001','CERTIFIED HEAVY','OFFICIAL','ARCHIVE','STATUS','—————','30.09.2026','PENDING','DINGAY®','CLASS II','RECORD'];
+const RVT=['DG-004281','SPECIMEN','REGISTERED','ACTIVE','F-01','L-04','SYMBOLIC','REGISTRY','DEDICATION','No. 000001','CERTIFIED HEAVY','OFFICIAL','ARCHIVE','STATUS','—————','30.09.2026','PENDING','DINGUY®','CLASS II','RECORD'];
 
 class Component extends DCLogic {
   heroStoneRef=React.createRef();bridgeRef=React.createRef();starRef=React.createRef();macroRef=React.createRef();bridgeTitleRef=React.createRef();capARef=React.createRef();capBRef=React.createRef();capPRef=React.createRef();carRef=React.createRef();progRef=React.createRef();zoomRef=React.createRef();parRef=React.createRef();bridgeEndRef=React.createRef();bridgeShadeRef=React.createRef();zoomDepthRef=React.createRef();zTxt=[0,1,2,3].map(()=>React.createRef());
@@ -992,7 +1016,7 @@ class Component extends DCLogic {
     this.onScrollH=()=>{if(!this.tk){this.tk=true;requestAnimationFrame(()=>{this.tk=false;this.scrollFx();});}};window.addEventListener('scroll',this.onScrollH,{passive:true});
     this.onRoute(true);
   }
-  componentWillUnmount(){clearInterval(this.poll);window.removeEventListener('hashchange',this.onHash);window.removeEventListener('resize',this.onResize);window.removeEventListener('scroll',this.onScrollH);clearInterval(this.cyc);(this.tm||[]).forEach(clearTimeout);}
+  componentWillUnmount(){clearInterval(this.poll);clearInterval(this.waitTk);window.removeEventListener('hashchange',this.onHash);window.removeEventListener('resize',this.onResize);window.removeEventListener('scroll',this.onScrollH);clearInterval(this.cyc);(this.tm||[]).forEach(clearTimeout);}
   later(fn,ms){(this.tm=this.tm||[]).push(setTimeout(fn,ms));}
   onRoute(first){
     const route=this.parse();const s={route,menu:false,sheet:false,certOpen:false};
@@ -1046,8 +1070,12 @@ class Component extends DCLogic {
     this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{
       if(this.state.route.a!=='pay')return;if(o.status==='paid'){this.finishPaid(o);return;}
       this.setState(s=>({pay:{...s.pay,loading:false,order:o,error:''}}));
-      clearInterval(this.poll);if(o.status==='review')this.poll=setInterval(()=>this.refreshPay(),12000);
+      clearInterval(this.poll);if(o.status==='review')this.startWait();
     },e=>this.setState(s=>({pay:{...s.pay,loading:false,error:e.message}})));}
+  startWait(){clearInterval(this.poll);clearInterval(this.waitTk);let n=0;
+    this.poll=setInterval(()=>{n++;if(this.waitLeft()>0||n%4===0)this.refreshPay();},4000);
+    this.waitTk=setInterval(()=>{if(this.state.route.a!=='pay'||!this.state.pay.order||this.state.pay.order.status!=='review'){clearInterval(this.waitTk);return;}this.setState({tick:Date.now()});},1000);}
+  waitLeft(){const o=this.state.pay.order;if(!o)return 0;const t0=Math.min(Date.now(),o.submittedAt||Date.now());return Math.max(0,30-Math.floor((Date.now()-t0)/1000));}
   refreshPay(){const p=this.state.pay;if(this.state.route.a!=='pay'){clearInterval(this.poll);return;}
     this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{if(o.status==='paid'){clearInterval(this.poll);this.finishPaid(o);}else if(o.status!=='review'){clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,order:o}}));}},()=>{});}
   finishPaid(o){const reg=o.reg;const regs={...this.state.regs,[reg.no]:reg};this.save(regs);
@@ -1057,12 +1085,12 @@ class Component extends DCLogic {
     const t0=Date.now();this.setState({proc:0,pay:{...p,error:''}});this.later(()=>{if(this.state.proc===0)this.setState({proc:1});},700);
     try{const o=await this.post('pay',{id:p.id,key:p.key,txn});await new Promise(r=>setTimeout(r,Math.max(0,1500-(Date.now()-t0))));
       if(o.status==='paid'){this.setState({proc:3});this.later(()=>{this.setState({proc:-1});this.finishPaid(o);},900);}
-      else{this.setState(s=>({proc:-1,pay:{...s.pay,order:o}}));clearInterval(this.poll);if(o.status==='review')this.poll=setInterval(()=>this.refreshPay(),12000);}}
+      else{this.setState(s=>({proc:-1,pay:{...s.pay,order:o}}));clearInterval(this.poll);if(o.status==='review')this.startWait();}}
     catch(err){this.setState(s=>({proc:-1,pay:{...s.pay,error:err.message}}));}};
   copy(text,msg){const done=()=>this.toastMsg(msg);if(navigator.clipboard)navigator.clipboard.writeText(text).then(done,()=>this.toastMsg(text));else this.toastMsg(text);}
   startReveal=()=>{this.setState({menu:false,rvs:1});this.later(()=>this.setState({rvs:2}),700);this.later(()=>this.setState({rvs:3}),1500);this.later(()=>{this.go('sideways');},2500);this.later(()=>this.setState({rvs:0}),2800);};
   share(reg){const url=location.href.split('#')[0]+'#/registry/'+reg.no;const text=T(`${reg.to} has been registered with ${reg.type}. Registration No. ${reg.no}`);
-    if(navigator.share){navigator.share({title:T('DINGAY Registration Office'),text,url}).catch(()=>{});}
+    if(navigator.share){navigator.share({title:T('DINGUY Registration Office'),text,url}).catch(()=>{});}
     else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>this.toastMsg('Registry link copied.'),()=>this.toastMsg(url));}else this.toastMsg(url);}
   download(reg){
     const W=1240,H=1711,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
@@ -1070,14 +1098,14 @@ class Component extends DCLogic {
     x.fillStyle='#f3f5f6';x.fillRect(0,0,W,H);x.strokeStyle='rgba(11,23,32,.4)';x.lineWidth=2;x.strokeRect(38,38,W-76,H-76);x.strokeStyle='rgba(11,23,32,.14)';x.lineWidth=1.5;x.strokeRect(52,52,W-104,H-104);
     const L=100,R=W-100;const fit=(t,w,s,wt)=>{do{x.font=`${wt} ${s}px ${F}`;s-=2}while(x.measureText(t).width>w&&s>20);};
     const wrap=(t,y,lh,max)=>{const ws=t.split(' ');let line='';for(const w of ws){const tt=line?line+' '+w:w;if(x.measureText(tt).width>max&&line){x.fillText(line,L,y);y+=lh;line=w}else line=tt}x.fillText(line,L,y);return y;};
-    x.fillStyle=ink;x.font=`500 22px ${M}`;x.fillText(T('UNOFFICIAL DINGAY REGISTRATION OFFICE'),L,150);x.textAlign='right';x.fillText(reg.no,R,150);x.textAlign='left';
+    x.fillStyle=ink;x.font=`500 22px ${M}`;x.fillText(T('UNOFFICIAL DINGUY REGISTRATION OFFICE'),L,150);x.textAlign='right';x.fillText(reg.no,R,150);x.textAlign='left';
     x.fillStyle='rgba(11,23,32,.35)';x.fillRect(L,178,R-L,1.5);x.fillStyle=ink;
-    x.font=`600 44px ${F}`;x.fillText(T('CERTIFICATE OF DINGAY REGISTRATION'),L,270);
+    x.font=`600 44px ${F}`;x.fillText(T('CERTIFICATE OF DINGUY REGISTRATION'),L,270);
     x.fillStyle='#2c4556';x.font=`400 32px ${F}`;x.fillText(T('This certifies that'),L,370);
     x.fillStyle=ink;fit(reg.to.toUpperCase(),R-L,140,600);x.fillText(reg.to.toUpperCase(),L,510);
     x.fillStyle='#2c4556';x.font=`400 32px ${F}`;x.fillText(T('has been assigned and ceremonially registered with'),L,590);
     x.fillStyle=ink;const ty=T(reg.type).toUpperCase();fit(ty,R-L,66,600);x.fillText(ty,L,680);
-    x.fillStyle='#2c4556';x.font=`400 32px ${F}`;x.fillText(T('under the DINGAY Registry.'),L,740);
+    x.fillStyle='#2c4556';x.font=`400 32px ${F}`;x.fillText(T('under the DINGUY Registry.'),L,740);
     x.fillStyle='rgba(11,23,32,.25)';x.fillRect(L,960,R-L,1.5);
     const cells=[[T('REGISTRATION NO.'),reg.no],[T('DEDICATED BY'),reg.by],[T('OCCASION'),T(reg.occasion||'—')],[T('DATE OF REGISTRATION'),T(reg.date)]];
     cells.forEach(([k,v],i)=>{const cx=L+(i%2)*((R-L)/2),cy=1010+Math.floor(i/2)*110;x.fillStyle=mut;x.font=`400 20px ${M}`;x.fillText(k,cx,cy);x.fillStyle=ink;x.font=`500 36px ${F}`;x.fillText(v,cx,cy+48);});
@@ -1085,15 +1113,21 @@ class Component extends DCLogic {
     x.fillStyle=mut;x.font=`400 20px ${F}`;wrap(T('This certificate records a symbolic digital registration only. It does not represent ownership of a physical stone or any legal, scientific, mineralogical or property right.'),H-150,28,860);
     x.save();x.translate(R-150,H-400);x.rotate(-12*Math.PI/180);x.strokeStyle='#8f2d22';x.fillStyle='#8f2d22';x.lineWidth=7;x.beginPath();x.arc(0,0,130,0,Math.PI*2);x.stroke();x.lineWidth=2;x.beginPath();x.arc(0,0,112,0,Math.PI*2);x.stroke();
     x.textAlign='center';x.font=`500 20px ${M}`;x.fillText(T('DG REGISTRY'),0,-36);x.font=`600 34px ${M}`;x.fillText(T('REGISTERED'),0,12);x.font=`400 18px ${M}`;x.fillText(new Date(reg.ts||Date.now()).toLocaleDateString('en-GB'),0,50);x.restore();
-    const a=document.createElement('a');a.download=`DINGAY-${reg.no}.png`;a.href=c.toDataURL('image/png');document.body.appendChild(a);a.click();a.remove();this.toastMsg('Certificate downloaded.');
+    const url=c.toDataURL('image/png'),fname=`DINGUY-${reg.no}.png`;
+    // On phones, hand the image to the share sheet — it has "Save Image" (iPhone) / "Save to gallery" (Android).
+    if(window.matchMedia&&matchMedia('(pointer:coarse)').matches&&navigator.canShare){try{const b=atob(url.split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
+      const file=new File([u],fname,{type:'image/png'});if(navigator.canShare({files:[file]})){navigator.share({files:[file]}).catch(()=>{});return;}}catch(e){}}
+    const a=document.createElement('a');a.download=fname;a.href=url;document.body.appendChild(a);a.click();a.remove();this.toastMsg('Certificate downloaded.');
   }
   payVals(){const p=this.state.pay,o=p.order;const st=o?o.status:'';
-    const labels={awaiting:'Awaiting payment',review:'Being confirmed',rejected:'Payment not confirmed',paid:'Paid'};
+    const labels={awaiting:'Awaiting payment',review:'Being confirmed',rejected:'Payment not confirmed',paid:'Paid',removed:'Removed'};
     const ph=o?o.payTo.phone:'';
     return{id:p.id||'—',loading:p.loading,missing:!p.loading&&!o,ready:!p.loading&&!!o,error:p.error,txnInput:p.txn,
       statusLabel:p.loading?'Loading':(labels[st]||'Not found'),canPay:st==='awaiting'||st==='rejected',inReview:st==='review',note:o&&o.note||'',
       name:o?o.name:'',to:o?o.to:'',by:o?o.by:'',kind:o?o.kind:'cobble',price:o?o.price:'',txn:o&&o.txn||'',payName:o?o.payTo.name:'',
-      phoneFmt:ph.replace(/^(\d{4})(\d{3})(\d{3})$/,'$1 $2 $3')};}
+      phoneFmt:ph.replace(/^(\d{4})(\d{3})(\d{3})$/,'$1 $2 $3'),hasName:!!(o&&o.payTo.name),
+      left:String(this.waitLeft()),bar:(this.waitLeft()/30).toFixed(3),waiting:st==='review'&&this.waitLeft()>0,late:st==='review'&&this.waitLeft()===0,
+      smsHref:'sms:+251996567218?&body='+encodeURIComponent('DINGUY order '+(p.id||'')+' · telebirr '+(o&&o.txn||''))};}
   carBy(d){const el=this.carRef.current;if(!el)return;const c=el.firstElementChild;const w=c?c.getBoundingClientRect().width+12:320;el.scrollBy({left:d*w,behavior:'smooth'});}
 
   renderVals(){
@@ -1126,28 +1160,28 @@ class Component extends DCLogic {
     const regSuggest=MS[world].map(m=>{const sel=draft.message===m;return{text:`“${m}”`,bg:sel?'#0b1720':'#f3f5f6',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('message',m)};});
     const sreg=st.regs[st.lastNo]||SEED['DG-004281'];
     const rr=recReg||SEED['DG-004281'];
-    const rec={...rr,reg:rr,message:rr.message?`“${rr.message}”`:'—',rows:[['Registered To',rr.to],['Dingay Type',rr.type],['Dedicated By',rr.by],['Registered On',rr.date],['Occasion',rr.occasion||'—']].map(([k,v])=>({k,v})),download:()=>this.download(rr),share:()=>this.share(rr)};
+    const rec={...rr,reg:rr,message:rr.message?`“${rr.message}”`:'—',rows:[['Registered To',rr.to],['Dinguy Type',rr.type],['Dedicated By',rr.by],['Registered On',rr.date],['Occasion',rr.occasion||'—']].map(([k,v])=>({k,v})),download:()=>this.download(rr),share:()=>this.share(rr)};
     let showBar=false,barLabel='BUY A STONE',barRight='→',barAction=()=>this.setState({sheet:true});
     if(!wide&&!st.menu){if(a===''||isCatalog)showBar=true;if(isProduct){showBar=true;barLabel='BUY THIS STONE';barRight=prod.priceLabel;barAction=prod.register;}}
     const rvs=st.rvs;
     return{
-      isDingay:!isSW,isSW,isHome:a===''&&!isNotFound,isCatalog,isProduct,isRegister,isPay,isLoadingRec,lookupBusy:st.lookupBusy,po:this.payVals(),setTxn:e=>{const v=e.target.value;this.setState(s=>({pay:{...s.pay,txn:v}}));},verifyPay:this.verifyPay,
-      copyPhone:()=>this.copy((st.pay.order&&st.pay.order.payTo.phone)||'0929415467','Number copied.'),copyOrderLink:()=>this.copy(location.href,'Order link copied.'),isSuccess,isRecord,isRegistryIndex,isNotFound,isFaq:a==='faq',isTerms:a==='terms',isSWHome,isWebsites,isGuerrilla,isContact,
-      wide,narrow:!wide,langLabel:LANG==='am'?'English':'አማርኛ',langOther:LANG==='am'?'en':'am',toggleLang:()=>window.dgLang&&window.dgLang.set(LANG==='am'?'en':'am'),swLabel:wide?'MADE BY SIDEWAYS':'SIDEWAYS',progRef:this.progRef,menu:st.menu,sheet:st.sheet,spinRate,heroKind:this.props.heroStone||'cobble',
+      isDinguy:!isSW,isSW,isHome:a===''&&!isNotFound,isCatalog,isProduct,isRegister,isPay,isLoadingRec,lookupBusy:st.lookupBusy,po:this.payVals(),setTxn:e=>{const v=e.target.value;this.setState(s=>({pay:{...s.pay,txn:v}}));},verifyPay:this.verifyPay,
+      copyPhone:()=>this.copy((st.pay.order&&st.pay.order.payTo.phone)||'0996567218','Number copied.'),copyOrderLink:()=>this.copy(location.href,'Order link copied.'),isSuccess,isRecord,isRegistryIndex,isNotFound,isFaq:a==='faq',isTerms:a==='terms',isSWHome,isWebsites,isGuerrilla,isContact,
+      wide,narrow:!wide,isTouch:typeof window!=='undefined'&&!!window.matchMedia&&matchMedia('(pointer:coarse)').matches,langLabel:LANG==='am'?'English':'አማርኛ',langOther:LANG==='am'?'en':'am',toggleLang:()=>window.dgLang&&window.dgLang.set(LANG==='am'?'en':'am'),swLabel:wide?'MADE BY SIDEWAYS':'SIDEWAYS',progRef:this.progRef,menu:st.menu,sheet:st.sheet,spinRate,heroKind:this.props.heroStone||'cobble',
       bar1:st.menu?'translateY(3.25px) rotate(45deg)':'none',bar2:st.menu?'translateY(-3.25px) rotate(-45deg)':'none',
       toggleMenu:()=>this.setState(s=>({menu:!s.menu,sheet:false})),openSheet:()=>this.setState({sheet:true,menu:false}),closeSheet:()=>this.setState({sheet:false}),
       goHome:go(''),goFriend:go('friend'),goLoved:go('loved-one'),goRegistry:go('registry'),goFaq:go('faq'),goTerms:go('terms'),goSample:go('registry/DG-004281'),
       goSW:go('sideways'),goWebsites:go('sideways/websites'),goGuerrilla:go('sideways/guerrilla'),goContact:go('contact'),startReveal:this.startReveal,
       heroStoneRef:this.heroStoneRef,bridgeRef:this.bridgeRef,starRef:this.starRef,macroRef:this.macroRef,bridgeTitleRef:this.bridgeTitleRef,capARef:this.capARef,capBRef:this.capBRef,capPRef:this.capPRef,carRef:this.carRef,
       entriesLabel:`Registry open · ${String(Object.keys(st.regs).length+4280).padStart(6,'0')} entries`,
-      steps:['Choose your Dingay.','Give it a name.','Dedicate it to someone.','Write your message.'].map((t,i)=>({n:'0'+(i+1),t,d:i*90})),
+      steps:['Choose your Dinguy.','Give it a name.','Dedicate it to someone.','Write your message.'].map((t,i)=>({n:'0'+(i+1),t,d:i*90})),
       zoomRef:this.zoomRef,parRef:this.parRef,bridgeEndRef:this.bridgeEndRef,bridgeShadeRef:this.bridgeShadeRef,zoomDepthRef:this.zoomDepthRef,
-      zoomLines:[['Why stop at the stars?','clamp(34px,min(11vw,12vh),130px)',600],['Dingays deserve names too.','clamp(32px,min(9.6vw,11vh),116px)',600]].map(([t,size,w],i)=>({t,size,w,ref:this.zTxt[i]})),
-      sampleRows:[['Registration No.','DG-004281'],['Registered To','Abel'],['Dingay Type','Certified Heavy'],['Dedicated By','Samuel'],['Occasion','Birthday']].map(([k,v])=>({k,v})),
+      zoomLines:[['Why stop at the stars?','clamp(34px,min(11vw,12vh),130px)',600],['Dinguys deserve names too.','clamp(32px,min(9.6vw,11vh),116px)',600]].map(([t,size,w],i)=>({t,size,w,ref:this.zTxt[i]})),
+      sampleRows:[['Registration No.','DG-004281'],['Registered To','Abel'],['Dinguy Type','Certified Heavy'],['Dedicated By','Samuel'],['Occasion','Birthday']].map(([k,v])=>({k,v})),
       cat,carLabel:`${String(st.carIndex).padStart(2,'0')} / 04`,
       onCarScroll:e=>{this.coverflow();const el=e.currentTarget;const c=el.firstElementChild;const w=c?c.getBoundingClientRect().width+12:1;const i=Math.min(4,Math.round(el.scrollLeft/w)+1);if(i!==st.carIndex)this.setState({carIndex:i});},
       carPrev:()=>this.carBy(-1),carNext:()=>this.carBy(1),
-      chooseMessage:()=>{if(st.msgPick<0){this.toastMsg('Select a message first.');return;}this.setState(s=>({draft:{...s.draft,message:MS[world][st.msgPick]}}));this.toastMsg('Message reserved. Now choose your Dingay.');const el=this.carRef.current;if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});},
+      chooseMessage:()=>{if(st.msgPick<0){this.toastMsg('Select a message first.');return;}this.setState(s=>({draft:{...s.draft,message:MS[world][st.msgPick]}}));this.toastMsg('Message reserved. Now choose your Dinguy.');const el=this.carRef.current;if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});},
       prod,receive:RECEIVE.map(([k,v],i)=>({n:'0'+(i+1),k,v})),stickyPos:wide?'sticky':'relative',
       draft,pendingNo:st.pendingNo,previewReg,progress,regSuggest,
       previewOrder:wide?0:-1,previewPad:wide?'40px':'4px',previewMax:wide?'520px':'340px',
