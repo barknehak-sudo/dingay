@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const o = await loadOrder(id);
     if (!o || o.key !== key) return send(res, 404, { error: 'Order not found.' });
     if (o.status === 'paid' || o.status === 'review' || o.status === 'removed') return send(res, 200, publicOrder(o));
-    if (!/^[A-Z0-9]{8,14}$/.test(txn)) return send(res, 400, { error: 'That doesn’t look like a telebirr transaction ID. It’s the 10-character code in your SMS, e.g. AB12CD34EF.' });
+    if (!/^[A-Z0-9]{8,14}$/.test(txn)) return send(res, 400, { error: 'That doesn’t look like a telebirr transaction ID. It’s the 10-character code in your SMS, e.g. DJ19BO2MR4.' });
     if (await limited('pay:' + o.id, 12, 86400)) return send(res, 429, { error: 'Too many attempts. Please contact us.' });
 
     // One transaction ID can only ever unlock one order.

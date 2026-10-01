@@ -150,12 +150,12 @@
     "telebirr number": "የቴሌብር ቁጥር", "COPY": "ቅዳ", "Name shown in telebirr": "በቴሌብር የሚታየው ስም",
     "Step 02 — Enter your transaction number": "ደረጃ 02 — የግብይት ቁጥርዎን ያስገቡ",
     "After paying, open the telebirr receipt (or the SMS) and find the Transaction Number — 10 letters and numbers, like": "ከከፈሉ በኋላ የቴሌብር ደረሰኙን (ወይም SMSኡን) ከፍተው የግብይት ቁጥሩን (Transaction Number) ይፈልጉ — 10 ፊደሎችና ቁጥሮች፣ ለምሳሌ",
-    "e.g. AB12CD34EF": "ለምሳሌ AB12CD34EF", "CONFIRM PAYMENT": "ክፍያውን አረጋግጥ",
+    "e.g. DJ19BO2MR4": "ለምሳሌ DJ19BO2MR4", "CONFIRM PAYMENT": "ክፍያውን አረጋግጥ",
     "Being confirmed": "በማረጋገጥ ላይ", "We’re confirming your payment by hand.": "ክፍያዎን እያረጋገጥን ነው።", "Transaction": "ግብይት",
     "is with the registry office. This page unlocks by itself once it’s confirmed — you can close it and come back with the link below.": "በመዝገብ ቢሮው እየታየ ነው። ሲረጋገጥ ይህ ገጽ በራሱ ይከፈታል — ገጹን ዘግተው ከታች ባለው ሊንክ መመለስ ይችላሉ።",
     "Your private order link": "የግል የትዕዛዝ ሊንክዎ", "Keep it to come back to this order.": "ወደዚህ ትዕዛዝ ለመመለስ ያስቀምጡት።",
     "COPY LINK": "ሊንኩን ቅዳ", "Digital registration. No physical stone included. Questions?": "ዲጂታል ምዝገባ። አካላዊ ድንጋይ አይካተትም። ጥያቄ አለዎት?",
-    "Awaiting payment": "ክፍያ በመጠባበቅ ላይ", "Removed": "ተወግዷል",
+    "Awaiting payment": "ክፍያ በመጠባበቅ ላይ", "Amount": "መጠን", "Removed": "ተወግዷል",
     "transaction number is": "የግብይት ቁጥሩ", "↑ Copy the Transaction Number into the box below": "↑ የግብይት ቁጥሩን (Transaction Number) ከታች ባለው ሳጥን ውስጥ ያስገቡ",
     "telebirr receipt with the Transaction Number highlighted": "የግብይት ቁጥሩ የተመለከተበት የቴሌብር ደረሰኝ",
     "Checking your payment": "ክፍያዎን በማጣራት ላይ", "seconds": "ሰከንድ", "We’re matching transaction": "የግብይት ቁጥር",
@@ -170,7 +170,7 @@
     "Enter the transaction number from your telebirr SMS.": "ከቴሌብር SMS የግብይት ቁጥሩን ያስገቡ።",
     "This link is incomplete.": "ይህ ሊንክ ያልተሟላ ነው።", "Network error — check your connection and try again.": "የኔትወርክ ችግር — ግንኙነትዎን አረጋግጠው እንደገና ይሞክሩ።",
     /* server messages */
-    "That doesn’t look like a telebirr transaction ID. It’s the 10-character code in your SMS, e.g. AB12CD34EF.": "ይህ የቴሌብር የግብይት ቁጥር አይመስልም። በSMS ውስጥ ያለው ባለ 10 ሆሄ ኮድ ነው፣ ለምሳሌ AB12CD34EF።",
+    "That doesn’t look like a telebirr transaction ID. It’s the 10-character code in your SMS, e.g. DJ19BO2MR4.": "ይህ የቴሌብር የግብይት ቁጥር አይመስልም። በSMS ውስጥ ያለው ባለ 10 ሆሄ ኮድ ነው፣ ለምሳሌ DJ19BO2MR4።",
     "This transaction ID has already been used for another order.": "ይህ የግብይት ቁጥር ለሌላ ትዕዛዝ ጥቅም ላይ ውሏል።",
     "Too many attempts. Please contact us.": "በጣም ብዙ ሙከራዎች። እባክዎ ያግኙን።", "Order not found.": "ትዕዛዙ አልተገኘም።",
     "Add a recipient and your name.": "የተቀባዩን ስምና የእርስዎን ስም ያስገቡ።", "Unknown Dinguy.": "ያልታወቀ ድንጋይ።",
@@ -394,25 +394,30 @@
   function chooser() {
     if (stored()) return;
     var css = document.createElement('style');
-    css.textContent = '@keyframes dgl-in{from{opacity:0;transform:translate3d(-50%,16px,0)}to{opacity:1;transform:translate3d(-50%,0,0)}}' +
-      '#dg-lang{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));z-index:150;width:min(calc(100vw - 24px),380px);transform:translate3d(-50%,0,0);' +
-      'background:rgba(11,23,32,.94);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);color:#eef2f4;border:1px solid rgba(238,242,244,.2);' +
-      'box-shadow:0 24px 60px -20px rgba(0,0,0,.7);padding:16px;font-family:"Helvetica Neue",Helvetica,Arial,"Noto Sans Ethiopic",sans-serif;animation:dgl-in .45s cubic-bezier(.2,.8,.2,1) both}' +
-      '#dg-lang .k{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#a9bccb}' +
-      '#dg-lang .q{margin:6px 0 12px;font-size:18px;font-weight:600;letter-spacing:-.01em}' +
-      '#dg-lang .r{display:grid;grid-template-columns:1fr 1fr;gap:8px}' +
-      '#dg-lang button{min-height:48px;border:1px solid rgba(238,242,244,.35);background:transparent;color:#eef2f4;font:inherit;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}' +
-      '#dg-lang button.on{background:#eef2f4;color:#0b1720;border-color:#eef2f4}';
+    css.textContent = '@keyframes dgl-in{from{opacity:0;transform:translate3d(-50%,-46%,0) scale(.96)}to{opacity:1;transform:translate3d(-50%,-50%,0) scale(1)}}' +
+      '@keyframes dgl-fade{from{opacity:0}to{opacity:1}}' +
+      '#dg-lang-bg{position:fixed;inset:0;z-index:149;background:rgba(0,0,0,.6);animation:dgl-fade .3s ease both;touch-action:none}' +
+      '#dg-lang{position:fixed;left:50%;top:50%;z-index:150;width:min(calc(100vw - 32px),380px);transform:translate3d(-50%,-50%,0);' +
+      'background:#f2c230;color:#0b0b0b;border-radius:22px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8);padding:22px 18px 18px;text-align:center;' +
+      'font-family:"Helvetica Neue",Helvetica,Arial,"Noto Sans Ethiopic",sans-serif;animation:dgl-in .45s cubic-bezier(.2,.8,.2,1) both;-webkit-backface-visibility:hidden;backface-visibility:hidden}' +
+      '#dg-lang .k{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(11,11,11,.7)}' +
+      '#dg-lang .q{margin:8px 0 18px;font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.2}' +
+      '#dg-lang .r{display:grid;grid-template-columns:1fr 1fr;gap:10px}' +
+      '#dg-lang button{min-height:60px;border-radius:14px;border:2px solid #0b0b0b;background:#0b0b0b;color:#f2c230;font:inherit;font-size:18px;font-weight:700;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}' +
+      '#dg-lang button[data-l=am]{background:#fff;color:#0b0b0b;border-color:#fff}';
     document.head.appendChild(css);
     var box = document.createElement('div');
     box.id = 'dg-lang'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Language / ቋንቋ');
     box.innerHTML = '<div class="k">Language · ቋንቋ</div><div class="q">Choose your language · ቋንቋ ይምረጡ</div>' +
-      '<div class="r"><button type="button" class="on" data-l="en">English</button><button type="button" data-l="am">አማርኛ</button></div>';
+      '<div class="r"><button type="button" data-l="en">English</button><button type="button" data-l="am">አማርኛ</button></div>';
     box.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
       if (b.getAttribute('data-l') === 'am') { window.dgLang.set('am'); return; }
-      save('en'); box.remove();
+      save('en'); box.remove(); var g = document.getElementById('dg-lang-bg'); if (g) g.remove();
     });
+    var bg = document.createElement('div'); bg.id = 'dg-lang-bg';
+    bg.addEventListener('click', function () { save('en'); bg.remove(); box.remove(); });
+    document.body.appendChild(bg);
     document.body.appendChild(box);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(chooser, 600); });
