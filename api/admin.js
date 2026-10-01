@@ -3,6 +3,7 @@
 // POST /api/admin {id, action:'approve'|'reject', note?}
 // GET  /api/admin?pending=1               → only orders waiting for review (cheap; used by the verifier)
 // POST /api/admin {id, action:'remove'}   → take a paid record off the public registry
+// POST /api/admin {id, action:'mark', what}  → record a follow-up (help_sms, congrats_sms, email, call, *_skip)
 // POST /api/admin {id, action:'restore'}  → put a removed record back (same number, same links)
 // POST /api/admin {create:{slug,to,by,…}} → add a registration by hand (paid another way / gift)
 // POST /api/admin {inquiry:id, action:'done'|'new'}
@@ -29,7 +30,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'GET') {
-      const ids = await kv('LRANGE', 'orders', 0, 199);
+      const ids = await kv('LRANGE', 'orders', 0, 499);
       const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
       const site = 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
       // payLink = the customer's private order link, so you can text it to them.
@@ -79,7 +80,11 @@ export default async function handler(req, res) {
       const { id, action, note } = req.body || {};
       const o = await loadOrder(id);
       if (!o) return send(res, 404, { error: 'Order not found.' });
-      if (action === 'approve') {
+      if (action === 'mark') {
+        const FOLLOW = ['help_sms', 'congrats_sms', 'email', 'call', 'help_skip', 'congrats_skip', 'email_skip'];
+        if (!FOLLOW.includes(req.body.what)) return send(res, 400, { error: 'Unknown follow-up.' });
+        o.follow = { ...(o.follow || {}), [req.body.what]: req.body.undo ? null : Date.now() };
+      } else if (action === 'approve') {
         if (o.status !== 'paid') { o.status = 'paid'; o.approvedBy = req.body.by === 'verifier' ? 'verifier' : 'admin'; o.approvedAt = Date.now(); await publish(o); }
       } else if (action === 'reject') {
         if (o.status === 'paid') return send(res, 400, { error: 'Already paid — cannot reject.' });
@@ -95,7 +100,7 @@ export default async function handler(req, res) {
         await publish(o); // same number, original approval date
       } else return send(res, 400, { error: 'Unknown action.' });
       await saveOrder(o);
-      await kv('SREM', 'review', o.id);
+      if (o.status !== 'review') await kv('SREM', 'review', o.id);
       const site = 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
       o.payLink = `${site}/#/pay/${o.id}/${o.key}`; o.recordLink = `${site}/#/registry/${o.id}`;
       return send(res, 200, { order: strip(o) });

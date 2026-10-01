@@ -322,8 +322,8 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <sc-if value="{{ isProduct }}">
 <main style="background:{{ prod.bg }};color:{{ prod.ink }};padding-top:72px;min-height:100vh;min-height:100dvh">
   <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:0 56px;padding:0 clamp(20px,5vw,56px)">
-    <div style="position:{{ stickyPos }};top:72px;align-self:start;padding-top:12px">
-      <div style="display:flex;gap:6px;flex-wrap:wrap;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:{{ prod.sub }}">
+    <div style="position:{{ stickyPos }};top:{{ stickyTopA }};align-self:start;padding-top:12px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:{{ prod.sub }}">
         <button onClick="{{ goRegistry }}" style="background:none;border:0;padding:6px 0;cursor:pointer;color:inherit;font:inherit;letter-spacing:inherit">Registry</button><span style="padding:6px 0">/</span>
         <button onClick="{{ prod.back }}" style="background:none;border:0;padding:6px 0;cursor:pointer;color:inherit;font:inherit;letter-spacing:inherit">{{ prod.world }}</button><span style="padding:6px 0">/</span><span style="padding:6px 0">{{ prod.fig }}</span>
       </div>
@@ -436,7 +436,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <div role="status" style="font-size:13px;color:{{ regHintColor }};margin-top:-16px">{{ regHint }}</div>
       </div>
     </div>
-    <div style="position:{{ stickyPos }};top:84px;align-self:start;padding-top:{{ previewPad }}">
+    <div style="position:{{ stickyPos }};top:{{ stickyTopB }};align-self:start;padding-top:{{ previewPad }}">
       <div style="position:relative;overflow:hidden;background:#0b1720;color:#e6ecef;padding:22px 20px 20px;border:1px solid rgba(11,23,32,.2)">
         <div aria-hidden="true" style="position:absolute;right:-40px;top:-40px;width:180px;height:180px;border:1px dashed rgba(230,236,239,.25);border-radius:50%"></div>
         <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9fb6c6">Certificate · Sealed until payment</div>
@@ -1214,7 +1214,7 @@ class Component extends DCLogic {
       onCarScroll:e=>{this.coverflow();const el=e.currentTarget;const c=el.firstElementChild;const w=c?c.getBoundingClientRect().width+12:1;const i=Math.min(4,Math.round(el.scrollLeft/w)+1);if(i!==st.carIndex)this.setState({carIndex:i});},
       carPrev:()=>this.carBy(-1),carNext:()=>this.carBy(1),
       chooseMessage:()=>{if(st.msgPick<0){this.toastMsg('Select a message first.');return;}this.setState(s=>({draft:{...s.draft,message:MS[world][st.msgPick]}}));this.toastMsg('Message reserved. Now choose your Dinguy.');const el=this.carRef.current;if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});},
-      prod,receive:RECEIVE.map(([k,v],i)=>({n:'0'+(i+1),k,v})),stickyPos:wide?'sticky':'relative',
+      prod,receive:RECEIVE.map(([k,v],i)=>({n:'0'+(i+1),k,v})),stickyPos:wide?'sticky':'relative',stickyTopA:wide?'72px':'auto',stickyTopB:wide?'84px':'auto',
       draft,pendingNo:st.pendingNo,previewReg,progress,regSuggest,
       previewOrder:wide?0:-1,previewPad:wide?'40px':'4px',previewMax:wide?'520px':'340px',
       setTo:e=>this.upd('to',e.target.value),setBy:e=>this.upd('by',e.target.value),setMsg:e=>this.upd('message',e.target.value),setPhone:e=>this.upd('phone',e.target.value),setEmail:e=>this.upd('email',e.target.value),

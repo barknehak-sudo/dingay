@@ -4,87 +4,168 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>DINGUY Orders</title>
+<meta name="theme-color" content="#0b1720">
+<title>DINGUY Office</title>
 <style>
-:root{--bg:#e6ecef;--card:#f3f5f6;--ink:#0b1720;--mut:#435f73;--line:rgba(11,23,32,.16);--ok:#1f8a55;--warn:#b7791f;--bad:#b3261e}
+:root{
+  color-scheme:light;
+  --bg:#eef1f3;--card:#ffffff;--card-2:#f6f8f9;--ink:#0b1720;--ink-2:#3d5566;--mut:#6f8797;--line:rgba(11,23,32,.12);
+  --brand:#0b1720;--on-brand:#eef2f4;--accent:#ffd84d;
+  --series-1:#2a78d6;--series-2:#eb6834;--track:rgba(11,23,32,.07);
+  --ok:#1f8a55;--ok-bg:#e3f3ea;--warn:#a96a00;--warn-bg:#fdf1d8;--bad:#b3261e;--bad-bg:#fbe7e5;--info-bg:#e7eef8;
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme:dark;
+    --bg:#0c1216;--card:#151d23;--card-2:#1b252c;--ink:#eef2f4;--ink-2:#b9c9d4;--mut:#8aa0ae;--line:rgba(238,242,244,.12);
+    --brand:#eef2f4;--on-brand:#0b1720;
+    --series-1:#3987e5;--series-2:#d95926;--track:rgba(238,242,244,.08);
+    --ok:#3fb27a;--ok-bg:rgba(63,178,122,.14);--warn:#e0a63a;--warn-bg:rgba(224,166,58,.14);--bad:#ef6b62;--bad-bg:rgba(239,107,98,.14);--info-bg:rgba(57,135,229,.14);
+  }
+}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
-button,input{font:inherit;color:inherit;touch-action:manipulation}
-.wrap{max-width:900px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 16px max(40px,env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit;touch-action:manipulation}
+a{color:inherit}
 .mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
-h1{margin:6px 0 18px;font-size:40px;letter-spacing:-.04em;line-height:.95}
-.login{display:flex;gap:8px}
-input{height:48px;padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:0;font-size:16px;flex:1;min-width:0}
-.btn{min-height:44px;padding:0 16px;border:0;background:var(--ink);color:#e6ecef;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
-.btn.bad{background:var(--bad)}
-a.btn{display:inline-flex;align-items:center;text-decoration:none}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
-.tabs button{min-height:44px;padding:0 14px;border:1px solid var(--ink);background:transparent;cursor:pointer;font-size:13px}
-.tabs button[aria-pressed=true]{background:var(--ink);color:#e6ecef}
-.card{background:var(--card);border:1px solid var(--line);padding:14px;margin-top:10px}
-.row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
-.big{font-size:20px;font-weight:600;letter-spacing:-.02em}
-.pill{display:inline-block;padding:3px 8px;font-size:11px;font-weight:700;letter-spacing:.08em;color:#fff}
-.s-paid{background:var(--ok)}.s-removed{background:#444}.s-review{background:var(--warn)}.s-rejected{background:var(--bad)}.s-awaiting{background:#6f8797}
-dl{display:grid;grid-template-columns:120px 1fr;gap:4px 10px;margin:10px 0 0;font-size:14px}
-dt{color:var(--mut)}dd{margin:0;overflow-wrap:anywhere}
-.reason{margin-top:8px;padding:8px 10px;background:#fff4e0;border-left:3px solid var(--warn);font-size:14px}
-.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-details.new{margin-top:16px;background:var(--card);border:1px solid var(--line);padding:0 14px}
-details.new summary{min-height:52px;display:flex;align-items:center;font-weight:700;letter-spacing:.06em;font-size:13px;cursor:pointer;list-style:none}
+.wrap{max-width:980px;margin:0 auto;padding:0 14px max(96px,calc(env(safe-area-inset-bottom) + 84px))}
+header.top{position:sticky;top:0;z-index:20;background:var(--bg);padding:max(12px,env(safe-area-inset-top)) 0 10px;border-bottom:1px solid var(--line)}
+.brandrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brandrow h1{margin:0;font-size:22px;letter-spacing:-.03em}
+.iconbtn{min-height:44px;min-width:44px;padding:0 12px;border:1px solid var(--line);background:var(--card);border-radius:12px;cursor:pointer;font-size:13px;font-weight:600}
+nav.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px}
+nav.tabs button{min-height:44px;border:0;background:transparent;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:6px}
+nav.tabs button[aria-current=page]{background:var(--brand);color:var(--on-brand)}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;display:inline-grid;place-items:center}
+nav.tabs button[aria-current=page] .badge{background:var(--accent);color:#0b1720}
+h2.sec{margin:22px 0 10px;font-size:13px;font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:500;display:flex;justify-content:space-between;align-items:baseline}
+h2.sec a,h2.sec button{font-family:inherit;font-size:12px;text-transform:none;letter-spacing:0;background:none;border:0;color:var(--ink);text-decoration:underline;cursor:pointer;padding:8px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.grid{display:grid;gap:10px}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:760px){.kpis{grid-template-columns:repeat(4,1fr)}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
+.kpi .v{margin-top:6px;font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.kpi .s{margin-top:6px;font-size:12px;color:var(--ink-2)}
+/* tasks */
+.task{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
+.task .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:18px}
+.t-review .ic{background:var(--warn-bg)}.t-help .ic{background:var(--info-bg)}.t-congrats .ic{background:var(--ok-bg)}.t-email .ic{background:var(--info-bg)}.t-inq .ic{background:var(--bad-bg)}
+.task .tt{font-size:15px;font-weight:700;line-height:1.25}
+.task .ts{margin-top:2px;font-size:13px;color:var(--ink-2);line-height:1.35}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 14px;border:0;border-radius:12px;background:var(--brand);color:var(--on-brand);font-size:13px;font-weight:700;letter-spacing:.02em;cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.ok{background:var(--ok);color:#fff}.btn.bad{background:var(--bad);color:#fff}
+.btn[disabled]{opacity:.5}
+.empty{padding:22px 14px;text-align:center;color:var(--ink-2);font-size:14px}
+/* orders */
+.filters{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.filters button{flex:none;min-height:40px;padding:0 12px;border:1px solid var(--line);background:var(--card);border-radius:999px;cursor:pointer;font-size:13px;font-weight:600}
+.filters button[aria-pressed=true]{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+input.search{width:100%;min-height:46px;padding:0 14px;border:1px solid var(--line);background:var(--card);border-radius:12px;font-size:16px;margin-bottom:8px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.oid{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:15px;font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.04em}
+.s-paid{background:var(--ok-bg);color:var(--ok)}.s-review{background:var(--warn-bg);color:var(--warn)}.s-rejected{background:var(--bad-bg);color:var(--bad)}.s-awaiting{background:var(--card-2);color:var(--ink-2)}.s-removed{background:var(--card-2);color:var(--mut)}
+dl.kv{display:grid;grid-template-columns:110px 1fr;gap:4px 10px;margin:10px 0 0;font-size:14px}
+dl.kv dt{color:var(--mut)}dl.kv dd{margin:0;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:12px;padding:4px 8px;border-radius:8px;background:var(--card-2);color:var(--ink-2)}
+.chip.done{background:var(--ok-bg);color:var(--ok)}
+.reason{margin-top:10px;padding:8px 10px;background:var(--warn-bg);border-radius:10px;font-size:14px}
+/* charts */
+.chart-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.chart-h .t{font-size:15px;font-weight:700}
+.readout{font-size:13px;color:var(--ink-2);min-height:1.3em}
+.cols{position:relative;height:150px;margin-top:12px;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid var(--line)}
+.cols .gl{position:absolute;left:0;right:0;border-top:1px dashed var(--line);pointer-events:none}
+.cols .gl span{position:absolute;right:0;top:-16px;font-size:11px;color:var(--mut)}
+.col{flex:1;height:100%;display:flex;align-items:flex-end;cursor:pointer;position:relative}
+.col i{display:block;width:100%;background:var(--series-1);border-radius:4px 4px 0 0;min-height:0}
+.col.zero i{height:2px!important;background:var(--track);border-radius:2px}
+.col:hover i,.col.sel i{filter:brightness(1.12)}
+.col.sel::after{content:"";position:absolute;inset:0;background:var(--track);border-radius:4px 4px 0 0;z-index:-1}
+.xlab{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--mut)}
+.hbar{display:grid;grid-template-columns:minmax(96px,38%) 1fr auto;gap:10px;align-items:center;margin-top:10px;font-size:13px}
+.hbar .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
+.hbar .tr{height:12px;background:var(--track);border-radius:0 4px 4px 0;overflow:hidden}
+.hbar .tr i{display:block;height:100%;background:var(--series-1);border-radius:0 4px 4px 0}
+.hbar .val{font-variant-numeric:tabular-nums;font-weight:700;min-width:3ch;text-align:right}
+.split{display:flex;height:14px;margin-top:12px;gap:2px}
+.split i{display:block;height:100%}
+.split i:first-child{border-radius:4px 0 0 4px}.split i:last-child{border-radius:0 4px 4px 0}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:13px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend b{width:10px;height:10px;border-radius:3px;display:inline-block}
+/* forms */
+details.new{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 14px}
+details.new summary{min-height:52px;display:flex;align-items:center;font-weight:700;font-size:14px;cursor:pointer;list-style:none}
 details.new summary::-webkit-details-marker{display:none}
 .f{display:grid;gap:10px;padding:4px 0 16px}.f label{display:grid;gap:4px;font-size:13px;color:var(--mut)}
-.f select,.f textarea{font:inherit;font-size:16px;min-height:48px;padding:0 12px;border:1px solid var(--line);background:#fff;border-radius:0}
+.f input,.f select,.f textarea{font-size:16px;min-height:48px;padding:0 12px;border:1px solid var(--line);background:var(--card-2);border-radius:10px;color:var(--ink)}
 .f textarea{padding:10px 12px;min-height:80px;resize:vertical}.f .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.done{margin-top:10px;padding:12px;background:#e6f4ec;border-left:3px solid var(--ok);font-size:14px}
-a{color:inherit}
-.err{color:var(--bad);margin-top:10px;min-height:1.2em}
+.done-box{margin-top:6px;padding:12px;background:var(--ok-bg);border-radius:12px;font-size:14px}
+.login{max-width:420px;margin:12vh auto 0}
+.login input{width:100%;min-height:52px;padding:0 14px;border:1px solid var(--line);background:var(--card);border-radius:12px;font-size:16px}
+.err{color:var(--bad);margin-top:10px;min-height:1.2em;font-size:14px}
+.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--brand);color:var(--on-brand);padding:12px 16px;border-radius:12px;font-size:14px;font-weight:600;z-index:50;box-shadow:0 12px 30px -10px rgba(0,0,0,.5)}
+table.data{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+table.data th,table.data td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+table.data td:last-child,table.data th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+details.tbl summary{margin-top:10px;font-size:12px;color:var(--ink-2);cursor:pointer}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="mono">DINGUY Registration Office · Staff only</div>
-  <h1>ORDERS</h1>
-  <form class="login" id="login">
-    <input id="pw" type="password" placeholder="Admin password" autocomplete="current-password">
-    <button class="btn" type="submit">OPEN</button>
-  </form>
-  <div class="err" id="err"></div>
+  <section class="login" id="login">
+    <div class="mono">DINGUY Registration Office · Staff only</div>
+    <h1 style="margin:6px 0 18px;font-size:36px;letter-spacing:-.04em">Office</h1>
+    <form id="loginForm" style="display:grid;gap:10px">
+      <input id="pw" type="password" placeholder="Admin password" autocomplete="current-password">
+      <button class="btn" type="submit" style="min-height:52px">OPEN</button>
+    </form>
+    <div class="err" id="err"></div>
+  </section>
   <div id="app" hidden>
-    <div class="row"><span class="mono" id="count"></span><button class="btn ghost" id="refresh">REFRESH</button></div>
-    <details class="new" id="newreg"><summary>+ NEW REGISTRATION (ADD BY HAND)</summary>
-      <form class="f" id="newform">
-        <label>Stone<select name="slug" required><option value="">Choose…</option><option value="cobblestone">COBBLESTONE · 89</option><option value="bloket">ብሎኬት · 89</option><option value="river-stone">የወንዝ ድንጋይ · 89</option><option value="foundation-stone">መሰረት ድንጋይ · 89</option><option value="queen-of-sheba">THE QUEEN OF SHEBA · 199</option><option value="mezezo-chocolate-opal">MEZEZO CHOCOLATE OPAL · 199</option><option value="shakiso-emerald">SHAKISO EMERALD · 199</option><option value="diamond">DIAMOND · 199</option></select></label>
-        <div class="two"><label>For (recipient)<input name="to" required maxlength="28"></label><label>From (buyer)<input name="by" required maxlength="28"></label></div>
-        <label>Occasion<select name="occasion"><option value="">—</option><option>Birthday</option><option>Anniversary</option><option>Graduation</option><option>Farewell</option><option>Apology</option><option>Just because</option></select></label>
-        <label>Message<textarea name="message" maxlength="140"></textarea></label>
-        <div class="two"><label>Buyer phone (optional)<input name="phone" type="tel" inputmode="tel" placeholder="09XX XXX XXX"></label><label>Recipient email (optional)<input name="email" type="email"></label></div>
-        <div class="two"><label>Language<select name="lang"><option value="en">English</option><option value="am">አማርኛ</option></select></label><label>Payment note (optional)<input name="note" maxlength="60" placeholder="e.g. cash, DJ…"></label></div>
-        <button class="btn" type="submit">REGISTER — MARK AS PAID</button>
-        <div id="newdone"></div>
-      </form>
-    </details>
-    <div class="tabs" id="tabs"></div>
-    <div id="list"></div>
+    <header class="top">
+      <div class="brandrow">
+        <div><div class="mono" id="updated">DINGUY Office</div><h1>DINGUY Office</h1></div>
+        <button class="iconbtn" id="refresh" aria-label="Refresh">↻ Refresh</button>
+      </div>
+      <nav class="tabs" id="tabs"></nav>
+    </header>
+    <main id="view"></main>
   </div>
 </div>
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const TZ='Africa/Addis_Ababa',PAYNUM='0996567218';
 let pw='';try{pw=sessionStorage.getItem('dg-admin')||''}catch(e){}
-let orders=[],inquiries=[],tab='review';
-const TABS=[['review','Needs review'],['paid','Paid'],['awaiting','Awaiting payment'],['rejected','Rejected'],['removed','Removed'],['all','All orders'],['inq','SIDEWAYS inquiries']];
-async function api(method,body){
-  const r=await fetch('/api/admin',{method,headers:{'x-admin-password':pw,'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+const S={orders:[],inquiries:[],tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
+try{const t=sessionStorage.getItem('dg-tab');if(t)S.tab=t;}catch(e){}
+
+async function api(method,body,query=''){
+  const r=await fetch('/api/admin'+query,{method,headers:{'x-admin-password':pw,'content-type':'application/json'},body:body?JSON.stringify(body):undefined,keepalive:method==='POST'});
   const j=await r.json().catch(()=>({error:'Bad response'}));if(!r.ok)throw new Error(j.error||r.status);return j;
 }
 async function load(){
   $('#err').textContent='';
-  try{const j=await api('GET');orders=j.orders;inquiries=j.inquiries||[];try{sessionStorage.setItem('dg-admin',pw)}catch(e){}$('#login').hidden=true;$('#app').hidden=false;render();}
+  try{const j=await api('GET');S.orders=j.orders;S.inquiries=j.inquiries||[];S.loadedAt=Date.now();
+    try{sessionStorage.setItem('dg-admin',pw)}catch(e){}
+    $('#login').hidden=true;$('#app').hidden=false;render();}
   catch(e){$('#err').textContent=e.message;$('#login').hidden=false;$('#app').hidden=true;}
 }
-const PAYNUM='0996567218';
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200);}
+
+/* ---------- helpers ---------- */
+const when=ms=>ms?new Date(ms).toLocaleString('en-GB',{timeZone:TZ,day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+function ago(ms){if(!ms)return'';const m=Math.round((Date.now()-ms)/60000);if(m<1)return'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';const d=Math.round(h/24);return d+' d ago';}
+const dayKey=ms=>new Date(ms).toLocaleDateString('en-CA',{timeZone:TZ});
+const fmtBirr=n=>Math.round(n).toLocaleString('en-US')+' Birr';
+const isFriend=o=>o.price===89;
+const F=o=>o.follow||{};
+
 function msgs(o){
   const am=o.lang==='am';
   const help=am
@@ -99,90 +180,233 @@ function msgs(o){
     :`Hi ${o.to},\n\n${o.by} has registered ${o.name} in your name with the DINGUY Registry.\n\n${o.message?`“${o.message}”\n\n`:''}Registration No. ${o.id}\nYour record and certificate: ${o.recordLink}\n\nDINGUY® — Registered stones for unreasonably meaningful occasions.\nDigital registration. No physical stone included.`;
   return {help,congrats,subject,body};
 }
-const sms=(phone,body)=>'sms:'+phone+'?&body='+encodeURIComponent(body);
-function contactButtons(o){
-  if(!o.phone&&!o.email)return '';
-  const m=msgs(o),b=[];
-  if(o.phone){
-    b.push(`<a class="btn ghost" href="tel:${esc(o.phone)}">CALL</a>`);
-    if(o.status==='paid')b.push(`<a class="btn" href="${esc(sms(o.phone,m.congrats))}">SMS: CONGRATS</a>`);
-    else if(o.status!=='removed')b.push(`<a class="btn" href="${esc(sms(o.phone,m.help))}">SMS: PAYMENT HELP</a>`);
+const smsHref=(phone,body)=>'sms:'+phone+'?&body='+encodeURIComponent(body);
+const mailHref=(o,m)=>`mailto:${o.email}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
+// A link that also records the follow-up when tapped.
+const markLink=(o,what,href,label,cls='btn')=>`<a class="${cls}" href="${esc(href)}" data-mark="${what}" data-id="${esc(o.id)}">${label}</a>`;
+
+/* ---------- tasks ---------- */
+function tasks(){
+  const now=Date.now(),out=[];
+  for(const o of S.orders){
+    const f=F(o);
+    if(o.status==='review')out.push({p:1,k:'review',o,ic:'🔎',t:`Check payment ${o.txn||''}`,s:`${o.name} for ${o.to} · ${o.price} Birr · ${o.reason||'waiting for you'}`,at:o.submittedAt||o.createdAt});
+    if((o.status==='awaiting'||o.status==='rejected')&&o.phone&&!f.help_sms&&!f.help_skip&&now-o.createdAt>10*60e3&&now-o.createdAt<7*864e5)
+      out.push({p:3,k:'help',o,ic:'💬',t:`Help ${o.by} pay`,s:`${o.status==='rejected'?'Code was rejected':'Didn’t pay yet'} · ${o.name} · ordered ${ago(o.createdAt)}`,at:o.createdAt});
+    const recent=now-(o.approvedAt||o.createdAt)<7*864e5; // older paid orders don't flood the list
+    if(o.status==='paid'&&recent&&o.phone&&!f.congrats_sms&&!f.congrats_skip)
+      out.push({p:2,k:'congrats',o,ic:'🎉',t:`Text congrats to ${o.by}`,s:`${o.to} · ${o.name} · paid ${ago(o.approvedAt)}`,at:o.approvedAt});
+    if(o.status==='paid'&&recent&&o.email&&!f.email&&!f.email_skip)
+      out.push({p:2,k:'email',o,ic:'✉️',t:`Email the certificate to ${o.to}`,s:`${o.email} · from ${o.by}`,at:o.approvedAt});
   }
-  if(o.email&&o.status==='paid')b.push(`<a class="btn" href="mailto:${esc(o.email)}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}">EMAIL ${esc(o.to).toUpperCase()}</a>`);
-  return `<div class="actions">${b.join('')}</div>`;
+  for(const q of S.inquiries)if(q.status!=='done')out.push({p:2,k:'inq',q,ic:'📨',t:`Reply to ${q.name}`,s:`SIDEWAYS · ${q.need} · ${ago(q.createdAt)}`,at:q.createdAt});
+  return out.sort((a,b)=>a.p-b.p||(a.at||0)-(b.at||0));
 }
-function when(ms){return ms?new Date(ms).toLocaleString('en-GB',{timeZone:'Africa/Addis_Ababa',dateStyle:'medium',timeStyle:'short'}):'—'}
+function reachLink(r){const t=String(r||'').trim();if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(t))return `mailto:${t}`;const d=t.replace(/[^\d+]/g,'');return d.length>=9?`tel:${d}`:'';}
+function taskCard(t){
+  const o=t.o;let acts='';
+  if(t.k==='review')acts=`<a class="btn ghost" href="https://transactioninfo.ethiotelecom.et/receipt/${encodeURIComponent(o.txn||'')}" target="_blank" rel="noopener noreferrer">Open receipt ↗</a><button class="btn ok" data-a="approve" data-id="${esc(o.id)}">Approve</button><button class="btn bad" data-a="reject" data-id="${esc(o.id)}">Reject</button>`;
+  if(t.k==='help')acts=markLink(o,'help_sms',smsHref(o.phone,msgs(o).help),'Send help SMS')+`<a class="btn ghost" href="tel:${esc(o.phone)}" data-mark="call" data-id="${esc(o.id)}">Call</a><button class="btn ghost" data-skip="help_skip" data-id="${esc(o.id)}">Skip</button>`;
+  if(t.k==='congrats')acts=markLink(o,'congrats_sms',smsHref(o.phone,msgs(o).congrats),'Send congrats SMS')+`<button class="btn ghost" data-skip="congrats_skip" data-id="${esc(o.id)}">Skip</button>`;
+  if(t.k==='email')acts=markLink(o,'email',mailHref(o,msgs(o)),'Send email')+`<button class="btn ghost" data-skip="email_skip" data-id="${esc(o.id)}">Skip</button>`;
+  if(t.k==='inq'){const q=t.q,h=reachLink(q.reach);acts=(h?`<a class="btn" href="${esc(h)}">${h.startsWith('mailto')?'Email':'Call'} ${esc(q.name)}</a>`:'')+`<button class="btn ghost" data-q="${esc(q.id)}" data-qa="done">Mark done</button>`;}
+  const sub=t.k==='inq'&&t.q.msg?`${esc(t.s)}<br>“${esc(t.q.msg.slice(0,140))}”`:esc(t.s);
+  return `<div class="card task t-${t.k}"><div class="ic" aria-hidden="true">${t.ic}</div><div><div class="tt">${esc(t.t)}</div><div class="ts">${sub}</div><div class="acts">${acts}</div></div></div>`;
+}
+
+/* ---------- stats ---------- */
+function stats(){
+  const real=S.orders.filter(o=>!o.manual);
+  const paid=S.orders.filter(o=>o.status==='paid');
+  const today=dayKey(Date.now()),wk=Date.now()-7*864e5;
+  const rev=paid.reduce((a,o)=>a+o.price,0);
+  const revToday=paid.filter(o=>dayKey(o.approvedAt||o.createdAt)===today).reduce((a,o)=>a+o.price,0);
+  const rev7=paid.filter(o=>(o.approvedAt||0)>=wk).reduce((a,o)=>a+o.price,0);
+  const realPaid=real.filter(o=>o.status==='paid'||o.status==='removed');
+  const coded=real.filter(o=>o.txn);
+  const conv=real.length?Math.round(realPaid.length/real.length*100):0;
+  const mins=realPaid.map(o=>((o.approvedAt||0)-(o.createdAt||0))/60000).filter(x=>x>0).sort((a,b)=>a-b);
+  const med=mins.length?mins[Math.floor(mins.length/2)]:null;
+  // last 14 days revenue
+  const days=[];for(let i=13;i>=0;i--){const t=Date.now()-i*864e5;days.push({k:dayKey(t),label:new Date(t).toLocaleDateString('en-GB',{timeZone:TZ,day:'numeric',month:'short'}),v:0,n:0});}
+  const byDay=Object.fromEntries(days.map(d=>[d.k,d]));
+  for(const o of paid){const d=byDay[dayKey(o.approvedAt||o.createdAt)];if(d){d.v+=o.price;d.n++;}}
+  const byStone={};for(const o of paid){byStone[o.name]=(byStone[o.name]||0)+1;}
+  const stones=Object.entries(byStone).sort((a,b)=>b[1]-a[1]);
+  const fr=paid.filter(isFriend).length,lv=paid.length-fr;
+  const am=paid.filter(o=>o.lang==='am').length;
+  return {rev,revToday,rev7,paid:paid.length,conv,med,real:real.length,coded:coded.length,realPaid:realPaid.length,days,stones,fr,lv,am};
+}
+
+/* ---------- views ---------- */
+function renderTabs(){
+  const n=tasks().length,inq=S.inquiries.filter(q=>q.status!=='done').length;
+  const T=[['dash','Dashboard',0],['tasks','Tasks',n],['orders','Orders',0],['inq','Inquiries',inq]];
+  $('#tabs').innerHTML=T.map(([k,l,c])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${l}${c?`<span class="badge">${c}</span>`:''}</button>`).join('');
+  $('#updated').textContent='Updated '+new Date(S.loadedAt).toLocaleTimeString('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit'});
+}
+function viewDash(){
+  const st=stats(),ts=tasks();
+  const max=Math.max(1,...st.days.map(d=>d.v));const top=Math.ceil(max/100)*100||100;
+  const cols=st.days.map((d,i)=>`<div class="col${d.v?'':' zero'}${S.sel===i?' sel':''}" data-col="${i}" role="img" aria-label="${esc(d.label)}: ${fmtBirr(d.v)}, ${d.n} paid"><i style="height:${(d.v/top*100).toFixed(1)}%"></i></div>`).join('');
+  const selD=S.sel!=null?st.days[S.sel]:null;
+  const funnel=[['Orders started',st.real],['Entered a code',st.coded],['Paid',st.realPaid]];
+  const fMax=Math.max(1,st.real);
+  const sMax=Math.max(1,...st.stones.map(s=>s[1]));
+  const tot=Math.max(1,st.fr+st.lv);
+  return `
+  ${ts.length?`<h2 class="sec"><span>Next up · ${ts.length}</span><button data-tab="tasks">See all</button></h2><div class="grid">${ts.slice(0,3).map(taskCard).join('')}</div>`:`<h2 class="sec"><span>Next up</span></h2><div class="card empty">✓ All caught up.</div>`}
+  <h2 class="sec"><span>Money</span></h2>
+  <div class="kpis">
+    <div class="card kpi"><div class="mono">Today</div><div class="v">${fmtBirr(st.revToday)}</div></div>
+    <div class="card kpi"><div class="mono">Last 7 days</div><div class="v">${fmtBirr(st.rev7)}</div></div>
+    <div class="card kpi"><div class="mono">All time</div><div class="v">${fmtBirr(st.rev)}</div><div class="s">${st.paid} registrations</div></div>
+    <div class="card kpi"><div class="mono">Pay rate</div><div class="v">${st.conv}%</div><div class="s">of started orders get paid${st.med!=null?` · ${Math.round(st.med)} min to pay (median)`:''}</div></div>
+  </div>
+  <h2 class="sec"><span>Revenue · last 14 days</span></h2>
+  <div class="card">
+    <div class="chart-h"><div class="t">Paid per day</div><div class="readout" aria-live="polite">${selD?`<strong>${esc(selD.label)}</strong> · ${fmtBirr(selD.v)} · ${selD.n} paid`:'Tap a bar'}</div></div>
+    <div class="cols" id="cols"><div class="gl" style="bottom:100%"><span>${fmtBirr(top)}</span></div><div class="gl" style="bottom:50%"><span>${fmtBirr(top/2)}</span></div>${cols}</div>
+    <div class="xlab"><span>${esc(st.days[0].label)}</span><span>${esc(st.days[7].label)}</span><span>Today</span></div>
+    <details class="tbl"><summary>Show as table</summary><table class="data"><thead><tr><th>Day</th><th>Paid</th><th>Birr</th></tr></thead><tbody>${st.days.slice().reverse().map(d=>`<tr><td>${esc(d.label)}</td><td>${d.n}</td><td>${d.v}</td></tr>`).join('')}</tbody></table></details>
+  </div>
+  <div class="two-col">
+    <div><h2 class="sec"><span>Where people drop off</span></h2>
+      <div class="card">${funnel.map(([l,v])=>`<div class="hbar"><span class="lab">${l}</span><span class="tr"><i style="width:${(v/fMax*100).toFixed(1)}%"></i></span><span class="val">${v}</span></div>`).join('')}
+        <div class="readout" style="margin-top:10px">${st.real?`${st.real-st.coded} never entered a code — send them the help SMS.`:'No orders yet.'}</div></div></div>
+    <div><h2 class="sec"><span>Friend vs loved one</span></h2>
+      <div class="card"><div class="split" role="img" aria-label="Friend ${st.fr}, Loved one ${st.lv}"><i style="flex:${st.fr||0.0001};background:var(--series-1)"></i><i style="flex:${st.lv||0.0001};background:var(--series-2)"></i></div>
+        <div class="legend"><span><b style="background:var(--series-1)"></b>Friend · ${st.fr} (${Math.round(st.fr/tot*100)}%)</span><span><b style="background:var(--series-2)"></b>Loved one · ${st.lv} (${Math.round(st.lv/tot*100)}%)</span></div>
+        <div class="readout" style="margin-top:10px">${st.paid?`${Math.round(st.am/st.paid*100)}% of buyers used Amharic.`:''}</div></div></div>
+  </div>
+  <h2 class="sec"><span>Best-selling stones</span></h2>
+  <div class="card">${st.stones.length?st.stones.map(([n,v])=>`<div class="hbar"><span class="lab" title="${esc(n)}">${esc(n)}</span><span class="tr"><i style="width:${(v/sMax*100).toFixed(1)}%"></i></span><span class="val">${v}</span></div>`).join(''):'<div class="empty">No paid registrations yet.</div>'}</div>
+  <h2 class="sec"><span>Add by hand</span></h2>
+  ${newForm()}`;
+}
+function viewTasks(){
+  const ts=tasks();const groups=[['review','Check these payments'],['congrats','Say congrats'],['email','Email certificates'],['help','Help them pay'],['inq','SIDEWAYS inquiries']];
+  if(!ts.length)return `<div class="card empty" style="margin-top:16px">✓ All caught up. New tasks show up here automatically.</div>`;
+  return groups.map(([k,l])=>{const g=ts.filter(t=>t.k===k);return g.length?`<h2 class="sec"><span>${l} · ${g.length}</span></h2><div class="grid">${g.map(taskCard).join('')}</div>`:'';}).join('');
+}
+function followChips(o){
+  const f=F(o),c=[];
+  const add=(k,label)=>{if(f[k])c.push(`<span class="chip done">✓ ${label} ${ago(f[k])}</span>`);};
+  add('help_sms','Help SMS');add('congrats_sms','Congrats SMS');add('email','Emailed');add('call','Called');
+  return c.length?`<div class="chips">${c.join('')}</div>`:'';
+}
+function orderCard(o){
+  const m=msgs(o),a=[];
+  if(o.phone){a.push(`<a class="btn ghost" href="tel:${esc(o.phone)}" data-mark="call" data-id="${esc(o.id)}">Call</a>`);
+    if(o.status==='paid')a.push(markLink(o,'congrats_sms',smsHref(o.phone,m.congrats),'Congrats SMS'));
+    else if(o.status!=='removed')a.push(markLink(o,'help_sms',smsHref(o.phone,m.help),'Help SMS'));}
+  if(o.email&&o.status==='paid')a.push(markLink(o,'email',mailHref(o,m),'Email '+esc(o.to)));
+  if(o.status==='review'||o.status==='awaiting'||o.status==='rejected')a.push(`<button class="btn ok" data-a="approve" data-id="${esc(o.id)}">Approve</button>`);
+  if(o.status==='review'||o.status==='awaiting')a.push(`<button class="btn bad" data-a="reject" data-id="${esc(o.id)}">Reject</button>`);
+  if(o.status==='paid')a.push(`<a class="btn ghost" href="${esc(o.recordLink)}" target="_blank" rel="noopener">Record ↗</a><button class="btn ghost" data-a="remove" data-id="${esc(o.id)}">Remove</button>`);
+  if(o.status==='removed')a.push(`<button class="btn" data-a="restore" data-id="${esc(o.id)}">Restore to registry</button>`);
+  const label={paid:'PAID',review:'CHECK',awaiting:'NOT PAID',rejected:'REJECTED',removed:'REMOVED'}[o.status]||o.status;
+  return `<div class="card">
+    <div class="row"><span class="oid">${esc(o.id)}</span><span class="pill s-${esc(o.status)}">${label}</span></div>
+    <div style="margin-top:8px;font-size:17px;font-weight:700">${esc(o.to)} <span style="font-weight:500;color:var(--ink-2)">from ${esc(o.by)}</span></div>
+    <dl class="kv">
+      <dt>Stone</dt><dd>${esc(o.name)} · ${o.price} Birr${o.manual?' · added by hand':''}</dd>
+      <dt>Ordered</dt><dd>${when(o.createdAt)}${o.lang==='am'?' · አማርኛ':''}</dd>
+      ${o.phone?`<dt>Phone</dt><dd><a href="tel:${esc(o.phone)}" data-mark="call" data-id="${esc(o.id)}">${esc(o.phone)}</a></dd>`:''}
+      ${o.email?`<dt>Their email</dt><dd>${esc(o.email)}</dd>`:''}
+      ${o.txn?`<dt>Transaction</dt><dd>${o.manual?esc(o.txn):`<a href="https://transactioninfo.ethiotelecom.et/receipt/${encodeURIComponent(o.txn)}" target="_blank" rel="noopener noreferrer">${esc(o.txn)} ↗</a>`}</dd>`:''}
+      ${o.paidAmount!=null?`<dt>Paid</dt><dd>${esc(o.paidAmount)} Birr${o.payer?' by '+esc(o.payer):''}</dd>`:''}
+      ${o.approvedBy?`<dt>Approved</dt><dd>${esc(o.approvedBy)} · ${when(o.approvedAt)}</dd>`:''}
+      ${o.message?`<dt>Message</dt><dd>“${esc(o.message)}”</dd>`:''}
+    </dl>
+    ${o.reason&&o.status==='review'?`<div class="reason">${esc(o.reason)}</div>`:''}
+    ${followChips(o)}
+    <div class="acts">${a.join('')}</div>
+  </div>`;
+}
+function viewOrders(){
+  const FIL=[['all','All'],['review','Check'],['awaiting','Not paid'],['paid','Paid'],['rejected','Rejected'],['removed','Removed']];
+  const q=S.q.trim().toLowerCase();
+  const list=S.orders.filter(o=>(S.filter==='all'||o.status===S.filter)&&(!q||[o.id,o.to,o.by,o.phone,o.txn,o.email].some(v=>String(v||'').toLowerCase().includes(q))));
+  const cnt=k=>k==='all'?S.orders.length:S.orders.filter(o=>o.status===k).length;
+  return `<div style="margin-top:14px"><input class="search" id="q" type="search" placeholder="Search name, phone, DG-…, transaction" value="${esc(S.q)}">
+    <div class="filters">${FIL.map(([k,l])=>`<button data-filter="${k}" aria-pressed="${S.filter===k}">${l} · ${cnt(k)}</button>`).join('')}</div></div>
+    <div class="grid" style="margin-top:12px">${list.slice(0,80).map(orderCard).join('')||'<div class="card empty">Nothing here.</div>'}</div>
+    ${list.length>80?`<div class="empty">Showing 80 of ${list.length}. Search to narrow down.</div>`:''}
+    <h2 class="sec"><span>Add by hand</span></h2>${newForm()}`;
+}
+function viewInq(){
+  if(!S.inquiries.length)return `<div class="card empty" style="margin-top:16px">No SIDEWAYS inquiries yet.</div>`;
+  return `<div class="grid" style="margin-top:14px">${S.inquiries.map(q=>{const h=reachLink(q.reach);return `<div class="card" style="${q.status==='done'?'opacity:.6':''}">
+    <div class="row"><strong style="font-size:17px">${esc(q.name)}</strong><span class="pill ${q.status==='done'?'s-awaiting':'s-review'}">${q.status==='done'?'DONE':'NEW'}</span></div>
+    <dl class="kv"><dt>Contact</dt><dd>${h?`<a href="${esc(h)}">${esc(q.reach)}</a>`:esc(q.reach)}</dd><dt>Needs</dt><dd>${esc(q.need)}</dd><dt>Received</dt><dd>${when(q.createdAt)}</dd></dl>
+    ${q.msg?`<p style="margin:10px 0 0;white-space:pre-wrap;font-size:15px;line-height:1.45">${esc(q.msg)}</p>`:''}
+    <div class="acts">${h?`<a class="btn" href="${esc(h)}">${h.startsWith('mailto')?'Email':'Call'}</a>`:''}<button class="btn ghost" data-q="${esc(q.id)}" data-qa="${q.status==='done'?'new':'done'}">${q.status==='done'?'Mark as new':'Mark done'}</button></div>
+  </div>`;}).join('')}</div>`;
+}
+const STONES=[['cobblestone','COBBLESTONE · 89'],['bloket','ብሎኬት · 89'],['river-stone','የወንዝ ድንጋይ · 89'],['foundation-stone','መሰረት ድንጋይ · 89'],['queen-of-sheba','THE QUEEN OF SHEBA · 199'],['mezezo-chocolate-opal','MEZEZO CHOCOLATE OPAL · 199'],['shakiso-emerald','SHAKISO EMERALD · 199'],['diamond','DIAMOND · 199']];
+function newForm(){
+  return `<details class="new"><summary>+ New registration (paid another way, or a gift)</summary>
+    <form class="f" id="newform">
+      <label>Stone<select name="slug" required><option value="">Choose…</option>${STONES.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select></label>
+      <div class="two"><label>For (recipient)<input name="to" required maxlength="28"></label><label>From (buyer)<input name="by" required maxlength="28"></label></div>
+      <label>Occasion<select name="occasion"><option value="">—</option>${['Birthday','Anniversary','Graduation','Farewell','Apology','Just because'].map(o=>`<option>${o}</option>`).join('')}</select></label>
+      <label>Message<textarea name="message" maxlength="140"></textarea></label>
+      <div class="two"><label>Buyer phone<input name="phone" type="tel" inputmode="tel" placeholder="09XX XXX XXX"></label><label>Recipient email<input name="email" type="email"></label></div>
+      <div class="two"><label>Language<select name="lang"><option value="en">English</option><option value="am">አማርኛ</option></select></label><label>Payment note<input name="note" maxlength="60" placeholder="cash, DJ…"></label></div>
+      <button class="btn" type="submit" style="min-height:52px">Register — mark as paid</button>
+      <div id="newdone"></div>
+    </form></details>`;
+}
 function render(){
-  const n=k=>k==='inq'?inquiries.filter(q=>q.status!=='done').length:k==='all'?orders.length:orders.filter(o=>o.status===k).length;
-  $('#tabs').innerHTML=TABS.map(([k,l])=>`<button data-t="${k}" aria-pressed="${k===tab}">${l} (${n(k)})</button>`).join('');
-  $('#count').textContent=orders.length+' latest orders';
-  if(tab==='inq'){renderInq();return;}
-  const list=orders.filter(o=>tab==='all'||o.status===tab);
-  $('#list').innerHTML=list.length?list.map(o=>`
-    <div class="card">
-      <div class="row"><span class="big">${esc(o.id)}</span><span class="pill s-${esc(o.status)}">${esc(o.status.toUpperCase())}</span></div>
-      <dl>
-        <dt>Stone</dt><dd>${esc(o.name)} · ${esc(o.price)} Birr</dd>
-        <dt>For</dt><dd>${esc(o.to)} (from ${esc(o.by)})</dd>
-        <dt>Ordered</dt><dd>${when(o.createdAt)}${o.lang==='am'?' · አማርኛ':''}</dd>
-        ${o.phone?`<dt>Buyer phone</dt><dd><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a></dd>`:''}
-        ${o.email?`<dt>Their email</dt><dd>${esc(o.email)}</dd>`:''}
-        <dt>Transaction</dt><dd>${o.txn?`<a href="https://transactioninfo.ethiotelecom.et/receipt/${encodeURIComponent(o.txn)}" target="_blank" rel="noopener noreferrer">${esc(o.txn)} ↗</a>`:'—'}</dd>
-        ${o.payer?`<dt>Paid by</dt><dd>${esc(o.payer)}</dd>`:''}
-        ${o.paidAmount!=null?`<dt>Amount</dt><dd>${esc(o.paidAmount)} Birr · ${when(o.paidAt)}</dd>`:''}
-        ${o.approvedBy?`<dt>Approved</dt><dd>${esc(o.approvedBy)} · ${when(o.approvedAt)}</dd>`:''}
-      </dl>
-      ${o.reason&&o.status==='review'?`<div class="reason">${esc(o.reason)}</div>`:''}
-      ${o.status==='review'||o.status==='awaiting'||o.status==='rejected'?`<div class="actions">
-        <button class="btn" data-a="approve" data-id="${esc(o.id)}">APPROVE</button>
-        ${o.status!=='rejected'?`<button class="btn bad" data-a="reject" data-id="${esc(o.id)}">REJECT</button>`:''}
-      </div>`:''}
-      ${contactButtons(o)}
-      ${o.status==='removed'?`<div class="actions"><button class="btn" data-a="restore" data-id="${esc(o.id)}">RESTORE TO REGISTRY</button></div>`:''}
-      ${o.status==='paid'?`<div class="actions"><button class="btn ghost" data-a="remove" data-id="${esc(o.id)}">REMOVE FROM PUBLIC REGISTRY</button></div>`:''}
-    </div>`).join(''):'<p class="mono" style="margin-top:20px">Nothing here.</p>';
+  renderTabs();
+  const v={dash:viewDash,tasks:viewTasks,orders:viewOrders,inq:viewInq}[S.tab]||viewDash;
+  $('#view').innerHTML=v();
 }
-function reachLink(r){const t=String(r||'').trim();if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(t))return `<a href="mailto:${esc(t)}">${esc(t)}</a>`;const d=t.replace(/[^\d+]/g,'');return d.length>=9?`<a href="tel:${esc(d)}">${esc(t)}</a>`:esc(t);}
-function renderInq(){
-  $('#list').innerHTML=inquiries.length?inquiries.map(q=>`
-    <div class="card" style="${q.status==='done'?'opacity:.55':''}">
-      <div class="row"><span class="big">${esc(q.name)}</span><span class="pill ${q.status==='done'?'s-awaiting':'s-review'}">${q.status==='done'?'DONE':'NEW'}</span></div>
-      <dl>
-        <dt>Contact</dt><dd>${reachLink(q.reach)}</dd>
-        <dt>Needs</dt><dd>${esc(q.need)}</dd>
-        <dt>Received</dt><dd>${when(q.createdAt)}</dd>
-      </dl>
-      ${q.msg?`<p style="margin:10px 0 0;white-space:pre-wrap;font-size:15px;line-height:1.45">${esc(q.msg)}</p>`:''}
-      <div class="actions"><button class="btn ${q.status==='done'?'ghost':''}" data-q="${esc(q.id)}" data-qa="${q.status==='done'?'new':'done'}">${q.status==='done'?'MARK AS NEW':'MARK AS DONE'}</button></div>
-    </div>`).join(''):'<p class="mono" style="margin-top:20px">No inquiries yet.</p>';
-}
-$('#login').onsubmit=e=>{e.preventDefault();pw=$('#pw').value;load();};
-$('#refresh').onclick=load;
-$('#newform').onsubmit=async e=>{
-  e.preventDefault();const f=e.target,btn=f.querySelector('button[type=submit]');
-  const create=Object.fromEntries(new FormData(f).entries());
-  if(!confirm(`Register ${create.to} (from ${create.by}) as PAID and publish it?`))return;
-  btn.disabled=true;$('#newdone').innerHTML='';
-  try{const j=await api('POST',{create});const o=j.order;orders=[o,...orders];render();f.reset();
-    $('#newdone').innerHTML=`<div class="done"><strong>${esc(o.id)}</strong> registered for ${esc(o.to)}. <a href="${esc(o.recordLink)}" target="_blank" rel="noopener">Open record ↗</a>${contactButtons(o)}</div>`;}
-  catch(err){$('#newdone').innerHTML=`<div class="err">${esc(err.message)}</div>`;}
-  btn.disabled=false;
-};
-$('#tabs').onclick=e=>{const t=e.target.closest('[data-t]');if(t){tab=t.dataset.t;render();}};
-$('#list').onclick=async e=>{
+function setTab(t){S.tab=t;S.sel=null;try{sessionStorage.setItem('dg-tab',t)}catch(e){}render();window.scrollTo(0,0);}
+function replaceOrder(o){S.orders=S.orders.map(x=>x.id===o.id?{...x,...o}:x);}
+
+/* ---------- events ---------- */
+$('#loginForm').onsubmit=e=>{e.preventDefault();pw=$('#pw').value;load();};
+$('#refresh').onclick=()=>load().then(()=>toast('Updated'));
+document.addEventListener('click',async e=>{
+  const tab=e.target.closest('[data-tab]');if(tab){setTab(tab.dataset.tab);return;}
+  const fil=e.target.closest('[data-filter]');if(fil){S.filter=fil.dataset.filter;render();return;}
+  const col=e.target.closest('[data-col]');if(col){const i=+col.dataset.col;S.sel=S.sel===i?null:i;render();return;}
+  // tapping an SMS / email / call link records the follow-up, then the link opens as normal
+  const mk=e.target.closest('a[data-mark]');
+  if(mk){const id=mk.dataset.id,what=mk.dataset.mark;const o=S.orders.find(x=>x.id===id);
+    if(o){o.follow={...F(o),[what]:Date.now()};}
+    api('POST',{id,action:'mark',what}).catch(()=>{});
+    setTimeout(()=>{render();if(what!=='call')toast('Marked as sent');},700);return;}
+  const sk=e.target.closest('[data-skip]');
+  if(sk){const id=sk.dataset.id,what=sk.dataset.skip;sk.disabled=true;
+    try{const j=await api('POST',{id,action:'mark',what});replaceOrder(j.order);render();toast('Skipped');}catch(err){alert(err.message);sk.disabled=false;}return;}
   const qb=e.target.closest('[data-q]');
-  if(qb){qb.disabled=true;try{const j=await api('POST',{inquiry:qb.dataset.q,action:qb.dataset.qa});inquiries=inquiries.map(q=>q.id===j.inquiry.id?j.inquiry:q);render();}catch(err){alert(err.message);qb.disabled=false;}return;}
-  const b=e.target.closest('[data-a]');if(!b)return;const id=b.dataset.id,a=b.dataset.a;
-  let note=null;
-  if(a==='restore'&&!confirm(`Put ${id} back in the public registry? Its number and certificate link work again.`))return;
-  if(a==='remove'&&!confirm(`Remove ${id} from the public registry? Its registry page and certificate stop working. This can't be undone.`))return;
-  if(a==='approve'&&!confirm(`Approve ${id}? The customer can then download the certificate.`))return;
-  if(a==='reject'){note=prompt(`Reject ${id}. Message shown to the customer (optional):`,'We could not confirm this payment. Please contact us.');if(note===null)return;}
+  if(qb){qb.disabled=true;try{const j=await api('POST',{inquiry:qb.dataset.q,action:qb.dataset.qa});S.inquiries=S.inquiries.map(q=>q.id===j.inquiry.id?j.inquiry:q);render();}catch(err){alert(err.message);qb.disabled=false;}return;}
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const id=b.dataset.id,a=b.dataset.a;let note=null;
+  if(a==='approve'&&!confirm(`Approve ${id}? The customer can then save the certificate.`))return;
+  if(a==='reject'){note=prompt(`Reject ${id}. Message shown to the customer:`,'We could not confirm this payment. Please check the transaction number or call 0996 567 218.');if(note===null)return;}
+  if(a==='remove'&&!confirm(`Remove ${id} from the public registry? You can restore it later from the Removed filter.`))return;
+  if(a==='restore'&&!confirm(`Put ${id} back in the public registry? Same number, same certificate link.`))return;
   b.disabled=true;
-  try{const j=await api('POST',{id,action:a,note});orders=orders.map(o=>o.id===id?j.order:o);render();}catch(err){alert(err.message);b.disabled=false;}
-};
+  try{const j=await api('POST',{id,action:a,note});replaceOrder(j.order);render();toast({approve:'Approved',reject:'Rejected',remove:'Removed',restore:'Restored'}[a]||'Done');}
+  catch(err){alert(err.message);b.disabled=false;}
+});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('#q');if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(_){}}}});
+document.addEventListener('submit',async e=>{
+  if(e.target.id!=='newform')return;e.preventDefault();
+  const f=e.target,btn=f.querySelector('button[type=submit]');const create=Object.fromEntries(new FormData(f).entries());
+  if(!confirm(`Register ${create.to} (from ${create.by}) as PAID and publish it?`))return;
+  btn.disabled=true;const out=f.querySelector('#newdone');out.innerHTML='';
+  try{const j=await api('POST',{create});const o=j.order;S.orders=[o,...S.orders];
+    const box=`<div class="done-box"><strong>${esc(o.id)}</strong> registered for ${esc(o.to)}. <a href="${esc(o.recordLink)}" target="_blank" rel="noopener">Open record ↗</a></div>`;
+    render();const n=document.querySelector('#newdone');if(n){n.closest('details').open=true;n.innerHTML=box;}toast('Registered');}
+  catch(err){out.innerHTML=`<div class="err">${esc(err.message)}</div>`;btn.disabled=false;}
+});
 if(pw)load();
-setInterval(()=>{if(!$('#app').hidden)load()},60000);
+setInterval(()=>{if(!$('#app').hidden&&document.visibilityState==='visible'&&!document.querySelector('details.new[open]')&&!(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))load();},60000);
 </script>
 </body>
 </html>
