@@ -414,6 +414,16 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
             </sc-for>
           </div>
         </div>
+        <div>
+          <label for="dg-phone" style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>05 — Your phone number</span><span>Required</span></label>
+          <input id="dg-phone" type="tel" inputmode="tel" autocomplete="tel" value="{{ draft.phone }}" onChange="{{ setPhone }}" placeholder="09XX XXX XXX" maxlength="16" style="display:block;width:100%;height:60px;margin-top:6px;background:transparent;border:0;border-bottom:1.5px solid #0b1720;font-weight:500;letter-spacing:-.01em;padding:0;outline:none;border-radius:0;font-size:26px">
+          <div style="margin-top:6px;font-size:13px;line-height:1.4;color:{{ phoneHintColor }}">{{ phoneHint }}</div>
+        </div>
+        <div>
+          <label for="dg-email" style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>06 — Their email</span><span>Optional</span></label>
+          <input id="dg-email" type="email" inputmode="email" autocomplete="off" autocapitalize="off" spellcheck="false" value="{{ draft.email }}" onChange="{{ setEmail }}" placeholder="name@example.com" maxlength="120" style="display:block;width:100%;height:60px;margin-top:6px;background:transparent;border:0;border-bottom:1.5px solid #0b1720;font-weight:500;letter-spacing:-.01em;padding:0;outline:none;border-radius:0;font-size:20px">
+          <div style="margin-top:6px;font-size:13px;line-height:1.4;color:{{ emailHintColor }}">{{ emailHint }}</div>
+        </div>
         <div style="padding:16px;border:1px solid rgba(11,23,32,.2)">
           <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase">Before you register</div>
           <p style="margin:8px 0 0;font-size:14px;line-height:1.5;color:#2c4556">DINGUY registrations are symbolic digital registrations. No physical stone is shipped or transferred. The registration does not represent ownership of a physical stone, land, mineral deposit, gemstone, or other tangible property. See our <a href="#/terms">Terms &amp; Conditions</a>.</p>
@@ -452,42 +462,53 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
       <p style="margin:16px 0 0;font-size:17px;color:#2c4556">{{ po.error }} Check that you opened the full order link.</p>
     </sc-if>
     <sc-if value="{{ po.ready }}">
-      <h1 style="margin:12px 0 0;font-size:clamp(44px,11vw,104px);line-height:.9;letter-spacing:-.045em;font-weight:600">PAY WITH TELEBIRR.</h1>
-      <div style="margin-top:28px;display:grid;grid-template-columns:1fr 96px;gap:16px;align-items:center">
-        <div>
-          <div style="font-size:clamp(26px,6vw,40px);font-weight:600;letter-spacing:-.03em;line-height:1">{{ po.name }}</div>
-          <div style="font-size:17px;color:#2c4556;margin-top:8px">for <strong style="color:#0b1720">{{ po.to }}</strong> · from {{ po.by }}</div>
-        </div>
-        <div><dc-import name="Stone" kind="{{ po.kind }}" spin="{{ spinRate }}" hint-size="96px,96px"></dc-import></div>
+      <div style="margin-top:12px;display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center;padding:10px 12px;background:#f3f5f6;border:1px solid rgba(11,23,32,.12)">
+        <div><dc-import name="Stone" kind="{{ po.kind }}" spin="{{ spinRate }}" hint-size="56px,56px"></dc-import></div>
+        <div style="min-width:0"><div style="font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.15">{{ po.name }}</div><div style="margin-top:2px;font-size:14px;color:#2c4556">for <strong style="color:#0b1720">{{ po.to }}</strong> · from {{ po.by }}</div></div>
       </div>
-      <div style="margin-top:22px;display:flex;justify-content:space-between;padding:16px 0;border-top:1px solid rgba(11,23,32,.2);border-bottom:1.5px solid #0b1720;font-size:22px;font-weight:600"><span>Total</span><span>{{ po.price }} Birr</span></div>
+      <ol aria-label="Payment steps" style="list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        <sc-for list="{{ po.steps }}" as="x" hint-placeholder-count="3"><li aria-current="{{ x.cur }}"><div style="height:6px;border-radius:3px;background:{{ x.bar }}"></div><div style="margin-top:6px;font-size:12px;line-height:1.2;font-weight:{{ x.w }};color:{{ x.c }}"><span>{{ x.n }}</span> <span>{{ x.label }}</span></div></li></sc-for>
+      </ol>
+      <sc-if value="{{ po.note }}"><div role="alert" style="margin-top:16px;padding:14px 16px;background:#fbe9e7;border-left:4px solid #b3261e;font-size:16px;font-weight:600;line-height:1.4">{{ po.note }}</div></sc-if>
 
-      <sc-if value="{{ po.canPay }}">
-        <sc-if value="{{ po.note }}"><div role="alert" style="margin-top:20px;padding:14px 16px;background:#fbe9e7;border-left:3px solid #b3261e;font-size:15px;line-height:1.4">{{ po.note }}</div></sc-if>
-        <section style="margin-top:32px">
-          <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Step 01 — Send the money</div>
-          <p style="margin:8px 0 0;font-size:17px;line-height:1.6">Send exactly <strong style="display:inline-block;padding:1px 8px;background:#ffd84d;color:#0b1720;font-size:22px;font-weight:800;letter-spacing:-.01em">{{ po.price }} Birr</strong> with telebirr to:</p>
-          <div style="margin-top:12px;background:#0b1720;color:#e6ecef;padding:18px 16px">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid rgba(230,236,239,.18)"><span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9fb6c6">Amount</span><span style="font-size:clamp(34px,10vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1;color:#ffd84d">{{ po.price }} <span style="font-size:.5em;font-weight:700">Birr</span></span></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-              <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9fb6c6">telebirr number</div><div style="margin-top:4px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:clamp(24px,6.4vw,34px);font-weight:500;letter-spacing:.02em">{{ po.phoneFmt }}</div></div>
-              <button onClick="{{ copyPhone }}" style="flex:none;min-height:44px;padding:0 14px;background:#e6ecef;color:#0b1720;border:0;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer">COPY</button>
+      <sc-if value="{{ po.step1 }}">
+        <section style="margin-top:22px">
+          <h2 style="margin:0;font-size:clamp(28px,7.6vw,40px);line-height:1.08;letter-spacing:-.03em;font-weight:800">Send <span style="background:#ffd84d;padding:0 6px;white-space:nowrap">{{ po.price }} Birr</span> with telebirr</h2>
+          <div style="margin-top:16px;background:#0b1720;color:#e6ecef;padding:18px 16px;border-radius:16px">
+            <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9fb6c6">To this number</div>
+            <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+              <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:clamp(26px,7.4vw,36px);font-weight:600;letter-spacing:.01em;white-space:nowrap">{{ po.phoneFmt }}</div>
+              <button onClick="{{ copyPhone }}" style="flex:none;min-height:48px;padding:0 16px;background:#ffd84d;color:#0b1720;border:0;border-radius:10px;font-size:13px;font-weight:800;letter-spacing:.06em;cursor:pointer">COPY</button>
             </div>
-            <sc-if value="{{ po.hasName }}"><div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(230,236,239,.18);display:flex;justify-content:space-between;gap:12px;font-size:15px"><span style="color:#b9c9d4">Name shown in telebirr</span><strong style="font-weight:600;text-align:right">{{ po.payName }}</strong></div></sc-if>
+            <sc-if value="{{ po.hasName }}"><div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(230,236,239,.18);display:flex;justify-content:space-between;gap:12px;font-size:16px"><span style="color:#b9c9d4">Name shown in telebirr</span><strong style="font-weight:700">{{ po.payName }}</strong></div></sc-if>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(230,236,239,.18);display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="color:#b9c9d4;font-size:16px">Amount</span><span style="font-size:clamp(30px,9vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1;color:#ffd84d">{{ po.price }} <span style="font-size:.5em">Birr</span></span></div>
           </div>
+          <ol style="list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px">
+            <sc-for list="{{ po.howto }}" as="h" hint-placeholder-count="4"><li style="display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;padding:10px 12px;background:#f3f5f6;border:1px solid rgba(11,23,32,.12);border-radius:12px"><span style="width:40px;height:40px;border-radius:50%;background:#0b1720;color:#ffd84d;display:grid;place-items:center;font-weight:800;font-size:18px">{{ h.n }}</span><span style="font-size:17px;font-weight:700;line-height:1.25">{{ h.t }}</span></li></sc-for>
+          </ol>
+          <button onClick="{{ sentMoney }}" style="margin-top:18px;width:100%;min-height:64px;padding:0 18px;background:#1f8a55;color:#fff;border:0;border-radius:14px;font-size:16px;font-weight:800;letter-spacing:.04em;cursor:pointer;box-shadow:0 14px 30px -16px rgba(31,138,85,.9)">✓ I’VE SENT THE MONEY</button>
+          <div style="margin-top:8px;text-align:center;font-size:14px;color:#435f73">Tap this only after telebirr says the payment is done.</div>
         </section>
-        <section style="margin-top:28px">
-          <label for="dg-txn" style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73;display:block">Step 02 — Enter your transaction number</label>
-          <p style="margin:8px 0 0;font-size:15px;line-height:1.45;color:#2c4556">After paying, open the telebirr receipt (or the SMS) and find the Transaction Number — 10 letters and numbers, like <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;color:#0b1720">DJ19BO2MR4</span>.</p>
-          <figure style="margin:12px 0 0;max-width:380px">
+      </sc-if>
+
+      <sc-if value="{{ po.step2 }}">
+        <section style="margin-top:22px">
+          <h2 style="margin:0;font-size:clamp(28px,7.6vw,40px);line-height:1.08;letter-spacing:-.03em;font-weight:800">Copy the code from telebirr</h2>
+          <p style="margin:10px 0 0;font-size:17px;font-weight:600;line-height:1.4">Find <span style="background:#ffd84d;padding:0 4px">Transaction Number</span> <span>on the telebirr receipt.</span></p>
+          <figure style="margin:12px 0 0;max-width:420px">
             <img src="assets/telebirr-transaction-number.jpg" width="760" height="283" alt="telebirr receipt with the Transaction Number highlighted" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;background:#fff;border:1px solid rgba(11,23,32,.14);border-radius:14px;box-shadow:0 14px 30px -22px rgba(0,0,0,.45)">
-            <figcaption style="margin-top:8px;font-size:12px;font-weight:600;color:#0b1720">↑ Copy the Transaction Number into the box below</figcaption>
           </figure>
-          <form onSubmit="{{ verifyPay }}" style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
-            <input id="dg-txn" value="{{ po.txnInput }}" onChange="{{ setTxn }}" placeholder="e.g. DJ19BO2MR4" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" maxlength="14" style="display:block;width:100%;height:60px;background:#f3f5f6;border:1px solid rgba(11,23,32,.3);padding:0 16px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:22px;letter-spacing:.06em;text-transform:uppercase;outline:none;border-radius:0">
-            <button type="submit" style="display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">CONFIRM PAYMENT<span>→</span></button>
-            <div role="alert" style="min-height:1.3em;font-size:15px;line-height:1.4;color:#b3261e">{{ po.error }}</div>
+          <form onSubmit="{{ verifyPay }}" style="margin-top:18px;display:flex;flex-direction:column;gap:10px">
+            <label for="dg-txn" style="font-size:17px;font-weight:700">Paste the code here</label>
+            <div style="display:flex;gap:8px">
+              <input id="dg-txn" value="{{ po.txnInput }}" onChange="{{ setTxn }}" placeholder="e.g. DJ19BO2MR4" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="40" style="flex:1;min-width:0;height:64px;background:#fff;border:2px solid {{ po.codeBorder }};border-radius:12px;padding:0 14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:22px;letter-spacing:.06em;text-transform:uppercase;outline:none">
+              <button type="button" onClick="{{ pasteTxn }}" style="flex:none;min-height:48px;padding:0 16px;background:#ffd84d;color:#0b1720;border:0;border-radius:10px;font-size:13px;font-weight:800;letter-spacing:.06em;cursor:pointer;min-height:64px;border-radius:12px">PASTE</button>
+            </div>
+            <div style="min-height:1.3em;font-size:15px;font-weight:700;color:{{ po.codeColor }}">{{ po.codeHint }}</div>
+            <button type="submit" disabled="{{ po.codeBad }}" style="display:flex;align-items:center;justify-content:center;gap:10px;min-height:64px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;border-radius:14px;font-size:16px;font-weight:800;letter-spacing:.04em;cursor:pointer;opacity:{{ po.codeOpacity }}">CHECK MY PAYMENT<span>→</span></button>
+            <div role="alert" style="min-height:1.3em;font-size:16px;font-weight:600;line-height:1.4;color:#b3261e">{{ po.error }}</div>
           </form>
+          <button onClick="{{ notSentYet }}" style="margin-top:4px;background:none;border:0;padding:10px 0;font-size:15px;font-weight:600;color:#0b1720;text-decoration:underline;text-underline-offset:3px;cursor:pointer">← I haven’t sent the money yet</button>
         </section>
       </sc-if>
 
@@ -512,7 +533,8 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         </div>
       </sc-if>
 
-      <div style="margin-top:28px;padding:14px 16px;border:1px dashed rgba(11,23,32,.35);display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <a href="tel:+251996567218" style="margin-top:24px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border:1.5px solid #0b1720;border-radius:14px;color:#0b1720;text-decoration:none;font-size:15px;font-weight:700">Need help? Call 0996 567 218</a>
+      <div style="margin-top:14px;padding:14px 16px;border:1px dashed rgba(11,23,32,.35);display:flex;justify-content:space-between;align-items:center;gap:12px">
         <div style="min-width:0"><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Your private order link</div><div style="margin-top:4px;font-size:14px;color:#2c4556">Keep it to come back to this order.</div></div>
         <button onClick="{{ copyOrderLink }}" style="flex:none;min-height:44px;padding:0 14px;background:transparent;color:#0b1720;border:1px solid #0b1720;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer">COPY LINK</button>
       </div>
@@ -989,7 +1011,7 @@ const RVT=['DG-004281','SPECIMEN','REGISTERED','ACTIVE','F-01','L-04','SYMBOLIC'
 class Component extends DCLogic {
   heroStoneRef=React.createRef();bridgeRef=React.createRef();starRef=React.createRef();macroRef=React.createRef();bridgeTitleRef=React.createRef();capARef=React.createRef();capBRef=React.createRef();capPRef=React.createRef();carRef=React.createRef();progRef=React.createRef();zoomRef=React.createRef();parRef=React.createRef();bridgeEndRef=React.createRef();bridgeShadeRef=React.createRef();zoomDepthRef=React.createRef();zTxt=[0,1,2,3].map(()=>React.createRef());
   rv=RVT.map((t,i)=>({t,x:Math.random()*90,y:Math.random()*92,dx:(Math.random()-.5)*1400,dy:(Math.random()-.5)*1400,r:(Math.random()-.5)*180}));
-  state={pay:{id:'',key:'',loading:false,order:null,error:'',txn:''},busy:false,regErr:'',lookupBusy:'',serverRecent:[],route:this.parse(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false},regs:this.load(),menu:false,sheet:false,toast:'',faqOpen:0,proc:-1,cycleNo:'',stamped:false,archived:false,rvs:0,certOpen:false,carIndex:1,msgPick:-1,lookup:'',lastNo:'',pendingNo:this.newNo(),wide:typeof window!=='undefined'&&window.innerWidth>=900,contact:{name:'',reach:'',need:'Website',msg:''},sent:false};
+  state={pay:{id:'',key:'',loading:false,order:null,error:'',txn:'',step:1},busy:false,regErr:'',lookupBusy:'',serverRecent:[],route:this.parse(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),email:''},regs:this.load(),menu:false,sheet:false,toast:'',faqOpen:0,proc:-1,cycleNo:'',stamped:false,archived:false,rvs:0,certOpen:false,carIndex:1,msgPick:-1,lookup:'',lastNo:'',pendingNo:this.newNo(),wide:typeof window!=='undefined'&&window.innerWidth>=900,contact:{name:'',reach:'',need:'Website',msg:''},sent:false};
 
   parse(){const h=(location.hash||'').replace(/^#\/?/,'').replace(/\/$/,'');const p=h.split('/');return{path:h,a:p[0]||'',b:decodeURIComponent(p[1]||''),c:decodeURIComponent(p[2]||'')};}
   load(){try{return{...SEED,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return{...SEED}}}
@@ -1019,7 +1041,7 @@ class Component extends DCLogic {
     if(route.a==='register'){const pr=P.find(p=>p.slug===route.b);if(pr&&this.state.draft.slug!==pr.slug)s.draft={...this.state.draft,slug:pr.slug};}
     if(route.a==='checkout'){location.hash='/friend';return;}
     clearInterval(this.poll);
-    if(route.a==='pay'){s.pay={id:route.b.toUpperCase(),key:route.c,loading:true,order:null,error:'',txn:''};}
+    if(route.a==='pay'){s.pay={id:route.b.toUpperCase(),key:route.c,loading:true,order:null,error:'',txn:'',step:this.sentFlag(route.b.toUpperCase())?2:1};}
     if(route.a==='registry'&&route.b){const no=route.b.toUpperCase();if(!this.state.regs[no])this.fetchRec(no);}
     if(route.a==='registry'&&!route.b)this.api('registry').then(j=>this.setState({serverRecent:j.recent||[]}),()=>{});
     if(route.a==='success'&&!this.state.lastNo){location.hash='/registry/DG-004281';return;}
@@ -1058,9 +1080,16 @@ class Component extends DCLogic {
   api(path,opts){return fetch('/api/'+path,opts).then(async r=>{const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Network error — check your connection and try again.');return j;});}
   post(path,body){return this.api(path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});}
   fetchRec(no){this.setState({lookupBusy:no});this.api('registry?no='+encodeURIComponent(no)).then(rec=>{this.setState(s=>({regs:{...s.regs,[rec.no]:rec},lookupBusy:''}));},()=>this.setState({lookupBusy:''}));}
+  sentFlag(id,v){const k='dingay.sent.'+id;try{if(v!==undefined){v?localStorage.setItem(k,'1'):localStorage.removeItem(k);return v;}return localStorage.getItem(k)==='1';}catch(e){return false}}
+  cleanCode(raw){const up=String(raw||'').toUpperCase();const c=up.replace(/[^A-Z0-9]/g,'');if(c.length<=14)return c;
+    const m=up.match(/\b(?=[A-Z0-9]*[A-Z])(?=[A-Z0-9]*\d)[A-Z0-9]{10}\b/);return m?m[0]:c.slice(0,14);}
+  setPayStep(n){this.sentFlag(this.state.pay.id,n===2);this.setState(s=>({pay:{...s.pay,step:n,error:''}}),()=>{const el=document.querySelector('[aria-label="Payment steps"]');if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});});}
+  pasteTxn=async()=>{try{const t=await navigator.clipboard.readText();const c=this.cleanCode(t);if(c){this.setState(s=>({pay:{...s.pay,txn:c,error:''}}));return;}}catch(e){}
+    const el=document.getElementById('dg-txn');if(el)el.focus();this.toastMsg('Press and hold the box, then tap Paste.');};
+  savedPhone(){try{return localStorage.getItem('dingay.phone')||''}catch(e){return''}}
   rememberOrder(id,key){try{const k='dingay.orders.v1';const m=JSON.parse(localStorage.getItem(k)||'{}');m[id]=key;localStorage.setItem(k,JSON.stringify(m));}catch(e){}}
   createOrder=async()=>{const d=this.state.draft;if(this.state.busy)return;this.setState({busy:true,regErr:''});
-    try{const j=await this.post('order',{slug:d.slug,to:d.to,by:d.by,occasion:d.occasion,message:d.message});this.rememberOrder(j.id,j.key);this.setState({busy:false});this.go('pay/'+j.id+'/'+j.key);}
+    try{const j=await this.post('order',{slug:d.slug,to:d.to,by:d.by,occasion:d.occasion,message:d.message,phone:d.phone,email:d.email.trim(),lang:LANG});this.rememberOrder(j.id,j.key);try{localStorage.setItem('dingay.phone',d.phone)}catch(e){}this.setState({busy:false});this.go('pay/'+j.id+'/'+j.key);}
     catch(e){this.setState({busy:false,regErr:e.message});}};
   loadPay(){const p=this.state.pay;if(!p.id||!p.key){this.setState({pay:{...p,loading:false,error:'This link is incomplete.'}});return;}
     this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{
@@ -1075,7 +1104,7 @@ class Component extends DCLogic {
   refreshPay(){const p=this.state.pay;if(this.state.route.a!=='pay'){clearInterval(this.poll);return;}
     this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{if(o.status==='paid'){clearInterval(this.poll);this.finishPaid(o);}else if(o.status!=='review'){clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,order:o}}));}},()=>{});}
   finishPaid(o){const reg=o.reg;const regs={...this.state.regs,[reg.no]:reg};this.save(regs);
-    this.setState({regs,lastNo:reg.no,draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false}},()=>this.go('success'));}
+    this.setState({regs,lastNo:reg.no,draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),email:''}},()=>this.go('success'));}
   verifyPay=async e=>{e&&e.preventDefault&&e.preventDefault();const p=this.state.pay;const txn=p.txn.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
     if(txn.length<8){this.setState({pay:{...p,error:'Enter the transaction number from your telebirr SMS.'}});return;}
     const t0=Date.now();this.setState({proc:0,pay:{...p,error:''}});this.later(()=>{if(this.state.proc===0)this.setState({proc:1});},700);
@@ -1119,9 +1148,14 @@ class Component extends DCLogic {
     const labels={awaiting:'Awaiting payment',review:'Being confirmed',rejected:'Payment not confirmed',paid:'Paid',removed:'Removed'};
     const ph=o?o.payTo.phone:'';
     return{id:p.id||'—',loading:p.loading,missing:!p.loading&&!o,ready:!p.loading&&!!o,error:p.error,txnInput:p.txn,
-      statusLabel:p.loading?'Loading':(labels[st]||'Not found'),canPay:st==='awaiting'||st==='rejected',inReview:st==='review',note:o&&o.note||'',
+      statusLabel:p.loading?'Loading':(labels[st]||'Not found'),canPay:st==='awaiting'||st==='rejected',step1:(st==='awaiting'||st==='rejected')&&p.step!==2&&st!=='rejected',step2:(st==='awaiting'&&p.step===2)||st==='rejected',inReview:st==='review',note:o&&o.note||'',
       name:o?o.name:'',to:o?o.to:'',by:o?o.by:'',kind:o?o.kind:'cobble',price:o?o.price:'',txn:o&&o.txn||'',payName:o?o.payTo.name:'',
       phoneFmt:ph.replace(/^(\d{4})(\d{3})(\d{3})$/,'$1 $2 $3'),hasName:!!(o&&o.payTo.name),
+      steps:['Send money','Enter code','Done'].map((label,k)=>{const cur=st==='paid'?3:(st==='review'?3:((st==='rejected'||p.step===2)?2:1));const done=k+1<cur,on=k+1===cur;return{n:String(k+1),label,cur:on?'step':'false',bar:done?'#1f8a55':(on?'#0b1720':'rgba(11,23,32,.15)'),w:on?800:600,c:on?'#0b1720':'#6f8797'};}),
+      howto:['Open the telebirr app','Tap “Send Money”','Paste the number','Enter the amount, then your PIN'].map((t,k)=>({n:String(k+1),t})),
+      codeHint:!p.txn?'10 letters and numbers, like DJ19BO2MR4':(p.txn.length===10?'✓ Looks right':(p.txn.length<10?'Keep going — the code has 10 characters':'Too long — check the code')),
+      codeColor:!p.txn?'#435f73':(p.txn.length===10?'#1f8a55':'#b7791f'),codeBorder:p.txn.length===10?'#1f8a55':'rgba(11,23,32,.3)',
+      codeBad:p.txn.length<8||p.txn.length>14,codeOpacity:(p.txn.length<8||p.txn.length>14)?.35:1,
       left:String(this.waitLeft()),bar:(this.waitLeft()/30).toFixed(3),waiting:st==='review'&&this.waitLeft()>0,late:st==='review'&&this.waitLeft()===0,
       smsHref:'sms:+251996567218?&body='+encodeURIComponent('DINGUY order '+(p.id||'')+' · telebirr '+(o&&o.txn||''))};}
   carBy(d){const el=this.carRef.current;if(!el)return;const c=el.firstElementChild;const w=c?c.getBoundingClientRect().width+12:320;el.scrollBy({left:d*w,behavior:'smooth'});}
@@ -1151,7 +1185,9 @@ class Component extends DCLogic {
     const today=fmt(new Date());
     const previewReg={no:st.pendingNo,to:draft.to,by:draft.by,type:pr?pr.name:'',occasion:draft.occasion,message:draft.message,date:today,kind:pr?pr.kind:'cobble'};
     const hasDed=!!(draft.to.trim()&&draft.by.trim());
-    const regOk=hasDed&&draft.agree&&!st.busy;
+    const phoneDigits=(draft.phone||'').replace(/[^\d+]/g,'');const phoneOk=/^(?:\+?251|0)?[79]\d{8}$/.test(phoneDigits);
+    const em=(draft.email||'').trim();const emailOk=!em||/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(em);
+    const regOk=hasDed&&phoneOk&&emailOk&&draft.agree&&!st.busy;
     const progress=[['Specimen selected',true],['Dedication recorded',hasDed],['Registry entry prepared',hasDed&&!!draft.message.trim()],['Certificate generated',false]].map(([label,d])=>({label,dot:d?'#0b1720':'transparent',c:d?'#0b1720':'#6f8797'}));
     const regSuggest=MS[world].map(m=>{const sel=draft.message===m;return{text:`“${m}”`,bg:sel?'#0b1720':'#f3f5f6',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('message',m)};});
     const sreg=st.regs[st.lastNo]||SEED['DG-004281'];
@@ -1161,7 +1197,7 @@ class Component extends DCLogic {
     if(!wide&&!st.menu){if(a===''||isCatalog)showBar=true;if(isProduct){showBar=true;barLabel='BUY THIS STONE';barRight=prod.priceLabel;barAction=prod.register;}}
     const rvs=st.rvs;
     return{
-      isDinguy:!isSW,isSW,isHome:a===''&&!isNotFound,isCatalog,isProduct,isRegister,isPay,isLoadingRec,lookupBusy:st.lookupBusy,po:this.payVals(),setTxn:e=>{const v=e.target.value;this.setState(s=>({pay:{...s.pay,txn:v}}));},verifyPay:this.verifyPay,
+      isDinguy:!isSW,isSW,isHome:a===''&&!isNotFound,isCatalog,isProduct,isRegister,isPay,isLoadingRec,lookupBusy:st.lookupBusy,po:this.payVals(),setTxn:e=>{const v=this.cleanCode(e.target.value);this.setState(s=>({pay:{...s.pay,txn:v,error:''}}));},pasteTxn:this.pasteTxn,sentMoney:()=>this.setPayStep(2),notSentYet:()=>this.setPayStep(1),verifyPay:this.verifyPay,
       copyPhone:()=>this.copy((st.pay.order&&st.pay.order.payTo.phone)||'0996567218','Number copied.'),copyOrderLink:()=>this.copy(location.href,'Order link copied.'),isSuccess,isRecord,isRegistryIndex,isNotFound,isFaq:a==='faq',isTerms:a==='terms',isSWHome,isWebsites,isGuerrilla,isContact,
       wide,narrow:!wide,isTouch:typeof window!=='undefined'&&!!window.matchMedia&&matchMedia('(pointer:coarse)').matches,langLabel:LANG==='am'?'English':'አማርኛ',langOther:LANG==='am'?'en':'am',toggleLang:()=>window.dgLang&&window.dgLang.set(LANG==='am'?'en':'am'),swLabel:wide?'MADE BY SIDEWAYS':'SIDEWAYS',progRef:this.progRef,menu:st.menu,sheet:st.sheet,spinRate,heroKind:this.props.heroStone||'cobble',
       bar1:st.menu?'translateY(3.25px) rotate(45deg)':'none',bar2:st.menu?'translateY(-3.25px) rotate(-45deg)':'none',
@@ -1181,11 +1217,13 @@ class Component extends DCLogic {
       prod,receive:RECEIVE.map(([k,v],i)=>({n:'0'+(i+1),k,v})),stickyPos:wide?'sticky':'relative',
       draft,pendingNo:st.pendingNo,previewReg,progress,regSuggest,
       previewOrder:wide?0:-1,previewPad:wide?'40px':'4px',previewMax:wide?'520px':'340px',
-      setTo:e=>this.upd('to',e.target.value),setBy:e=>this.upd('by',e.target.value),setMsg:e=>this.upd('message',e.target.value),toggleAgree:e=>this.upd('agree',e.target.checked),
+      setTo:e=>this.upd('to',e.target.value),setBy:e=>this.upd('by',e.target.value),setMsg:e=>this.upd('message',e.target.value),setPhone:e=>this.upd('phone',e.target.value),setEmail:e=>this.upd('email',e.target.value),
+      phoneHint:phoneOk?'✓ We’ll text you if you need help paying, and when it’s confirmed.':'So we can help you pay and text you the confirmation. Never shared.',phoneHintColor:phoneOk?'#1f8a55':'#435f73',
+      emailHint:em&&!emailOk?'That email doesn’t look right.':'We’ll also email the certificate to them.',emailHintColor:em&&!emailOk?'#b3261e':'#435f73',toggleAgree:e=>this.upd('agree',e.target.checked),
       msgCount:`${draft.message.length} / 140`,
       occasions:OCC.map(o=>{const sel=draft.occasion===o;return{label:o,sel,bg:sel?'#0b1720':'transparent',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('occasion',sel?'':o)};}),
       generate:()=>{const l=MS[world].filter(m=>m!==draft.message);this.upd('message',l[Math.floor(Math.random()*l.length)]);},
-      regBlocked:!regOk,regOpacity:regOk?1:.35,regBtn:st.busy?'CREATING ORDER…':'CONTINUE TO PAYMENT',regHintColor:st.regErr?'#b3261e':'#435f73',regHint:st.regErr||(st.busy?'Reserving your registration number…':(regOk?'Next: pay with telebirr.':(!hasDed?'Add a recipient and your name to continue.':'Please confirm the registration type.'))),
+      regBlocked:!regOk,regOpacity:regOk?1:.35,regBtn:st.busy?'CREATING ORDER…':'CONTINUE TO PAYMENT',regHintColor:st.regErr?'#b3261e':'#435f73',regHint:st.regErr||(st.busy?'Reserving your registration number…':(regOk?'Next: pay with telebirr.':(!hasDed?'Add a recipient and your name to continue.':(!phoneOk?'Add your phone number to continue.':(!emailOk?'Check the email address.':'Please confirm the registration type.'))))),
       submitReg:()=>{if(regOk)this.createOrder();},
       processing:st.proc>=0,procNo:st.pay.id,procSteps:['Finding your telebirr receipt','Confirming the payment','Registry entry created','Certificate issued'].map((label,i)=>({label:label.toUpperCase(),op:st.proc>=i?1:.25,dot:st.proc>i?'#eef2f4':'transparent'})),
       succ:{...sreg,reg:sreg,download:()=>this.download(sreg),view:go('registry/'+sreg.no),share:()=>this.share(sreg)},cycleNo:st.cycleNo||st.lastNo,stamped:st.stamped,archived:st.archived,

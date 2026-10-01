@@ -18,6 +18,7 @@ input{height:48px;padding:0 14px;border:1px solid var(--line);background:#fff;bo
 .btn{min-height:44px;padding:0 16px;border:0;background:var(--ink);color:#e6ecef;font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
 .btn.bad{background:var(--bad)}
+a.btn{display:inline-flex;align-items:center;text-decoration:none}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
 .tabs button{min-height:44px;padding:0 14px;border:1px solid var(--ink);background:transparent;cursor:pointer;font-size:13px}
 .tabs button[aria-pressed=true]{background:var(--ink);color:#e6ecef}
@@ -64,6 +65,33 @@ async function load(){
   try{const j=await api('GET');orders=j.orders;inquiries=j.inquiries||[];try{sessionStorage.setItem('dg-admin',pw)}catch(e){}$('#login').hidden=true;$('#app').hidden=false;render();}
   catch(e){$('#err').textContent=e.message;$('#login').hidden=false;$('#app').hidden=true;}
 }
+const PAYNUM='0996567218';
+function msgs(o){
+  const am=o.lang==='am';
+  const help=am
+    ?`ሰላም ${o.by}፣ ከDINGUY ነው 👋 ለ${o.to} ያዘዙት ${o.name} ክፍያ እየጠበቀ ነው።\n1) ቴሌብርን ይክፈቱ → Send Money\n2) ${o.price} ብር ወደ ${PAYNUM} (Din) ይላኩ\n3) ከደረሰኙ ላይ የግብይት ቁጥሩን (Transaction Number) ይቅዱ\n4) እዚህ ያስገቡት፦ ${o.payLink}\nጥያቄ ካለዎት፦ ${PAYNUM}`
+    :`Hi ${o.by}, this is DINGUY 👋 Your ${o.name} for ${o.to} is waiting for payment.\n1) Open telebirr → Send Money\n2) Send ${o.price} Birr to ${PAYNUM} (Din)\n3) Copy the Transaction Number from the receipt\n4) Paste it here: ${o.payLink}\nQuestions? Call ${PAYNUM}`;
+  const congrats=am
+    ?`እንኳን ደስ አለዎት ${o.by}! 🎉 ${o.to} በይፋ በ${o.name} ተመዝግቧል። የምዝገባ ቁ. ${o.id}። ይመልከቱና ሰርተፊኬቱን ያስቀምጡ፦ ${o.recordLink} — DINGUY`
+    :`Congratulations ${o.by}! 🎉 ${o.to} is now officially registered with ${o.name}. Registration No. ${o.id}. See it and save the certificate: ${o.recordLink} — DINGUY`;
+  const subject=am?`${o.to}፣ በስምዎ ድንጋይ ተመዝግቧል`:`${o.to}, a stone has been registered in your name`;
+  const body=am
+    ?`ሰላም ${o.to}፣\n\n${o.by} በDINGUY መዝገብ ውስጥ ${o.name}ን በስምዎ አስመዝግበዋል።\n\n${o.message?`“${o.message}”\n\n`:''}የምዝገባ ቁ. ${o.id}\nመዝገብዎና ሰርተፊኬትዎ፦ ${o.recordLink}\n\nDINGUY® — ከልክ በላይ ትርጉም ላላቸው አጋጣሚዎች የተመዘገቡ ድንጋዮች።\nዲጂታል ምዝገባ። አካላዊ ድንጋይ አይካተትም።`
+    :`Hi ${o.to},\n\n${o.by} has registered ${o.name} in your name with the DINGUY Registry.\n\n${o.message?`“${o.message}”\n\n`:''}Registration No. ${o.id}\nYour record and certificate: ${o.recordLink}\n\nDINGUY® — Registered stones for unreasonably meaningful occasions.\nDigital registration. No physical stone included.`;
+  return {help,congrats,subject,body};
+}
+const sms=(phone,body)=>'sms:'+phone+'?&body='+encodeURIComponent(body);
+function contactButtons(o){
+  if(!o.phone&&!o.email)return '';
+  const m=msgs(o),b=[];
+  if(o.phone){
+    b.push(`<a class="btn ghost" href="tel:${esc(o.phone)}">CALL</a>`);
+    if(o.status==='paid')b.push(`<a class="btn" href="${esc(sms(o.phone,m.congrats))}">SMS: CONGRATS</a>`);
+    else if(o.status!=='removed')b.push(`<a class="btn" href="${esc(sms(o.phone,m.help))}">SMS: PAYMENT HELP</a>`);
+  }
+  if(o.email&&o.status==='paid')b.push(`<a class="btn" href="mailto:${esc(o.email)}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}">EMAIL ${esc(o.to).toUpperCase()}</a>`);
+  return `<div class="actions">${b.join('')}</div>`;
+}
 function when(ms){return ms?new Date(ms).toLocaleString('en-GB',{timeZone:'Africa/Addis_Ababa',dateStyle:'medium',timeStyle:'short'}):'—'}
 function render(){
   const n=k=>k==='inq'?inquiries.filter(q=>q.status!=='done').length:k==='all'?orders.length:orders.filter(o=>o.status===k).length;
@@ -77,7 +105,9 @@ function render(){
       <dl>
         <dt>Stone</dt><dd>${esc(o.name)} · ${esc(o.price)} Birr</dd>
         <dt>For</dt><dd>${esc(o.to)} (from ${esc(o.by)})</dd>
-        <dt>Ordered</dt><dd>${when(o.createdAt)}</dd>
+        <dt>Ordered</dt><dd>${when(o.createdAt)}${o.lang==='am'?' · አማርኛ':''}</dd>
+        ${o.phone?`<dt>Buyer phone</dt><dd><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a></dd>`:''}
+        ${o.email?`<dt>Their email</dt><dd>${esc(o.email)}</dd>`:''}
         <dt>Transaction</dt><dd>${o.txn?`<a href="https://transactioninfo.ethiotelecom.et/receipt/${encodeURIComponent(o.txn)}" target="_blank" rel="noopener noreferrer">${esc(o.txn)} ↗</a>`:'—'}</dd>
         ${o.payer?`<dt>Paid by</dt><dd>${esc(o.payer)}</dd>`:''}
         ${o.paidAmount!=null?`<dt>Amount</dt><dd>${esc(o.paidAmount)} Birr · ${when(o.paidAt)}</dd>`:''}
@@ -88,6 +118,7 @@ function render(){
         <button class="btn" data-a="approve" data-id="${esc(o.id)}">APPROVE</button>
         ${o.status!=='rejected'?`<button class="btn bad" data-a="reject" data-id="${esc(o.id)}">REJECT</button>`:''}
       </div>`:''}
+      ${contactButtons(o)}
       ${o.status==='paid'?`<div class="actions"><button class="btn ghost" data-a="remove" data-id="${esc(o.id)}">REMOVE FROM PUBLIC REGISTRY</button></div>`:''}
     </div>`).join(''):'<p class="mono" style="margin-top:20px">Nothing here.</p>';
 }

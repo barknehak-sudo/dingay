@@ -13,6 +13,14 @@ export default async function handler(req, res) {
     const occasion = OCCASIONS.includes(b.occasion) ? b.occasion : '';
     if (!p) return send(res, 400, { error: 'Unknown Dinguy.' });
     if (!to || !by) return send(res, 400, { error: 'Add a recipient and your name.' });
+    // Buyer's phone (Ethiopian mobile) — stored as 09XXXXXXXX / 07XXXXXXXX.
+    const digits = String(b.phone || '').replace(/[^\d]/g, '');
+    const m = /^(?:251|0)?([79]\d{8})$/.exec(digits);
+    if (!m) return send(res, 400, { error: 'Add your phone number to continue.' });
+    const phone = '0' + m[1];
+    const email = clean(b.email, 120);
+    if (email && !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email)) return send(res, 400, { error: 'Check the email address.' });
+    const lang = b.lang === 'am' ? 'am' : 'en';
 
     let id;
     for (let i = 0; i < 8 && !id; i++) {
@@ -21,7 +29,7 @@ export default async function handler(req, res) {
     }
     if (!id) return send(res, 503, { error: 'Please try again.' });
 
-    const o = { id, key: newKey(), slug: b.slug, name: p.name, kind: p.kind, price: p.price, to, by, occasion, message, status: 'awaiting', createdAt: Date.now() };
+    const o = { id, key: newKey(), slug: b.slug, name: p.name, kind: p.kind, price: p.price, to, by, occasion, message, phone, email: email || null, lang, status: 'awaiting', createdAt: Date.now() };
     await saveOrder(o);
     await kv('LPUSH', 'orders', id);
     await kv('LTRIM', 'orders', 0, 999);

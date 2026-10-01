@@ -27,7 +27,9 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       const ids = await kv('LRANGE', 'orders', 0, 199);
       const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
-      const orders = raw.filter(Boolean).map((r) => strip(JSON.parse(r)));
+      const site = 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
+      // payLink = the customer's private order link, so you can text it to them.
+      const orders = raw.filter(Boolean).map((r) => { const o = JSON.parse(r); o.payLink = `${site}/#/pay/${o.id}/${o.key}`; o.recordLink = `${site}/#/registry/${o.id}`; return strip(o); });
       const inReview = orders.filter((o) => o.status === 'review').map((o) => o.id);
       if (inReview.length) await kv('SADD', 'review', ...inReview);
       const qids = await kv('LRANGE', 'inquiries', 0, 199);
