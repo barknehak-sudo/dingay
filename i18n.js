@@ -408,7 +408,7 @@
     document.head.appendChild(css);
     var box = document.createElement('div');
     box.id = 'dg-lang'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Language / ቋንቋ');
-    box.innerHTML = '<div class="k">Language · ቋንቋ</div><div class="q">Choose your language · ቋንቋ ይምረጡ</div>' +
+    box.innerHTML = '<div class="k">Language · ቋንቋ</div><div class="q">Choose your language<br><span style="font-family:\'Noto Sans Ethiopic\',sans-serif">ቋንቋ ይምረጡ</span></div>' +
       '<div class="r"><button type="button" data-l="en">English</button><button type="button" data-l="am">አማርኛ</button></div>';
     box.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
