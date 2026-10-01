@@ -35,5 +35,6 @@ cat > "$PLIST" <<EOF
 EOF
 
 launchctl bootout "gui/$(id -u)/com.dingay.verifier" 2>/dev/null || true
-launchctl bootstrap "gui/$(id -u)" "$PLIST"
+sleep 3  # let launchd finish stopping the old copy
+launchctl bootstrap "gui/$(id -u)" "$PLIST" || { sleep 5; launchctl bootstrap "gui/$(id -u)" "$PLIST"; }
 echo "Installed. Log: $LOG"
