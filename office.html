@@ -31,6 +31,13 @@ dl{display:grid;grid-template-columns:120px 1fr;gap:4px 10px;margin:10px 0 0;fon
 dt{color:var(--mut)}dd{margin:0;overflow-wrap:anywhere}
 .reason{margin-top:8px;padding:8px 10px;background:#fff4e0;border-left:3px solid var(--warn);font-size:14px}
 .actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+details.new{margin-top:16px;background:var(--card);border:1px solid var(--line);padding:0 14px}
+details.new summary{min-height:52px;display:flex;align-items:center;font-weight:700;letter-spacing:.06em;font-size:13px;cursor:pointer;list-style:none}
+details.new summary::-webkit-details-marker{display:none}
+.f{display:grid;gap:10px;padding:4px 0 16px}.f label{display:grid;gap:4px;font-size:13px;color:var(--mut)}
+.f select,.f textarea{font:inherit;font-size:16px;min-height:48px;padding:0 12px;border:1px solid var(--line);background:#fff;border-radius:0}
+.f textarea{padding:10px 12px;min-height:80px;resize:vertical}.f .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.done{margin-top:10px;padding:12px;background:#e6f4ec;border-left:3px solid var(--ok);font-size:14px}
 a{color:inherit}
 .err{color:var(--bad);margin-top:10px;min-height:1.2em}
 </style>
@@ -46,6 +53,18 @@ a{color:inherit}
   <div class="err" id="err"></div>
   <div id="app" hidden>
     <div class="row"><span class="mono" id="count"></span><button class="btn ghost" id="refresh">REFRESH</button></div>
+    <details class="new" id="newreg"><summary>+ NEW REGISTRATION (ADD BY HAND)</summary>
+      <form class="f" id="newform">
+        <label>Stone<select name="slug" required><option value="">Choose…</option><option value="cobblestone">COBBLESTONE · 89</option><option value="bloket">ብሎኬት · 89</option><option value="river-stone">የወንዝ ድንጋይ · 89</option><option value="foundation-stone">መሰረት ድንጋይ · 89</option><option value="queen-of-sheba">THE QUEEN OF SHEBA · 199</option><option value="mezezo-chocolate-opal">MEZEZO CHOCOLATE OPAL · 199</option><option value="shakiso-emerald">SHAKISO EMERALD · 199</option><option value="diamond">DIAMOND · 199</option></select></label>
+        <div class="two"><label>For (recipient)<input name="to" required maxlength="28"></label><label>From (buyer)<input name="by" required maxlength="28"></label></div>
+        <label>Occasion<select name="occasion"><option value="">—</option><option>Birthday</option><option>Anniversary</option><option>Graduation</option><option>Farewell</option><option>Apology</option><option>Just because</option></select></label>
+        <label>Message<textarea name="message" maxlength="140"></textarea></label>
+        <div class="two"><label>Buyer phone (optional)<input name="phone" type="tel" inputmode="tel" placeholder="09XX XXX XXX"></label><label>Recipient email (optional)<input name="email" type="email"></label></div>
+        <div class="two"><label>Language<select name="lang"><option value="en">English</option><option value="am">አማርኛ</option></select></label><label>Payment note (optional)<input name="note" maxlength="60" placeholder="e.g. cash, DJ…"></label></div>
+        <button class="btn" type="submit">REGISTER — MARK AS PAID</button>
+        <div id="newdone"></div>
+      </form>
+    </details>
     <div class="tabs" id="tabs"></div>
     <div id="list"></div>
   </div>
@@ -119,6 +138,7 @@ function render(){
         ${o.status!=='rejected'?`<button class="btn bad" data-a="reject" data-id="${esc(o.id)}">REJECT</button>`:''}
       </div>`:''}
       ${contactButtons(o)}
+      ${o.status==='removed'?`<div class="actions"><button class="btn" data-a="restore" data-id="${esc(o.id)}">RESTORE TO REGISTRY</button></div>`:''}
       ${o.status==='paid'?`<div class="actions"><button class="btn ghost" data-a="remove" data-id="${esc(o.id)}">REMOVE FROM PUBLIC REGISTRY</button></div>`:''}
     </div>`).join(''):'<p class="mono" style="margin-top:20px">Nothing here.</p>';
 }
@@ -138,12 +158,23 @@ function renderInq(){
 }
 $('#login').onsubmit=e=>{e.preventDefault();pw=$('#pw').value;load();};
 $('#refresh').onclick=load;
+$('#newform').onsubmit=async e=>{
+  e.preventDefault();const f=e.target,btn=f.querySelector('button[type=submit]');
+  const create=Object.fromEntries(new FormData(f).entries());
+  if(!confirm(`Register ${create.to} (from ${create.by}) as PAID and publish it?`))return;
+  btn.disabled=true;$('#newdone').innerHTML='';
+  try{const j=await api('POST',{create});const o=j.order;orders=[o,...orders];render();f.reset();
+    $('#newdone').innerHTML=`<div class="done"><strong>${esc(o.id)}</strong> registered for ${esc(o.to)}. <a href="${esc(o.recordLink)}" target="_blank" rel="noopener">Open record ↗</a>${contactButtons(o)}</div>`;}
+  catch(err){$('#newdone').innerHTML=`<div class="err">${esc(err.message)}</div>`;}
+  btn.disabled=false;
+};
 $('#tabs').onclick=e=>{const t=e.target.closest('[data-t]');if(t){tab=t.dataset.t;render();}};
 $('#list').onclick=async e=>{
   const qb=e.target.closest('[data-q]');
   if(qb){qb.disabled=true;try{const j=await api('POST',{inquiry:qb.dataset.q,action:qb.dataset.qa});inquiries=inquiries.map(q=>q.id===j.inquiry.id?j.inquiry:q);render();}catch(err){alert(err.message);qb.disabled=false;}return;}
   const b=e.target.closest('[data-a]');if(!b)return;const id=b.dataset.id,a=b.dataset.a;
   let note=null;
+  if(a==='restore'&&!confirm(`Put ${id} back in the public registry? Its number and certificate link work again.`))return;
   if(a==='remove'&&!confirm(`Remove ${id} from the public registry? Its registry page and certificate stop working. This can't be undone.`))return;
   if(a==='approve'&&!confirm(`Approve ${id}? The customer can then download the certificate.`))return;
   if(a==='reject'){note=prompt(`Reject ${id}. Message shown to the customer (optional):`,'We could not confirm this payment. Please contact us.');if(note===null)return;}

@@ -3,8 +3,12 @@
 // POST /api/admin {id, action:'approve'|'reject', note?}
 // GET  /api/admin?pending=1               → only orders waiting for review (cheap; used by the verifier)
 // POST /api/admin {id, action:'remove'}   → take a paid record off the public registry
+// POST /api/admin {id, action:'restore'}  → put a removed record back (same number, same links)
+// POST /api/admin {create:{slug,to,by,…}} → add a registration by hand (paid another way / gift)
 // POST /api/admin {inquiry:id, action:'done'|'new'}
-import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip, RECEIVERS, PAY_TO } from './_lib.js';
+import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO } from './_lib.js';
+
+const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
 
 const strip = (o) => { delete o.key; return o; };
 
@@ -46,6 +50,31 @@ export default async function handler(req, res) {
       await setJSON('inq:' + q.id, q);
       return send(res, 200, { inquiry: q });
     }
+    if (req.method === 'POST' && (req.body || {}).create) {
+      const c = req.body.create, p = PRODUCTS[c.slug];
+      const to = clean(c.to, 28), by = clean(c.by, 28);
+      if (!p) return send(res, 400, { error: 'Choose a stone.' });
+      if (!to || !by) return send(res, 400, { error: 'Fill in who it is for and who it is from.' });
+      const digits = String(c.phone || '').replace(/[^\d]/g, ''), pm = /^(?:251|0)?([79]\d{8})$/.exec(digits);
+      if (digits && !pm) return send(res, 400, { error: 'Phone number doesn’t look right.' });
+      const email = clean(c.email, 120);
+      if (email && !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email)) return send(res, 400, { error: 'Email doesn’t look right.' });
+      let id;
+      for (let i = 0; i < 8 && !id; i++) { const cand = 'DG-' + String(100000 + Math.floor(Math.random() * 900000)); if (await kv('SET', 'lock:' + cand, '1', 'NX')) id = cand; }
+      if (!id) return send(res, 503, { error: 'Please try again.' });
+      const now = Date.now();
+      const o = { id, key: newKey(), slug: c.slug, name: p.name, kind: p.kind, price: p.price, to, by,
+        occasion: OCCASIONS.includes(c.occasion) ? c.occasion : '', message: clean(c.message, 140),
+        phone: pm ? '0' + pm[1] : null, email: email || null, lang: c.lang === 'am' ? 'am' : 'en',
+        status: 'paid', manual: true, txn: clean(c.note, 60) || null, createdAt: now, approvedBy: 'admin (manual)', approvedAt: now };
+      await saveOrder(o);
+      await kv('LPUSH', 'orders', id);
+      await kv('LTRIM', 'orders', 0, 999);
+      await publish(o);
+      const site = 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
+      o.payLink = `${site}/#/pay/${o.id}/${o.key}`; o.recordLink = `${site}/#/registry/${o.id}`;
+      return send(res, 200, { order: strip(o) });
+    }
     if (req.method === 'POST') {
       const { id, action, note } = req.body || {};
       const o = await loadOrder(id);
@@ -60,11 +89,16 @@ export default async function handler(req, res) {
         await kv('DEL', 'reg:' + o.id);
         await kv('LREM', 'recent', 0, o.id);
         o.status = 'removed'; o.removedAt = Date.now();
+      } else if (action === 'restore') {
+        if (o.status !== 'removed') return send(res, 400, { error: 'Only removed records can be restored.' });
+        o.status = 'paid'; o.restoredAt = Date.now();
+        await publish(o); // same number, original approval date
       } else return send(res, 400, { error: 'Unknown action.' });
       await saveOrder(o);
       await kv('SREM', 'review', o.id);
-      delete o.key;
-      return send(res, 200, { order: o });
+      const site = 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
+      o.payLink = `${site}/#/pay/${o.id}/${o.key}`; o.recordLink = `${site}/#/registry/${o.id}`;
+      return send(res, 200, { order: strip(o) });
     }
     send(res, 405, { error: 'Method not allowed' });
   } catch (e) {
