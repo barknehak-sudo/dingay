@@ -4,6 +4,7 @@
 // GET  /api/admin?pending=1               → only orders waiting for review (cheap; used by the verifier)
 // POST /api/admin {id, action:'remove'}   → take a paid record off the public registry
 // POST /api/admin {id, action:'mark', what}  → record a follow-up (help_sms, congrats_sms, email, call, *_skip)
+// POST /api/admin {id, action:'receipt', receipt:{amount,account,payer,paidAt}} → store what the telebirr receipt says
 // POST /api/admin {id, action:'restore'}  → put a removed record back (same number, same links)
 // POST /api/admin {create:{slug,to,by,…}} → add a registration by hand (paid another way / gift)
 // POST /api/admin {inquiry:id, action:'done'|'new'}
@@ -80,7 +81,18 @@ export default async function handler(req, res) {
       const { id, action, note } = req.body || {};
       const o = await loadOrder(id);
       if (!o) return send(res, 404, { error: 'Order not found.' });
-      if (action === 'mark') {
+      // Receipt facts (from the verifier, which can read telebirr from Ethiopia). Approve may carry them too.
+      const rc = req.body.receipt;
+      if (rc && typeof rc === 'object') {
+        const amt = Number(rc.amount);
+        if (Number.isFinite(amt) && amt >= 0 && amt < 100000) o.paidAmount = amt;
+        if (/^\d{4}$/.test(String(rc.account || ''))) o.paidTo = String(rc.account);
+        if (rc.payer) o.payer = String(rc.payer).slice(0, 80);
+        if (Number.isFinite(Number(rc.paidAt))) o.paidAt = Number(rc.paidAt);
+      }
+      if (action === 'receipt') {
+        if (!rc) return send(res, 400, { error: 'No receipt.' });
+      } else if (action === 'mark') {
         const FOLLOW = ['help_sms', 'congrats_sms', 'email', 'call', 'help_skip', 'congrats_skip', 'email_skip'];
         if (!FOLLOW.includes(req.body.what)) return send(res, 400, { error: 'Unknown follow-up.' });
         o.follow = { ...(o.follow || {}), [req.body.what]: req.body.undo ? null : Date.now() };

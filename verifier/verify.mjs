@@ -47,11 +47,28 @@ async function check(o, payTo) {
   if (!/completed/i.test(r.status)) problems.push('not completed');
   if (!(r.amount >= o.price)) problems.push(`paid ${r.amount}, price ${o.price}`);
   if (!paidAt || paidAt < o.createdAt - 15 * 60e3) problems.push('payment older than order');
-  return problems.length ? { problems } : { approve: true };
+  const receipt = { amount: r.amount, account: String(r.account).replace(/\D/g, '').slice(-4), payer: r.payer, paidAt };
+  return problems.length ? { problems } : { approve: true, receipt };
+}
+
+// Once per start: read the real amount + receiving account for paid orders that don't have them yet.
+async function backfill(orders) {
+  const todo = orders.filter((o) => (o.status === 'paid' || o.status === 'removed') && o.txn && !o.manual && o.paidAmount == null);
+  let n = 0;
+  for (const o of todo) {
+    try {
+      const r = parseReceipt(await fetchReceipt(o.txn), o.txn);
+      if (!r.found) continue;
+      await admin('POST', { id: o.id, action: 'receipt', receipt: { amount: r.amount, account: String(r.account).replace(/\D/g, '').slice(-4), payer: r.payer, paidAt: parseEAT(r.date) } });
+      n++;
+    } catch (e) { /* try again next start */ }
+  }
+  if (todo.length) console.log(new Date().toISOString(), `backfilled receipts for ${n}/${todo.length} paid orders`);
 }
 
 async function tick() {
   const j = await admin('GET', null, first ? '' : '?pending=1');
+  if (first) backfill(j.orders).catch((e) => console.log(new Date().toISOString(), 'backfill error', e.message));
   first = false;
   if (j.receivers) receivers = j.receivers;
   const payTo = j.payTo || {};
@@ -61,7 +78,7 @@ async function tick() {
     try {
       const v = await check(o, payTo);
       if (v.approve) {
-        await admin('POST', { id: o.id, action: 'approve', by: 'verifier' });
+        await admin('POST', { id: o.id, action: 'approve', by: 'verifier', receipt: v.receipt });
         console.log(new Date().toISOString(), 'APPROVED', o.id, o.txn);
       } else if (v.reject) {
         await admin('POST', { id: o.id, action: 'reject', note: v.reject });

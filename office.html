@@ -140,7 +140,7 @@ details.tbl summary{margin-top:10px;font-size:12px;color:var(--ink-2);cursor:poi
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const TZ='Africa/Addis_Ababa',PAYNUM='0996567218';
+const TZ='Africa/Addis_Ababa',PAYNUM='0996567218',SW_MAIL='infosideways7@gmail.com',SW_LINK='https://dinguy.xyz/#/sideways';
 let pw='';try{pw=sessionStorage.getItem('dg-admin')||''}catch(e){}
 const S={orders:[],inquiries:[],tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
 try{const t=sessionStorage.getItem('dg-tab');if(t)S.tab=t;}catch(e){}
@@ -176,12 +176,15 @@ function msgs(o){
     :`Congratulations ${o.by}! 🎉 ${o.to} is now officially registered with ${o.name}. Registration No. ${o.id}. See it and save the certificate: ${o.recordLink} — DINGUY`;
   const subject=am?`${o.to}፣ በስምዎ ድንጋይ ተመዝግቧል`:`${o.to}, a stone has been registered in your name`;
   const body=am
-    ?`ሰላም ${o.to}፣\n\n${o.by} በDINGUY መዝገብ ውስጥ ${o.name}ን በስምዎ አስመዝግበዋል።\n\n${o.message?`“${o.message}”\n\n`:''}የምዝገባ ቁ. ${o.id}\nመዝገብዎና ሰርተፊኬትዎ፦ ${o.recordLink}\n\nDINGUY® — ከልክ በላይ ትርጉም ላላቸው አጋጣሚዎች የተመዘገቡ ድንጋዮች።\nዲጂታል ምዝገባ። አካላዊ ድንጋይ አይካተትም።`
-    :`Hi ${o.to},\n\n${o.by} has registered ${o.name} in your name with the DINGUY Registry.\n\n${o.message?`“${o.message}”\n\n`:''}Registration No. ${o.id}\nYour record and certificate: ${o.recordLink}\n\nDINGUY® — Registered stones for unreasonably meaningful occasions.\nDigital registration. No physical stone included.`;
+    ?`ሰላም ${o.to}፣\n\n${o.by} በDINGUY መዝገብ ውስጥ ${o.name}ን በስምዎ አስመዝግበዋል።\n\n${o.message?`“${o.message}”\n\n`:''}የምዝገባ ቁ. ${o.id}\nመዝገብዎና ሰርተፊኬትዎ፦ ${o.recordLink}\n\nDINGUY® — ከልክ በላይ ትርጉም ላላቸው አጋጣሚዎች የተመዘገቡ ድንጋዮች።\nዲጂታል ምዝገባ። አካላዊ ድንጋይ አይካተትም።\n\n—\nDINGUY የSIDEWAYS ስራ ነው።\nSIDEWAYS ሰዎች ቆም ብለው፣ ደግመው አይተው እንዲያስታውሱ የሚያደርጉ ድረ-ገጾችን፣ ዘመቻዎችንና ሀሳቦችን ይሰራል።\nየእርስዎን ሀሳብ እንስራው፦ ${SW_LINK}\n${SW_MAIL} · 0996 567 218`
+    :`Hi ${o.to},\n\n${o.by} has registered ${o.name} in your name with the DINGUY Registry.\n\n${o.message?`“${o.message}”\n\n`:''}Registration No. ${o.id}\nYour record and certificate: ${o.recordLink}\n\nDINGUY® — Registered stones for unreasonably meaningful occasions.\nDigital registration. No physical stone included.\n\n—\nDINGUY is a SIDEWAYS project.\nSIDEWAYS makes websites, campaigns and ideas that make people stop, look twice and remember.\nGot an idea? Let’s make people talk: ${SW_LINK}\n${SW_MAIL} · 0996 567 218`;
   return {help,congrats,subject,body};
 }
 const smsHref=(phone,body)=>'sms:'+phone+'?&body='+encodeURIComponent(body);
 const mailHref=(o,m)=>`mailto:${o.email}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
+// Opens Gmail's compose window signed in as the SIDEWAYS address, everything filled in.
+const gmailHref=(o,m)=>`https://mail.google.com/mail/?authuser=${encodeURIComponent(SW_MAIL)}&view=cm&fs=1&to=${encodeURIComponent(o.email)}&su=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
+const emailLinks=(o,m,label)=>`<a class="btn" href="${esc(gmailHref(o,m))}" target="_blank" rel="noopener" data-mark="email" data-id="${esc(o.id)}">${label}</a><a class="btn ghost" href="${esc(mailHref(o,m))}" data-mark="email" data-id="${esc(o.id)}">Other mail app</a>`;
 // A link that also records the follow-up when tapped.
 const markLink=(o,what,href,label,cls='btn')=>`<a class="${cls}" href="${esc(href)}" data-mark="${what}" data-id="${esc(o.id)}">${label}</a>`;
 
@@ -197,7 +200,7 @@ function tasks(){
     if(o.status==='paid'&&recent&&o.phone&&!f.congrats_sms&&!f.congrats_skip)
       out.push({p:2,k:'congrats',o,ic:'🎉',t:`Text congrats to ${o.by}`,s:`${o.to} · ${o.name} · paid ${ago(o.approvedAt)}`,at:o.approvedAt});
     if(o.status==='paid'&&recent&&o.email&&!f.email&&!f.email_skip)
-      out.push({p:2,k:'email',o,ic:'✉️',t:`Email the certificate to ${o.to}`,s:`${o.email} · from ${o.by}`,at:o.approvedAt});
+      out.push({p:2,k:'email',o,ic:'✉️',t:`Email the certificate to ${o.to}`,s:`${o.email} · from ${o.by} · sends from ${SW_MAIL}`,at:o.approvedAt});
   }
   for(const q of S.inquiries)if(q.status!=='done')out.push({p:2,k:'inq',q,ic:'📨',t:`Reply to ${q.name}`,s:`SIDEWAYS · ${q.need} · ${ago(q.createdAt)}`,at:q.createdAt});
   return out.sort((a,b)=>a.p-b.p||(a.at||0)-(b.at||0));
@@ -208,7 +211,7 @@ function taskCard(t){
   if(t.k==='review')acts=`<a class="btn ghost" href="https://transactioninfo.ethiotelecom.et/receipt/${encodeURIComponent(o.txn||'')}" target="_blank" rel="noopener noreferrer">Open receipt ↗</a><button class="btn ok" data-a="approve" data-id="${esc(o.id)}">Approve</button><button class="btn bad" data-a="reject" data-id="${esc(o.id)}">Reject</button>`;
   if(t.k==='help')acts=markLink(o,'help_sms',smsHref(o.phone,msgs(o).help),'Send help SMS')+`<a class="btn ghost" href="tel:${esc(o.phone)}" data-mark="call" data-id="${esc(o.id)}">Call</a><button class="btn ghost" data-skip="help_skip" data-id="${esc(o.id)}">Skip</button>`;
   if(t.k==='congrats')acts=markLink(o,'congrats_sms',smsHref(o.phone,msgs(o).congrats),'Send congrats SMS')+`<button class="btn ghost" data-skip="congrats_skip" data-id="${esc(o.id)}">Skip</button>`;
-  if(t.k==='email')acts=markLink(o,'email',mailHref(o,msgs(o)),'Send email')+`<button class="btn ghost" data-skip="email_skip" data-id="${esc(o.id)}">Skip</button>`;
+  if(t.k==='email')acts=emailLinks(o,msgs(o),'Send from Gmail')+`<button class="btn ghost" data-skip="email_skip" data-id="${esc(o.id)}">Skip</button>`;
   if(t.k==='inq'){const q=t.q,h=reachLink(q.reach);acts=(h?`<a class="btn" href="${esc(h)}">${h.startsWith('mailto')?'Email':'Call'} ${esc(q.name)}</a>`:'')+`<button class="btn ghost" data-q="${esc(q.id)}" data-qa="done">Mark done</button>`;}
   const sub=t.k==='inq'&&t.q.msg?`${esc(t.s)}<br>“${esc(t.q.msg.slice(0,140))}”`:esc(t.s);
   return `<div class="card task t-${t.k}"><div class="ic" aria-hidden="true">${t.ic}</div><div><div class="tt">${esc(t.t)}</div><div class="ts">${sub}</div><div class="acts">${acts}</div></div></div>`;
@@ -218,10 +221,18 @@ function taskCard(t){
 function stats(){
   const real=S.orders.filter(o=>!o.manual);
   const paid=S.orders.filter(o=>o.status==='paid');
+  // Money = what telebirr receipts say was received. Hand-added registrations aren't counted;
+  // removed records still count if a receipt shows real money came in.
+  const counted=S.orders.filter(o=>!o.manual&&(o.status==='paid'||(o.status==='removed'&&o.paidAmount!=null)));
+  const amt=o=>o.paidAmount!=null?o.paidAmount:o.price;
+  const sum=l=>l.reduce((a,o)=>a+amt(o),0);
   const today=dayKey(Date.now()),wk=Date.now()-7*864e5;
-  const rev=paid.reduce((a,o)=>a+o.price,0);
-  const revToday=paid.filter(o=>dayKey(o.approvedAt||o.createdAt)===today).reduce((a,o)=>a+o.price,0);
-  const rev7=paid.filter(o=>(o.approvedAt||0)>=wk).reduce((a,o)=>a+o.price,0);
+  const rev=sum(counted);
+  const revToday=sum(counted.filter(o=>dayKey(o.approvedAt||o.createdAt)===today));
+  const rev7=sum(counted.filter(o=>(o.approvedAt||0)>=wk));
+  const noReceipt=counted.filter(o=>o.paidAmount==null);
+  const manual=S.orders.filter(o=>o.manual&&o.status==='paid');
+  const byAcct={};for(const o of counted)if(o.paidAmount!=null){const k=o.paidTo||'?';byAcct[k]=(byAcct[k]||0)+o.paidAmount;}
   const realPaid=real.filter(o=>o.status==='paid'||o.status==='removed');
   const coded=real.filter(o=>o.txn);
   const conv=real.length?Math.round(realPaid.length/real.length*100):0;
@@ -230,12 +241,12 @@ function stats(){
   // last 14 days revenue
   const days=[];for(let i=13;i>=0;i--){const t=Date.now()-i*864e5;days.push({k:dayKey(t),label:new Date(t).toLocaleDateString('en-GB',{timeZone:TZ,day:'numeric',month:'short'}),v:0,n:0});}
   const byDay=Object.fromEntries(days.map(d=>[d.k,d]));
-  for(const o of paid){const d=byDay[dayKey(o.approvedAt||o.createdAt)];if(d){d.v+=o.price;d.n++;}}
+  for(const o of counted){const d=byDay[dayKey(o.approvedAt||o.createdAt)];if(d){d.v+=amt(o);d.n++;}}
   const byStone={};for(const o of paid){byStone[o.name]=(byStone[o.name]||0)+1;}
   const stones=Object.entries(byStone).sort((a,b)=>b[1]-a[1]);
   const fr=paid.filter(isFriend).length,lv=paid.length-fr;
   const am=paid.filter(o=>o.lang==='am').length;
-  return {rev,revToday,rev7,paid:paid.length,conv,med,real:real.length,coded:coded.length,realPaid:realPaid.length,days,stones,fr,lv,am};
+  return {rev,revToday,rev7,counted:counted.length,noReceipt,manual,byAcct,paid:paid.length,conv,med,real:real.length,coded:coded.length,realPaid:realPaid.length,days,stones,fr,lv,am};
 }
 
 /* ---------- views ---------- */
@@ -260,10 +271,19 @@ function viewDash(){
   <div class="kpis">
     <div class="card kpi"><div class="mono">Today</div><div class="v">${fmtBirr(st.revToday)}</div></div>
     <div class="card kpi"><div class="mono">Last 7 days</div><div class="v">${fmtBirr(st.rev7)}</div></div>
-    <div class="card kpi"><div class="mono">All time</div><div class="v">${fmtBirr(st.rev)}</div><div class="s">${st.paid} registrations</div></div>
+    <div class="card kpi"><div class="mono">All time received</div><div class="v">${fmtBirr(st.rev)}</div><div class="s">${st.counted} payments · ${st.paid} live registrations</div></div>
     <div class="card kpi"><div class="mono">Pay rate</div><div class="v">${st.conv}%</div><div class="s">of started orders get paid${st.med!=null?` · ${Math.round(st.med)} min to pay (median)`:''}</div></div>
   </div>
-  <h2 class="sec"><span>Revenue · last 14 days</span></h2>
+  <h2 class="sec"><span>Money check</span></h2>
+  <div class="card">
+    ${Object.entries(st.byAcct).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${k==='7218'?'0996 567 218 (…7218)':k==='5467'?'Old number (…5467)':'Account …'+esc(k)}</span><strong>${fmtBirr(v)}</strong></div>`).join('')}
+    ${st.noReceipt.length?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Not checked against a receipt yet</span><strong>${fmtBirr(st.noReceipt.reduce((a,o)=>a+o.price,0))}</strong></div>`:''}
+    <div class="row" style="padding:8px 0"><span>Added by hand (not counted)</span><strong>${st.manual.length}</strong></div>
+    <div class="readout" style="margin-top:6px">Amounts come from the telebirr receipts the Mac helper reads.</div>
+    ${st.noReceipt.length?`<details class="tbl"><summary>Show the ${st.noReceipt.length} without a receipt amount</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.noReceipt.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
+    ${st.manual.length?`<details class="tbl"><summary>Show the ${st.manual.length} added by hand</summary><table class="data"><thead><tr><th>Order</th><th>Note</th><th>Price</th></tr></thead><tbody>${st.manual.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
+  </div>
+  <h2 class="sec"><span>Money · last 14 days</span></h2>
   <div class="card">
     <div class="chart-h"><div class="t">Paid per day</div><div class="readout" aria-live="polite">${selD?`<strong>${esc(selD.label)}</strong> · ${fmtBirr(selD.v)} · ${selD.n} paid`:'Tap a bar'}</div></div>
     <div class="cols" id="cols"><div class="gl" style="bottom:100%"><span>${fmtBirr(top)}</span></div><div class="gl" style="bottom:50%"><span>${fmtBirr(top/2)}</span></div>${cols}</div>
@@ -300,7 +320,7 @@ function orderCard(o){
   if(o.phone){a.push(`<a class="btn ghost" href="tel:${esc(o.phone)}" data-mark="call" data-id="${esc(o.id)}">Call</a>`);
     if(o.status==='paid')a.push(markLink(o,'congrats_sms',smsHref(o.phone,m.congrats),'Congrats SMS'));
     else if(o.status!=='removed')a.push(markLink(o,'help_sms',smsHref(o.phone,m.help),'Help SMS'));}
-  if(o.email&&o.status==='paid')a.push(markLink(o,'email',mailHref(o,m),'Email '+esc(o.to)));
+  if(o.email&&o.status==='paid')a.push(emailLinks(o,m,'Email '+esc(o.to)));
   if(o.status==='review'||o.status==='awaiting'||o.status==='rejected')a.push(`<button class="btn ok" data-a="approve" data-id="${esc(o.id)}">Approve</button>`);
   if(o.status==='review'||o.status==='awaiting')a.push(`<button class="btn bad" data-a="reject" data-id="${esc(o.id)}">Reject</button>`);
   if(o.status==='paid')a.push(`<a class="btn ghost" href="${esc(o.recordLink)}" target="_blank" rel="noopener">Record ↗</a><button class="btn ghost" data-a="remove" data-id="${esc(o.id)}">Remove</button>`);
@@ -315,7 +335,7 @@ function orderCard(o){
       ${o.phone?`<dt>Phone</dt><dd><a href="tel:${esc(o.phone)}" data-mark="call" data-id="${esc(o.id)}">${esc(o.phone)}</a></dd>`:''}
       ${o.email?`<dt>Their email</dt><dd>${esc(o.email)}</dd>`:''}
       ${o.txn?`<dt>Transaction</dt><dd>${o.manual?esc(o.txn):`<a href="https://transactioninfo.ethiotelecom.et/receipt/${encodeURIComponent(o.txn)}" target="_blank" rel="noopener noreferrer">${esc(o.txn)} ↗</a>`}</dd>`:''}
-      ${o.paidAmount!=null?`<dt>Paid</dt><dd>${esc(o.paidAmount)} Birr${o.payer?' by '+esc(o.payer):''}</dd>`:''}
+      ${o.paidAmount!=null?`<dt>Received</dt><dd>${esc(o.paidAmount)} Birr${o.paidTo?' → …'+esc(o.paidTo):''}${o.payer?' · from '+esc(o.payer):''}</dd>`:''}
       ${o.approvedBy?`<dt>Approved</dt><dd>${esc(o.approvedBy)} · ${when(o.approvedAt)}</dd>`:''}
       ${o.message?`<dt>Message</dt><dd>“${esc(o.message)}”</dd>`:''}
     </dl>
