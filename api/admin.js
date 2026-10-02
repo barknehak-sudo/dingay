@@ -89,6 +89,7 @@ export default async function handler(req, res) {
         if (/^\d{4}$/.test(String(rc.account || ''))) o.paidTo = String(rc.account);
         if (rc.payer) o.payer = String(rc.payer).slice(0, 80);
         if (Number.isFinite(Number(rc.paidAt))) o.paidAt = Number(rc.paidAt);
+        o.receiptMissing = rc.missing === true || undefined;
       }
       if (action === 'receipt') {
         if (!rc) return send(res, 400, { error: 'No receipt.' });

@@ -54,16 +54,22 @@ async function check(o, payTo) {
 // Once per start: read the real amount + receiving account for paid orders that don't have them yet.
 async function backfill(orders) {
   const todo = orders.filter((o) => (o.status === 'paid' || o.status === 'removed') && o.txn && !o.manual && o.paidAmount == null);
+  let missing = 0;
   let n = 0;
   for (const o of todo) {
     try {
-      const r = parseReceipt(await fetchReceipt(o.txn), o.txn);
-      if (!r.found) continue;
+      const html = await fetchReceipt(o.txn);
+      const r = parseReceipt(html, o.txn);
+      if (!r.found) {
+        // telebirr says this transaction doesn't exist → no money came in for it
+        if (/request is not correct/i.test(html)) { await admin('POST', { id: o.id, action: 'receipt', receipt: { amount: 0, missing: true } }); missing++; }
+        continue;
+      }
       await admin('POST', { id: o.id, action: 'receipt', receipt: { amount: r.amount, account: String(r.account).replace(/\D/g, '').slice(-4), payer: r.payer, paidAt: parseEAT(r.date) } });
       n++;
     } catch (e) { /* try again next start */ }
   }
-  if (todo.length) console.log(new Date().toISOString(), `backfilled receipts for ${n}/${todo.length} paid orders`);
+  if (todo.length) console.log(new Date().toISOString(), `backfilled receipts for ${n}/${todo.length} paid orders; ${missing} have no telebirr receipt`);
 }
 
 async function tick() {

@@ -232,7 +232,8 @@ function stats(){
   const rev7=sum(counted.filter(o=>(o.approvedAt||0)>=wk));
   const noReceipt=counted.filter(o=>o.paidAmount==null);
   const manual=S.orders.filter(o=>o.manual&&o.status==='paid');
-  const byAcct={};for(const o of counted)if(o.paidAmount!=null){const k=o.paidTo||'?';byAcct[k]=(byAcct[k]||0)+o.paidAmount;}
+  const missing=counted.filter(o=>o.receiptMissing);
+  const byAcct={};for(const o of counted)if(o.paidAmount!=null&&!o.receiptMissing){const k=o.paidTo||'?';byAcct[k]=(byAcct[k]||0)+o.paidAmount;}
   const realPaid=real.filter(o=>o.status==='paid'||o.status==='removed');
   const coded=real.filter(o=>o.txn);
   const conv=real.length?Math.round(realPaid.length/real.length*100):0;
@@ -246,7 +247,7 @@ function stats(){
   const stones=Object.entries(byStone).sort((a,b)=>b[1]-a[1]);
   const fr=paid.filter(isFriend).length,lv=paid.length-fr;
   const am=paid.filter(o=>o.lang==='am').length;
-  return {rev,revToday,rev7,counted:counted.length,noReceipt,manual,byAcct,paid:paid.length,conv,med,real:real.length,coded:coded.length,realPaid:realPaid.length,days,stones,fr,lv,am};
+  return {rev,revToday,rev7,counted:counted.length,missing,noReceipt,manual,byAcct,paid:paid.length,conv,med,real:real.length,coded:coded.length,realPaid:realPaid.length,days,stones,fr,lv,am};
 }
 
 /* ---------- views ---------- */
@@ -278,9 +279,11 @@ function viewDash(){
   <div class="card">
     ${Object.entries(st.byAcct).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${k==='7218'?'0996 567 218 (…7218)':k==='5467'?'Old number (…5467)':'Account …'+esc(k)}</span><strong>${fmtBirr(v)}</strong></div>`).join('')}
     ${st.noReceipt.length?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Not checked against a receipt yet</span><strong>${fmtBirr(st.noReceipt.reduce((a,o)=>a+o.price,0))}</strong></div>`:''}
+    ${st.missing.length?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Marked paid, but telebirr has no such transaction</span><strong>${st.missing.length} · 0 Birr</strong></div>`:''}
     <div class="row" style="padding:8px 0"><span>Added by hand (not counted)</span><strong>${st.manual.length}</strong></div>
     <div class="readout" style="margin-top:6px">Amounts come from the telebirr receipts the Mac helper reads.</div>
     ${st.noReceipt.length?`<details class="tbl"><summary>Show the ${st.noReceipt.length} without a receipt amount</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.noReceipt.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
+    ${st.missing.length?`<details class="tbl" open><summary>Show the ${st.missing.length} with no telebirr receipt</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.missing.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
     ${st.manual.length?`<details class="tbl"><summary>Show the ${st.manual.length} added by hand</summary><table class="data"><thead><tr><th>Order</th><th>Note</th><th>Price</th></tr></thead><tbody>${st.manual.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
   </div>
   <h2 class="sec"><span>Money · last 14 days</span></h2>
