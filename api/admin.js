@@ -8,11 +8,15 @@
 // POST /api/admin {id, action:'restore'}  → put a removed record back (same number, same links)
 // POST /api/admin {create:{slug,to,by,…}} → add a registration by hand (paid another way / gift)
 // POST /api/admin {inquiry:id, action:'done'|'new'}
+// Orders come back with payLink, recordLink and msgs (the SMS/email texts); `auto` says what is sent automatically.
 import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO } from './_lib.js';
+import { messages, links, followUp, sweep, autoOn } from './_notify.js';
 
 const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
 
-const strip = (o) => { delete o.key; return o; };
+// What /office gets: no secret key, plus the customer's links and the ready-made texts.
+const view = (o, site) => { Object.assign(o, links(o, site), { msgs: messages(o, site) }); delete o.key; return o; };
+const siteOf = (req) => 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
 
 export default async function handler(req, res) {
   try {
@@ -23,25 +27,25 @@ export default async function handler(req, res) {
       return send(res, 401, { error: 'Wrong password.' });
     }
 
+    if (req.method === 'GET') await sweep();
     if (req.method === 'GET' && req.query.pending) {
       const ids = await kv('SMEMBERS', 'review');
       const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
-      const orders = raw.filter(Boolean).map((r) => strip(JSON.parse(r))).filter((o) => o.status === 'review');
+      const orders = raw.filter(Boolean).map((r) => view(JSON.parse(r), siteOf(req))).filter((o) => o.status === 'review');
       return send(res, 200, { orders, receivers: RECEIVERS, payTo: PAY_TO });
     }
 
     if (req.method === 'GET') {
       const ids = await kv('LRANGE', 'orders', 0, 499);
       const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
-      const site = 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
       // payLink = the customer's private order link, so you can text it to them.
-      const orders = raw.filter(Boolean).map((r) => { const o = JSON.parse(r); o.payLink = `${site}/#/pay/${o.id}/${o.key}`; o.recordLink = `${site}/#/registry/${o.id}`; return strip(o); });
+      const orders = raw.filter(Boolean).map((r) => view(JSON.parse(r), siteOf(req)));
       const inReview = orders.filter((o) => o.status === 'review').map((o) => o.id);
       if (inReview.length) await kv('SADD', 'review', ...inReview);
       const qids = await kv('LRANGE', 'inquiries', 0, 199);
       const qraw = qids.length ? await kv('MGET', ...qids.map((i) => 'inq:' + i)) : [];
       const inquiries = qraw.filter(Boolean).map((r) => JSON.parse(r));
-      return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO });
+      return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn() });
     }
     if (req.method === 'POST' && (req.body || {}).inquiry) {
       const { inquiry, action } = req.body;
@@ -73,9 +77,8 @@ export default async function handler(req, res) {
       await kv('LPUSH', 'orders', id);
       await kv('LTRIM', 'orders', 0, 999);
       await publish(o);
-      const site = 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
-      o.payLink = `${site}/#/pay/${o.id}/${o.key}`; o.recordLink = `${site}/#/registry/${o.id}`;
-      return send(res, 200, { order: strip(o) });
+      const done = await followUp(o.id).catch((e) => (console.error('followUp', e.message), null));
+      return send(res, 200, { order: view(done || o, siteOf(req)) });
     }
     if (req.method === 'POST') {
       const { id, action, note } = req.body || {};
@@ -114,9 +117,8 @@ export default async function handler(req, res) {
       } else return send(res, 400, { error: 'Unknown action.' });
       await saveOrder(o);
       if (o.status !== 'review') await kv('SREM', 'review', o.id);
-      const site = 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
-      o.payLink = `${site}/#/pay/${o.id}/${o.key}`; o.recordLink = `${site}/#/registry/${o.id}`;
-      return send(res, 200, { order: strip(o) });
+      const done = action === 'approve' ? await followUp(o.id).catch((e) => (console.error('followUp', e.message), null)) : null;
+      return send(res, 200, { order: view(done || o, siteOf(req)) });
     }
     send(res, 405, { error: 'Method not allowed' });
   } catch (e) {

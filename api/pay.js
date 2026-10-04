@@ -1,5 +1,6 @@
 // POST /api/pay — customer submits the telebirr transaction ID; we verify it against the official receipt.
 import { kv, loadOrder, saveOrder, publish, publicOrder, send, fetchReceipt, parseReceipt, parseEAT, receiverCheck, limited, PAY_TO } from './_lib.js';
+import { followUp } from './_notify.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
@@ -53,6 +54,7 @@ export default async function handler(req, res) {
     if (problems.length) { o.status = 'review'; o.reason = problems.join('; '); await kv('SADD', 'review', o.id); }
     else { o.status = 'paid'; o.approvedBy = 'auto'; o.approvedAt = Date.now(); await publish(o); }
     await saveOrder(o);
+    if (o.status === 'paid') await followUp(o.id).catch((e) => console.error('followUp', e.message));
     send(res, 200, publicOrder(o));
   } catch (e) {
     console.error(e);

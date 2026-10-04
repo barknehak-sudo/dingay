@@ -2,3 +2,4 @@
 .thumbnail
 uploads/
 .claude/
+node_modules/
