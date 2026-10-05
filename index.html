@@ -564,6 +564,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
       <p style="margin:18px 0 0;font-size:17px">Your certificate is ready.</p>
       <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;max-width:420px">
         <button onClick="{{ succ.download }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:#eef2f4;color:#0b0b0a;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">SAVE CERTIFICATE<span>↓</span></button>
+        <button onClick="{{ succ.story }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:linear-gradient(45deg,#f58529,#dd2a7b 45%,#8134af 75%,#515bd4);color:#fff;border:0;font-size:12px;font-weight:700;letter-spacing:.1em;cursor:pointer">SHARE TO INSTAGRAM STORY<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" style="display:block;flex:none;fill:none;stroke:currentColor;stroke-width:2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></button>
         <button onClick="{{ succ.view }}" style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 20px;background:transparent;color:#eef2f4;border:1px solid rgba(238,242,244,.35);font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">VIEW REGISTRY PAGE<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" style="display:block;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M7 17 17 7M8.5 7H17v8.5"></path></svg></button>
         <button onClick="{{ succ.share }}" style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 20px;background:transparent;color:#eef2f4;border:1px solid rgba(238,242,244,.35);font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">SHARE WITH THEM<span>→</span></button>
         <sc-if value="{{ isTouch }}"><div style="font-size:13px;line-height:1.4;color:#a9bccb">Tip: after tapping Save, choose “Save Image” to keep it in your Photos.</div></sc-if>
@@ -623,6 +624,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
       <sc-if value="{{ rec.isPublic }}"><p style="margin:0;max-width:36ch;font-size:16px;line-height:1.5;color:#2c4556">The dedication and certificate are private. They open from the link sent to the buyer.</p></sc-if>
       <div style="display:flex;flex-direction:column;gap:8px;max-width:420px">
         <sc-if value="{{ rec.full }}"><button onClick="{{ rec.download }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">SAVE CERTIFICATE<span>↓</span></button></sc-if>
+        <button onClick="{{ rec.story }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:linear-gradient(45deg,#f58529,#dd2a7b 45%,#8134af 75%,#515bd4);color:#fff;border:0;font-size:12px;font-weight:700;letter-spacing:.1em;cursor:pointer">SHARE TO INSTAGRAM STORY<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" style="display:block;flex:none;fill:none;stroke:currentColor;stroke-width:2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></button>
         <button onClick="{{ openSheet }}" style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 20px;background:transparent;color:#0b1720;border:1px solid rgba(11,23,32,.35);font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">BUY YOUR OWN STONE<span>→</span></button>
         <div style="margin-top:36px;padding-top:18px;border-top:1px solid rgba(11,23,32,.16)">
           <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Experience archived.</div>
@@ -1140,6 +1142,39 @@ class Component extends DCLogic {
   share(reg){const url=location.href.split('#')[0]+'#/registry/'+reg.no+(reg.key?'/'+reg.key:'');const text=T(`${reg.to} has been registered with ${reg.type}. Registration No. ${reg.no}`);
     if(navigator.share){navigator.share({title:T('DINGUY Registration Office'),text,url}).catch(()=>{});}
     else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>this.toastMsg('Registry link copied.'),()=>this.toastMsg(url));}else this.toastMsg(url);}
+  // A 1080×1920 Instagram story: the stone, who it's registered to, the number. Never the private message.
+  async story(reg){
+    if(this.storyBusy)return;this.storyBusy=true;this.toastMsg('Making your story…');
+    try{
+      const W=1080,H=1920,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+      const loved=['opal','choc','emerald','diamond'].includes(reg.kind);
+      const F='"Helvetica Neue",Helvetica,Arial,"Noto Sans Ethiopic",sans-serif',M='"IBM Plex Mono",ui-monospace,monospace';
+      const bg=x.createRadialGradient(W/2,560,80,W/2,820,1500);
+      if(loved){bg.addColorStop(0,'#4b6a80');bg.addColorStop(.45,'#132531');bg.addColorStop(1,'#000');}else{bg.addColorStop(0,'#f4f4f1');bg.addColorStop(.55,'#d6d6d2');bg.addColorStop(1,'#a9a9a4');}
+      x.fillStyle=bg;x.fillRect(0,0,W,H);
+      const ink=loved?'#f4efe9':'#0b0b0b',sub=loved?'#b9c9d4':'#3b3b3b',acc=loved?'#cfe0ea':'#0b0b0b';
+      if(!loved){x.fillStyle='#f2c230';x.fillRect(0,0,W,22);for(let i=-40;i<W+40;i+=44){x.fillStyle='#0b0b0b';x.beginPath();x.moveTo(i,0);x.lineTo(i+22,0);x.lineTo(i,22);x.lineTo(i-22,22);x.fill();}}
+      x.textAlign='center';x.fillStyle=sub;x.font=`500 30px ${M}`;x.fillText(T('DINGUY REGISTRY · OFFICIAL RECORD'),W/2,170);
+      // stone + soft shadow
+      x.save();x.globalAlpha=loved?.6:.4;x.translate(W/2,990);x.scale(1,.16);const sh=x.createRadialGradient(0,0,0,0,0,340);sh.addColorStop(0,'rgba(0,0,0,.9)');sh.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=sh;x.fillRect(-360,-360,720,720);x.restore();
+      const src=await Promise.race([window.dgStoneShot?window.dgStoneShot(reg.kind):Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),6000))])||(reg.kind==='blocket'?'assets/blocket.png':null);
+      if(src){const im=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src;});if(im)x.drawImage(im,W/2-400,250,800,800);}
+      const fit=(t,max,size,wt,fam)=>{do{x.font=`${wt} ${size}px ${fam}`;size-=4}while(x.measureText(t).width>max&&size>40);};
+      x.fillStyle=sub;x.font=`400 40px ${F}`;x.fillText(T('Officially registered to'),W/2,1160);
+      const to=String(reg.to||'').toUpperCase();x.fillStyle=ink;fit(to,W-140,150,700,F);x.fillText(to,W/2,1320);
+      x.fillStyle=sub;x.font=`400 40px ${F}`;x.fillText(T('with'),W/2,1400);
+      const ty=String(T(reg.type)||'').toUpperCase();x.fillStyle=acc;fit(ty,W-160,76,600,F);x.fillText(ty,W/2,1490);
+      x.fillStyle=ink;x.font=`500 46px ${M}`;x.fillText(reg.no,W/2,1600);
+      x.fillStyle=sub;x.font=`500 34px ${M}`;x.fillText('dinguy.xyz',W/2,1800);
+      const url=c.toDataURL('image/png'),fname=`DINGUY-story-${reg.no}.png`;
+      const b=atob(url.split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
+      const file=new File([u],fname,{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        this.toastMsg('Choose Instagram, then “Story”.');
+        try{await navigator.share({files:[file]});}catch(e){}
+      }else{const a=document.createElement('a');a.download=fname;a.href=url;document.body.appendChild(a);a.click();a.remove();this.toastMsg('Story image saved — add it to your Instagram story.');}
+    }finally{this.storyBusy=false;}
+  }
   async download(reg){
     const W=1240,H=1711,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
     const F='"Helvetica Neue",Helvetica,Arial,"Noto Sans Ethiopic",sans-serif',M='"IBM Plex Mono",ui-monospace,monospace',ink='#0b1720',mut='#435f73';
@@ -1219,7 +1254,7 @@ class Component extends DCLogic {
     const sreg=st.regs[st.lastNo]||SEED['DG-004281'];
     const rr=recReg||SEED['DG-004281'];
     const full=!!rr.by;
-    const rec={...rr,reg:rr,full,isPublic:!full,badge:full?'Private record':'Public record',message:rr.message?`“${rr.message}”`:'—',rows:(full?[['Registered To',rr.to],['Dinguy Type',rr.type],['Dedicated By',rr.by],['Registered On',rr.date],['Occasion',rr.occasion||'—']]:[['Registered To',rr.to],['Dinguy Type',rr.type],['Registered On',rr.date]]).map(([k,v])=>({k,v})),download:()=>this.download(rr),share:()=>this.share(rr)};
+    const rec={...rr,reg:rr,full,isPublic:!full,badge:full?'Private record':'Public record',message:rr.message?`“${rr.message}”`:'—',rows:(full?[['Registered To',rr.to],['Dinguy Type',rr.type],['Dedicated By',rr.by],['Registered On',rr.date],['Occasion',rr.occasion||'—']]:[['Registered To',rr.to],['Dinguy Type',rr.type],['Registered On',rr.date]]).map(([k,v])=>({k,v})),download:()=>this.download(rr),share:()=>this.share(rr),story:()=>this.story(rr)};
     let showBar=false,barLabel='BUY A STONE',barRight='→',barAction=()=>this.setState({sheet:true});
     if(!wide&&!st.menu){if(a===''||isCatalog)showBar=true;if(isProduct){showBar=true;barLabel='BUY THIS STONE';barRight=prod.priceLabel;barAction=prod.register;}}
     const rvs=st.rvs;
@@ -1253,7 +1288,7 @@ class Component extends DCLogic {
       regBlocked:!regOk,regOpacity:regOk?1:.35,regBtn:st.busy?'CREATING ORDER…':'CONTINUE TO PAYMENT',regHintColor:st.regErr?'#b3261e':'#435f73',regHint:st.regErr||(st.busy?'Reserving your registration number…':(regOk?'Next: pay with telebirr.':(!hasDed?'Add a recipient and your name to continue.':(!phoneOk?'Add your phone number to continue.':(!emailOk?'Check the email address.':'Please confirm the registration type.'))))),
       submitReg:()=>{if(regOk)this.createOrder();},
       processing:st.proc>=0,procNo:st.pay.id,procSteps:['Finding your telebirr receipt','Confirming the payment','Registry entry created','Certificate issued'].map((label,i)=>({label:label.toUpperCase(),op:st.proc>=i?1:.25,dot:st.proc>i?'#eef2f4':'transparent'})),
-      succ:{...sreg,reg:sreg,download:()=>this.download(sreg),view:go('registry/'+sreg.no),share:()=>this.share(sreg)},cycleNo:st.cycleNo||st.lastNo,stamped:st.stamped,archived:st.archived,
+      succ:{...sreg,reg:sreg,download:()=>this.download(sreg),story:()=>this.story(sreg),view:go('registry/'+sreg.no),share:()=>this.share(sreg)},cycleNo:st.cycleNo||st.lastNo,stamped:st.stamped,archived:st.archived,
       rec,openCert:()=>this.setState({certOpen:true}),closeCert:()=>this.setState({certOpen:false}),certOpen:st.certOpen,
       lookup:st.lookup,setLookup:e=>this.setState({lookup:e.target.value}),
       doLookup:e=>{e.preventDefault();const raw=st.lookup.trim();if(!raw)return;const m=/^(?:DG-?)?(\d{6})$/i.exec(raw.replace(/\s+/g,''));if(m){this.go('registry/DG-'+m[1]);return;}this.search(raw);},

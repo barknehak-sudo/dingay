@@ -8,9 +8,10 @@
 // POST /api/admin {id, action:'restore'}  → put a removed record back (same number, same links)
 // POST /api/admin {create:{slug,to,by,…}} → add a registration by hand (paid another way / gift)
 // POST /api/admin {inquiry:id, action:'done'|'new'}
+// POST /api/admin {testEmail:'you@x.com'} → sends a sample certificate email through the Gmail setup
 // Orders come back with payLink, recordLink and msgs (the SMS/email texts); `auto` says what is sent automatically.
 import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO } from './_lib.js';
-import { messages, links, followUp, sweep, autoOn } from './_notify.js';
+import { messages, links, followUp, sweep, autoOn, sendTestEmail } from './_notify.js';
 
 const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
 
@@ -46,6 +47,12 @@ export default async function handler(req, res) {
       const qraw = qids.length ? await kv('MGET', ...qids.map((i) => 'inq:' + i)) : [];
       const inquiries = qraw.filter(Boolean).map((r) => JSON.parse(r));
       return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn() });
+    }
+    if (req.method === 'POST' && (req.body || {}).testEmail) {
+      const to = clean(req.body.testEmail, 120);
+      if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(to)) return send(res, 400, { error: 'Email doesn’t look right.' });
+      if (!autoOn().email) return send(res, 400, { error: 'GMAIL_APP_PASSWORD is not set in Vercel (or the site wasn’t redeployed after adding it).' });
+      try { return send(res, 200, await sendTestEmail(to)); } catch (e) { return send(res, 502, { error: 'Gmail refused: ' + e.message }); }
     }
     if (req.method === 'POST' && (req.body || {}).inquiry) {
       const { inquiry, action } = req.body;

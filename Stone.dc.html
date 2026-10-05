@@ -191,6 +191,14 @@ class Component extends DCLogic {
       this.gt=setTimeout(()=>{if(!this.state.glReady)this.glFallback();},8000);}
     else shot(this.props.kind||'cobble').then(u=>{if(u&&!this.dead)this.setState({shot:u});});
   }
+  // The page reuses this component when you switch collections (Friend ↔ Loved one), so follow kind changes.
+  componentDidUpdate(prev){
+    const kind=this.props.kind||'cobble';if((prev.kind||'cobble')===kind)return;
+    if(this.gl){const{T,grp,mesh}=this.gl;const m=buildMesh(T,kind);grp.remove(mesh);mesh.geometry.dispose();mesh.material.dispose();grp.add(m);this.gl.mesh=m;
+      this.pitch=this.basePitch=PITCH[kind]||.25;
+      const lv=renderChecked(T,this.gl.renderer,this.gl.scene,this.gl.cam,m,kind);if(lv<0)this.glFallback();}
+    else if(!this.props.gl){this.setState({shot:null});shot(kind).then(u=>{if(u&&!this.dead&&(this.props.kind||'cobble')===kind)this.setState({shot:u});});}
+  }
   componentWillUnmount(){this.dead=true;cancelAnimationFrame(this.raf);this.io&&this.io.disconnect();this.ro&&this.ro.disconnect();clearTimeout(this.ht);clearTimeout(this.gt);
     if(this.gl){const{renderer,mesh,envT}=this.gl;mesh.geometry.dispose();mesh.material.dispose();envT&&envT.dispose();renderer.dispose();try{renderer.forceContextLoss()}catch(e){}renderer.domElement.remove();this.gl=null;}}
   glFallback(){if(this.dead)return;if(this.gl){const{renderer}=this.gl;try{renderer.domElement.remove();renderer.dispose();}catch(e){}this.gl=null;}this.setState({glFail:true});}

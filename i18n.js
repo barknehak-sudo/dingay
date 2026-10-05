@@ -199,7 +199,9 @@
     /* ---------- success / record / registry ---------- */
     "Registry entry confirmed ·": "የመዝገብ ግቤት ተረጋግጧል ·", "IT'S OFFICIAL.": "ይፋ ሆኗል።", "Well, officially enough.": "እሺ፣ በቂ ያህል ይፋ።",
     "has been registered with:": "የተመዘገበለት ድንጋይ፦", "Registration No.": "የምዝገባ ቁ.", "Your certificate is ready.": "ሰርተፊኬትዎ ዝግጁ ነው።",
-    "DOWNLOAD CERTIFICATE": "ሰርተፊኬቱን አውርድ", "SAVE CERTIFICATE": "ሰርተፊኬቱን አስቀምጥ",
+    "DOWNLOAD CERTIFICATE": "ሰርተፊኬቱን አውርድ", "SAVE CERTIFICATE": "ሰርተፊኬቱን አስቀምጥ", "SHARE TO INSTAGRAM STORY": "በኢንስታግራም ስቶሪ አጋራ", "Making your story…": "ስቶሪዎን በማዘጋጀት ላይ…",
+    "Choose Instagram, then “Story”.": "ኢንስታግራምን ይምረጡ፣ ከዚያ “Story”።", "Story image saved — add it to your Instagram story.": "የስቶሪው ምስል ተቀምጧል — በኢንስታግራም ስቶሪዎ ላይ ያጋሩት።",
+    "DINGUY REGISTRY · OFFICIAL RECORD": "የDINGUY መዝገብ · ይፋዊ መዝገብ", "Officially registered to": "በይፋ የተመዘገበለት", "with": "በ",
     "Tip: after tapping Save, choose “Save Image” to keep it in your Photos.": "ምክር፦ “አስቀምጥ”ን ከነኩ በኋላ በፎቶዎችዎ ውስጥ ለማስቀመጥ “Save Image”ን ይምረጡ።", "VIEW REGISTRY PAGE": "የመዝገብ ገጹን ተመልከት", "SHARE WITH THEM": "ለእነሱ አጋራ",
     "Experience archived.": "ልምዱ ተመዝግቧል።", "One more entry was found in the registry.": "በመዝገቡ ውስጥ አንድ ተጨማሪ ግቤት ተገኝቷል።",
     "OPEN FINAL RECORD": "የመጨረሻውን መዝገብ ክፈት", "DINGUY Registration Office": "የDINGUY ምዝገባ ቢሮ", "Public record": "የሕዝብ መዝገብ",

@@ -57,6 +57,13 @@ export async function sendEmail(to, subject, text) {
   return mailer.sendMail({ from: `SIDEWAYS · DINGUY <${SW_MAIL}>`, replyTo: SW_MAIL, to, subject, text });
 }
 
+// A sample certificate email (the real template), so the Gmail setup can be checked.
+export async function sendTestEmail(to) {
+  const m = messages({ id: 'DG-000000', key: 'test', to: 'Test Recipient', by: 'DINGUY', name: 'DIAMOND', message: 'This is a test of the automatic certificate email.', lang: 'en' });
+  const info = await sendEmail(to, '[TEST] ' + m.subject, m.body);
+  return { from: SW_MAIL, to, id: info.messageId, response: info.response };
+}
+
 /* ---------- what's due ---------- */
 const MIN = 60e3, HOUR = 60 * MIN;
 // Only recent orders are followed up automatically, so turning this on never texts old customers.

@@ -357,7 +357,7 @@ function viewDash(){
 }
 function autoLine(){
   const a=S.auto||{},on=x=>x?'<strong>on</strong>':'off';
-  return `<div class="readout" style="margin-top:14px">Automatic SMS ${on(a.sms)} · automatic email ${on(a.email)}${a.email?` from ${esc(a.from)}`:''}. ${a.sms||a.email?'Help texts go out 30 s after an unpaid order, congrats and certificates as soon as it’s paid. Anything that fails stays here.':'Set SMSETHIOPIA_KEY / GMAIL_APP_PASSWORD in Vercel to turn it on.'}</div>`;
+  return `<div class="readout" style="margin-top:14px">Automatic SMS ${on(a.sms)} · automatic email ${on(a.email)}${a.email?` from ${esc(a.from)}`:''}. ${a.sms||a.email?'Help texts go out 30 s after an unpaid order, congrats and certificates as soon as it’s paid. Anything that fails stays here.':'Set SMSETHIOPIA_KEY / GMAIL_APP_PASSWORD in Vercel to turn it on.'}${a.email?` <button class="btn ghost" data-testmail style="margin-left:6px;min-height:30px;padding:0 10px">Send test email</button>`:''}</div>`;
 }
 function viewTasks(){
   const ts=tasks();const groups=[['review','Check these payments'],['congrats','Say congrats'],['email','Email certificates'],['help','Help them pay'],['inq','SIDEWAYS inquiries']];
@@ -448,6 +448,8 @@ $('#refresh').onclick=()=>load().then(()=>toast('Updated'));
 document.addEventListener('click',async e=>{
   const tab=e.target.closest('[data-tab]');if(tab){setTab(tab.dataset.tab);return;}
   const fil=e.target.closest('[data-filter]');if(fil){S.filter=fil.dataset.filter;render();return;}
+  const tm=e.target.closest('[data-testmail]');if(tm){const to=prompt('Send a test certificate email to:');if(!to)return;tm.disabled=true;
+    try{const j=await api('POST',{testEmail:to.trim()});toast('Sent from '+j.from+' — check '+j.to);}catch(err){alert(err.message);}tm.disabled=false;return;}
   const lb=e.target.closest('[data-lb]');if(lb){S.lb=lb.dataset.lb;render();return;}
   const po=e.target.closest('[data-post]');if(po){const b=leaders(S.lb).boards.find(x=>x.id===po.dataset.post);const t=b&&postText(b,S.lb);
     if(t){try{await navigator.clipboard.writeText(t);toast('Copied — paste it into your post');}catch(err){prompt('Copy this:',t);}}return;}
