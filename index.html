@@ -494,16 +494,16 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 
       <sc-if value="{{ po.step2 }}">
         <section style="margin-top:22px">
-          <h2 style="margin:0;font-size:clamp(28px,7.6vw,40px);line-height:1.08;letter-spacing:-.03em;font-weight:800">Copy the code from telebirr</h2>
-          <p style="margin:10px 0 0;font-size:17px;font-weight:600;line-height:1.4">Find <span style="background:#ffd84d;padding:0 4px">Transaction Number</span> <span>on the telebirr receipt.</span></p>
-          <p style="margin:8px 0 0;font-size:16px;line-height:1.45;color:#2c4556">Easier: copy the whole telebirr SMS from <strong>127</strong>, or the receipt link in it, and paste it below. We’ll find the code.</p>
-          <figure style="margin:12px 0 0;max-width:420px">
-            <img src="assets/telebirr-transaction-number.jpg" width="760" height="283" alt="telebirr receipt with the Transaction Number highlighted" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;background:#fff;border:1px solid rgba(11,23,32,.14);border-radius:14px;box-shadow:0 14px 30px -22px rgba(0,0,0,.45)">
+          <h2 style="margin:0;font-size:clamp(28px,7.6vw,40px);line-height:1.08;letter-spacing:-.03em;font-weight:800">Paste the telebirr SMS</h2>
+          <p style="margin:10px 0 0;font-size:17px;font-weight:600;line-height:1.4">Open the SMS from <strong>127</strong>. Copy the <span style="background:#ffd84d;padding:0 4px">link at the end</span> <span>— or the whole message — and paste it below.</span></p>
+          <p style="margin:6px 0 0;font-size:15px;line-height:1.45;color:#2c4556">We take the code from it for you.</p>
+          <figure style="margin:12px 0 0;max-width:260px">
+            <img src="assets/telebirr-sms.jpg" width="720" height="989" alt="The telebirr SMS from 127, with the receipt link at the end underlined" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;background:#fff;border:1px solid rgba(11,23,32,.14);border-radius:18px;box-shadow:0 14px 30px -22px rgba(0,0,0,.45)">
           </figure>
           <form onSubmit="{{ verifyPay }}" style="margin-top:18px;display:flex;flex-direction:column;gap:10px">
-            <label for="dg-txn" style="font-size:17px;font-weight:700">Paste the code, the SMS or the link</label>
+            <label for="dg-txn" style="font-size:17px;font-weight:700">Paste the link or the SMS here</label>
             <div style="display:flex;gap:8px">
-              <input id="dg-txn" value="{{ po.txnInput }}" onChange="{{ setTxn }}" placeholder="e.g. DJ19BO2MR4" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="2000" style="flex:1;min-width:0;height:64px;background:#fff;border:2px solid {{ po.codeBorder }};border-radius:12px;padding:0 14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:22px;letter-spacing:.06em;text-transform:uppercase;outline:none">
+              <input id="dg-txn" value="{{ po.txnInput }}" onChange="{{ setTxn }}" placeholder="Paste here" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="2000" style="flex:1;min-width:0;height:64px;background:#fff;border:2px solid {{ po.codeBorder }};border-radius:12px;padding:0 14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:22px;letter-spacing:.06em;text-transform:uppercase;outline:none">
               <button type="button" onClick="{{ pasteTxn }}" style="flex:none;min-height:48px;padding:0 16px;background:#ffd84d;color:#0b1720;border:0;border-radius:10px;font-size:13px;font-weight:800;letter-spacing:.06em;cursor:pointer;min-height:64px;border-radius:12px">PASTE</button>
             </div>
             <div style="min-height:1.3em;font-size:15px;font-weight:700;color:{{ po.codeColor }}">{{ po.codeHint }}</div>
@@ -1214,7 +1214,7 @@ class Component extends DCLogic {
       phoneFmt:ph.replace(/^(\d{4})(\d{3})(\d{3})$/,'$1 $2 $3'),hasName:!!(o&&o.payTo.name),
       steps:['Send money','Enter code','Done'].map((label,k)=>{const cur=st==='paid'?3:(st==='review'?3:((st==='rejected'||p.step===2)?2:1));const done=k+1<cur,on=k+1===cur;return{n:String(k+1),label,cur:on?'step':'false',bar:done?'#1f8a55':(on?'#0b1720':'rgba(11,23,32,.15)'),w:on?800:600,c:on?'#0b1720':'#6f8797'};}),
       howto:['Open the telebirr app','Tap “Send Money”','Paste the number','Enter the amount, then your PIN'].map((t,k)=>({n:String(k+1),t})),
-      codeHint:!p.txn?'10 letters and numbers, like DJ19BO2MR4':(p.txn.length===10?'✓ Looks right':(p.txn.length<10?'Keep going — the code has 10 characters':'Too long — check the code')),
+      codeHint:!p.txn?'Tap PASTE, or press and hold the box → Paste':(p.txn.length===10?'✓ Looks right':(p.txn.length<10?'Keep going — the code has 10 characters':'Too long — check the code')),
       codeColor:!p.txn?'#435f73':(p.txn.length===10?'#1f8a55':'#b7791f'),codeBorder:p.txn.length===10?'#1f8a55':'rgba(11,23,32,.3)',
       codeBad:p.txn.length<8||p.txn.length>14,codeOpacity:(p.txn.length<8||p.txn.length>14)?.35:1,
       left:String(this.waitLeft()),bar:(this.waitLeft()/30).toFixed(3),waiting:st==='review'&&this.waitLeft()>0,late:st==='review'&&this.waitLeft()===0,
