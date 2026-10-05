@@ -1,12 +1,12 @@
 // POST /api/pay — customer submits the telebirr transaction ID; we verify it against the official receipt.
-import { kv, loadOrder, saveOrder, publish, publicOrder, send, fetchReceipt, parseReceipt, parseEAT, receiverCheck, limited, PAY_TO } from './_lib.js';
+import { kv, loadOrder, saveOrder, publish, publicOrder, send, fetchReceipt, parseReceipt, parseEAT, receiverCheck, limited, PAY_TO, txnFrom } from './_lib.js';
 import { followUp } from './_notify.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
   try {
     const { id, key } = req.body || {};
-    const txn = String((req.body || {}).txn || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const txn = txnFrom((req.body || {}).txn);
     const o = await loadOrder(id);
     if (!o || o.key !== key) return send(res, 404, { error: 'Order not found.' });
     if (o.status === 'paid' || o.status === 'review' || o.status === 'removed') return send(res, 200, publicOrder(o));

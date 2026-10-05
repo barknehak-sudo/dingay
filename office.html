@@ -154,7 +154,8 @@ details.tbl summary{margin-top:10px;font-size:12px;color:var(--ink-2);cursor:poi
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const TZ='Africa/Addis_Ababa',SW_MAIL='infosideways7@gmail.com';
+const TZ='Africa/Addis_Ababa';
+let SW_MAIL='offscriptet@gmail.com'; // the sending address; the server's setting wins (see load())
 let pw='';try{pw=sessionStorage.getItem('dg-admin')||''}catch(e){}
 const S={orders:[],inquiries:[],auto:{},lb:'30d',tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
 try{const t=sessionStorage.getItem('dg-tab');if(t)S.tab=t;}catch(e){}
@@ -165,7 +166,7 @@ async function api(method,body,query=''){
 }
 async function load(){
   $('#err').textContent='';
-  try{const j=await api('GET');S.orders=j.orders;S.inquiries=j.inquiries||[];S.auto=j.auto||{};S.loadedAt=Date.now();
+  try{const j=await api('GET');S.orders=j.orders;S.inquiries=j.inquiries||[];S.auto=j.auto||{};if(S.auto.from)SW_MAIL=S.auto.from;S.loadedAt=Date.now();
     try{sessionStorage.setItem('dg-admin',pw)}catch(e){}
     $('#login').hidden=true;$('#app').hidden=false;render();}
   catch(e){$('#err').textContent=e.message;$('#login').hidden=false;$('#app').hidden=true;}

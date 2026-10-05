@@ -1,14 +1,15 @@
-// Automatic follow-ups: SMS through SMS Ethiopia, email through the SIDEWAYS Gmail account.
+// Automatic follow-ups: SMS through SMS Ethiopia, email through Gmail (offscriptet@gmail.com).
 //   SMSETHIOPIA_KEY     — API key from smsethiopia.com → Console → API Keys (no key = no automatic SMS)
 //   GMAIL_APP_PASSWORD  — Gmail app password for GMAIL_USER (no password = no automatic email)
-//   GMAIL_USER          — sender address, default infosideways7@gmail.com
+//   GMAIL_USER          — sender address, default offscriptet@gmail.com
 //   SITE_URL            — links inside messages, default https://dinguy.xyz
 // Whatever isn't sent automatically (not configured, or the send failed) stays a task in /office.
 import nodemailer from 'nodemailer';
 import { kv, loadOrder, saveOrder, PAY_TO } from './_lib.js';
 
 export const SITE = (process.env.SITE_URL || 'https://dinguy.xyz').replace(/\/$/, '');
-export const SW_MAIL = process.env.GMAIL_USER || 'infosideways7@gmail.com';
+export const SW_MAIL = process.env.GMAIL_USER || 'offscriptet@gmail.com';
+const SW_CONTACT = 'infosideways7@gmail.com'; // SIDEWAYS contact in the email footer
 const SW_LINK = 'https://dinguy.xyz/#/sideways';
 export const autoOn = () => ({ sms: !!process.env.SMSETHIOPIA_KEY, email: !!process.env.GMAIL_APP_PASSWORD, from: SW_MAIL });
 
@@ -27,8 +28,8 @@ export function messages(o, site = SITE) {
     : `Congratulations ${o.by}! 🎉 ${o.to} is now officially registered with ${o.name}. Registration No. ${o.id}. See it and save the certificate: ${recordLink} — DINGUY`;
   const subject = am ? `${o.to}፣ በስምዎ ድንጋይ ተመዝግቧል` : `${o.to}, a stone has been registered in your name`;
   const body = am
-    ? `ሰላም ${o.to}፣\n\n${o.by} በDINGUY መዝገብ ውስጥ ${o.name}ን በስምዎ አስመዝግበዋል።\n\n${o.message ? `“${o.message}”\n\n` : ''}የምዝገባ ቁ. ${o.id}\nመዝገብዎና ሰርተፊኬትዎ፦ ${recordLink}\n\nDINGUY® — ከልክ በላይ ትርጉም ላላቸው አጋጣሚዎች የተመዘገቡ ድንጋዮች።\nዲጂታል ምዝገባ። አካላዊ ድንጋይ አይካተትም።\n\n—\nDINGUY የSIDEWAYS ስራ ነው።\nSIDEWAYS ሰዎች ቆም ብለው፣ ደግመው አይተው እንዲያስታውሱ የሚያደርጉ ድረ-ገጾችን፣ ዘመቻዎችንና ሀሳቦችን ይሰራል።\nየእርስዎን ሀሳብ እንስራው፦ ${SW_LINK}\n${SW_MAIL} · 0996 567 218`
-    : `Hi ${o.to},\n\n${o.by} has registered ${o.name} in your name with the DINGUY Registry.\n\n${o.message ? `“${o.message}”\n\n` : ''}Registration No. ${o.id}\nYour record and certificate: ${recordLink}\n\nDINGUY® — Registered stones for unreasonably meaningful occasions.\nDigital registration. No physical stone included.\n\n—\nDINGUY is a SIDEWAYS project.\nSIDEWAYS makes websites, campaigns and ideas that make people stop, look twice and remember.\nGot an idea? Let’s make people talk: ${SW_LINK}\n${SW_MAIL} · 0996 567 218`;
+    ? `ሰላም ${o.to}፣\n\n${o.by} በDINGUY መዝገብ ውስጥ ${o.name}ን በስምዎ አስመዝግበዋል።\n\n${o.message ? `“${o.message}”\n\n` : ''}የምዝገባ ቁ. ${o.id}\nመዝገብዎና ሰርተፊኬትዎ፦ ${recordLink}\n\nDINGUY® — ከልክ በላይ ትርጉም ላላቸው አጋጣሚዎች የተመዘገቡ ድንጋዮች።\nዲጂታል ምዝገባ። አካላዊ ድንጋይ አይካተትም።\n\n—\nDINGUY የSIDEWAYS ስራ ነው።\nSIDEWAYS ሰዎች ቆም ብለው፣ ደግመው አይተው እንዲያስታውሱ የሚያደርጉ ድረ-ገጾችን፣ ዘመቻዎችንና ሀሳቦችን ይሰራል።\nየእርስዎን ሀሳብ እንስራው፦ ${SW_LINK}\n${SW_CONTACT} · 0996 567 218`
+    : `Hi ${o.to},\n\n${o.by} has registered ${o.name} in your name with the DINGUY Registry.\n\n${o.message ? `“${o.message}”\n\n` : ''}Registration No. ${o.id}\nYour record and certificate: ${recordLink}\n\nDINGUY® — Registered stones for unreasonably meaningful occasions.\nDigital registration. No physical stone included.\n\n—\nDINGUY is a SIDEWAYS project.\nSIDEWAYS makes websites, campaigns and ideas that make people stop, look twice and remember.\nGot an idea? Let’s make people talk: ${SW_LINK}\n${SW_CONTACT} · 0996 567 218`;
   return { help, congrats, subject, body };
 }
 

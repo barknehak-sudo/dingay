@@ -9,8 +9,11 @@
 <x-dc>
 <div ref="{{ wrapRef }}" onPointerDown="{{ down }}" onPointerMove="{{ move }}" onPointerUp="{{ up }}" onPointerCancel="{{ up }}" onPointerLeave="{{ leave }}" onClickCapture="{{ clickCap }}" onContextMenu="{{ ctx }}" role="img" aria-label="{{ alt }}" style="position:relative;width:100%;aspect-ratio:1/1;touch-action:{{ touch }};cursor:{{ cursor }};user-select:none;-webkit-user-select:none;-webkit-touch-callout:none">
   <div style="position:absolute;left:16%;right:16%;bottom:5%;height:10%;background:radial-gradient(closest-side,rgba(0,0,0,.5),rgba(0,0,0,0));filter:blur(8px)"></div>
+  <sc-if value="{{ showShot }}">
+    <img ref="{{ shotRef }}" src="{{ shot }}" alt="" draggable="false" style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;will-change:transform">
+  </sc-if>
   <sc-if value="{{ showFb }}">
-  <div ref="{{ fbRef }}" style="position:absolute;inset:0">
+  <div ref="{{ fbRef }}" style="position:absolute;top:0;right:0;bottom:0;left:0">
     <sc-if value="{{ isBlocket }}">
       <img src="assets/blocket.png" alt="" draggable="false" style="position:absolute;left:4%;right:4%;top:18%;width:92%;height:auto;filter:drop-shadow(0 18px 20px rgba(0,0,0,.35))">
     </sc-if>
@@ -26,7 +29,7 @@
     </sc-if>
   </div>
   </sc-if>
-  <div ref="{{ glRef }}" style="position:absolute;inset:0"></div>
+  <div ref="{{ glRef }}" style="position:absolute;top:0;right:0;bottom:0;left:0"></div>
   <sc-if value="{{ disturbed }}">
     <div style="position:absolute;left:50%;top:4%;transform:translateX(-50%);white-space:nowrap;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:#132531;color:#eef2f4;padding:6px 9px;z-index:2">Specimen disturbed. Please stop.</div>
   </sc-if>
@@ -92,8 +95,9 @@ function blobs(x,base,hues,n,sat,light,alpha,rad){x.fillStyle=base;x.fillRect(0,
     const g=x.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,`hsla(${h},${sat}%,${light}%,${alpha})`);g.addColorStop(1,`hsla(${h},${sat}%,${light}%,0)`);x.fillStyle=g;x.fillRect(cx-r,cy-r,r*2,r*2);}
   x.globalCompositeOperation='source-over';}
 const texCache={};
+let maxAniso=8;
 function texInto(T,url,rep,mat){const p=texCache[url]||(texCache[url]=new Promise(res=>new T.TextureLoader().load(url,res,undefined,()=>res(null))));
-  p.then(base=>{if(!base)return;const t=base.clone();t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.MirroredRepeatWrapping;t.repeat.set(rep[0],rep[1]);t.anisotropy=4;t.needsUpdate=true;mat.map=t;mat.bumpMap=t;mat.needsUpdate=true;});}
+  return p.then(base=>{if(!base)return;const t=base.clone();t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.MirroredRepeatWrapping;t.repeat.set(rep[0],rep[1]);t.anisotropy=maxAniso;t.needsUpdate=true;mat.map=t;mat.bumpMap=t;mat.needsUpdate=true;});}
 function simpleMat(T,kind,old,level){
   const map=old&&old.map||null;
   if(level===1&&(kind==='opal'||kind==='choc'))return new T.MeshPhysicalMaterial({map,color:'#ffffff',roughness:kind==='opal'?.16:.22,clearcoat:1,clearcoatRoughness:.05});
@@ -101,11 +105,11 @@ function simpleMat(T,kind,old,level){
   return new T.MeshStandardMaterial({map,color:kind==='choc'?'#6e4631':(kind==='emerald'?'#1c9a62':'#ffffff'),roughness:.3,metalness:0,vertexColors:!!(old&&old.vertexColors),flatShading:kind==='emerald'||kind==='diamond'});
 }
 function buildMesh(T,kind){
-  let geo,mat;
+  let geo,mat,ready=Promise.resolve();
   if(ROCK[kind]){const c=ROCK[kind];geo=rockGeo(T,c);
-    mat=new T.MeshPhysicalMaterial({bumpScale:c.bump,color:c.color,roughness:c.rough,metalness:0,vertexColors:true,clearcoat:c.coat||0,clearcoatRoughness:.25});texInto(T,c.tex,c.rep,mat);}
+    mat=new T.MeshPhysicalMaterial({bumpScale:c.bump,color:c.color,roughness:c.rough,metalness:0,vertexColors:true,clearcoat:c.coat||0,clearcoatRoughness:.25});ready=texInto(T,c.tex,c.rep,mat);}
   else if(kind==='blocket'){geo=blocketGeo(T);
-    mat=new T.MeshStandardMaterial({bumpScale:5,color:'#f1eee8',roughness:.97,metalness:0});texInto(T,'assets/tex-concrete-2.png',[.55,.55],mat);}
+    mat=new T.MeshStandardMaterial({bumpScale:5,color:'#f1eee8',roughness:.97,metalness:0});ready=texInto(T,'assets/tex-concrete-2.png',[.55,.55],mat);}
   else if(kind==='opal'||kind==='choc'){geo=new T.SphereGeometry(1,128,96);const p=geo.attributes.position;
     for(let i=0;i<p.count;i++){let y=p.getY(i);y=y>0?y*.52:y*.18;p.setXYZ(i,p.getX(i)*1.05,y,p.getZ(i)*.78);}geo.computeVertexNormals();
     const opal=kind==='opal';
@@ -113,63 +117,103 @@ function buildMesh(T,kind){
     mat=new T.MeshPhysicalMaterial({map,color:'#ffffff',roughness:opal?.14:.2,clearcoat:1,clearcoatRoughness:.04,iridescence:opal?1:.7,iridescenceIOR:opal?1.7:1.9,iridescenceThicknessRange:opal?[180,900]:[300,700],sheen:opal?.6:.3,sheenColor:opal?'#cfe0ff':'#ffb27a',sheenRoughness:.4});}
   else if(kind==='emerald'){geo=ringsGeo(T,[{r:.58,y:.34},{r:.8,y:.27},{r:1,y:.13},{r:1,y:.05},{r:.78,y:-.2},{r:.5,y:-.42},{r:.2,y:-.58}],8,1,.7);geo.rotateY(Math.PI/8);
     mat=new T.MeshPhysicalMaterial({color:'#1fa56a',roughness:.03,metalness:0,transmission:.72,thickness:1.1,ior:1.58,attenuationColor:'#0a5d3a',attenuationDistance:.55,specularIntensity:1,envMapIntensity:1.6,flatShading:true,side:T.DoubleSide,emissive:'#032b19',emissiveIntensity:.35});}
-  else{const q=Math.PI/16;geo=ringsGeo(T,[{r:.55,y:.3},{r:.8,y:.2,rot:q},{r:1,y:.06},{r:1,y:.01},{r:.6,y:-.32,rot:q},{r:.02,y:-.66}],16,1,1);
-    mat=new T.MeshPhysicalMaterial({color:'#ffffff',roughness:0,metalness:0,transmission:1,thickness:1.4,ior:2.42,dispersion:6,specularIntensity:1,envMapIntensity:2.6,flatShading:true,side:T.DoubleSide});}
+  else{// round brilliant: table, star and crown facets, girdle, then pavilion — more facets = more sparkle
+    const q=Math.PI/32;geo=ringsGeo(T,[{r:.56,y:.31},{r:.74,y:.25,rot:q},{r:.9,y:.15},{r:1,y:.06,rot:q},{r:1,y:.02,rot:q},{r:.72,y:-.22},{r:.38,y:-.48,rot:q},{r:.02,y:-.68}],32,1,1);
+    mat=new T.MeshPhysicalMaterial({color:'#f2f6ff',roughness:0,metalness:0,transmission:1,thickness:1.6,ior:2.42,dispersion:9,specularIntensity:1,envMapIntensity:1.5,attenuationColor:'#dfe8f5',attenuationDistance:2.5,flatShading:true,side:T.DoubleSide});}
   geo.computeBoundingSphere();const m=new T.Mesh(geo,mat);const r=geo.boundingSphere.radius;m.scale.setScalar(1.22/r);
-  m.position.sub(geo.boundingSphere.center.clone().multiplyScalar(1.22/r));return m;
+  m.position.sub(geo.boundingSphere.center.clone().multiplyScalar(1.22/r));m.userData.ready=ready;return m;
+}
+function stage(T,Room,renderer){
+  const scene=new T.Scene();const pm=new T.PMREMGenerator(renderer);const envT=pm.fromScene(new Room(),.04).texture;scene.environment=envT;pm.dispose();
+  const cam=new T.PerspectiveCamera(30,1,.1,50);cam.position.set(0,0,5.4);
+  const key=new T.DirectionalLight('#fff4e6',2.4);key.position.set(3,4,5);scene.add(key);
+  const rim=new T.DirectionalLight('#7fa6c4',2.2);rim.position.set(-4,1.5,-3);scene.add(rim);
+  scene.add(new T.HemisphereLight('#dfe8ee','#132531',.5));
+  return{scene,cam,envT};
+}
+const PITCH={blocket:.5,emerald:.5,diamond:.5};
+/* reads the centre pixels straight after a render: catches GPUs that "succeed" but draw nothing or pure black */
+function drewOk(renderer,kind){
+  if(kind==='blocket')return true;
+  try{const g=renderer.getContext(),c=renderer.domElement,px=new Uint8Array(4*9);let lum=0,alpha=0;
+    g.readPixels(Math.floor(c.width/2)-1,Math.floor(c.height/2)-1,3,3,g.RGBA,g.UNSIGNED_BYTE,px);
+    for(let i=0;i<9;i++){alpha=Math.max(alpha,px[i*4+3]);lum=Math.max(lum,px[i*4]+px[i*4+1]+px[i*4+2]);}
+    const minLum=(kind==='opal'||kind==='diamond')?120:(kind==='choc'||kind==='emerald'?12:30);
+    return alpha>40&&lum>=minLum;}catch(e){return true;}
+}
+// Render once; if the GPU can't handle the material, step down to simpler ones. Returns the level used, or -1.
+function renderChecked(T,renderer,scene,cam,mesh,kind){
+  let err=false;renderer.debug.checkShaderErrors=true;renderer.debug.onShaderError=()=>{err=true;};
+  try{renderer.render(scene,cam);}catch(e){err=true;}
+  let lv=0;
+  for(let level=1;level<=2&&(err||!drewOk(renderer,kind));level++){
+    const old=mesh.material;mesh.material=simpleMat(T,kind,old,level);old.dispose();err=false;lv=level;
+    try{renderer.render(scene,cam);}catch(e){err=true;}
+  }
+  return(err||!drewOk(renderer,kind))?-1:lv;
 }
 
+/* ---------- stills ----------
+   One shared renderer photographs each kind once. Small stones, the certificate and the
+   downloaded certificate use these pictures, so they look 3D without a WebGL context each. */
+const SHOT_PX=640,shots={};let shotR=null,shotQ=Promise.resolve();
+function shot(kind){
+  kind=K[kind]?kind:'cobble';
+  if(/[?&]nogl\b/.test(location.search))return Promise.resolve(null);
+  return shots[kind]||(shots[kind]=(shotQ=shotQ.then(async()=>{
+    try{
+      const{T,Room}=await lib();
+      if(!shotR){shotR=new T.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});shotR.setPixelRatio(1);shotR.setSize(SHOT_PX,SHOT_PX,false);
+        shotR.toneMapping=T.ACESFilmicToneMapping;shotR.toneMappingExposure=1.05;shotR.outputColorSpace=T.SRGBColorSpace;maxAniso=shotR.capabilities.getMaxAnisotropy();}
+      const{scene,cam,envT}=stage(T,Room,shotR);const mesh=buildMesh(T,kind);const grp=new T.Group();grp.add(mesh);scene.add(grp);
+      await Promise.race([mesh.userData.ready,new Promise(r=>setTimeout(r,6000))]);
+      grp.rotation.set(PITCH[kind]||.25,.7,0);
+      const ok=renderChecked(T,shotR,scene,cam,mesh,kind)>=0;
+      const url=ok?shotR.domElement.toDataURL('image/png'):null;
+      mesh.geometry.dispose();mesh.material.dispose();envT.dispose();
+      return url;
+    }catch(e){return null;}
+  })));
+}
+window.dgStoneShot=shot;
+
 class Component extends DCLogic {
-  state={disturbed:false};
-  wrapRef=React.createRef();bodyRef=React.createRef();irisRef=React.createRef();lightRef=React.createRef();fbRef=React.createRef();glRef=React.createRef();
+  state={disturbed:false,shot:null,glReady:false};
+  shotRef=React.createRef();wrapRef=React.createRef();bodyRef=React.createRef();irisRef=React.createRef();lightRef=React.createRef();fbRef=React.createRef();glRef=React.createRef();
   a=Math.random()*40-20;vel=0;tx=0;ty=0;vis=true;yaw=Math.random()*6;pitch=0;hx=0;hy=0;
   componentDidMount(){
     this.reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
     if('IntersectionObserver' in window&&this.wrapRef.current){this.io=new IntersectionObserver(es=>{this.vis=es[0].isIntersecting},{rootMargin:'120px'});this.io.observe(this.wrapRef.current);}
     const tick=t=>{this.raf=requestAnimationFrame(tick);if(!this.vis)return;const dt=Math.min(50,t-(this.lt||t));this.lt=t;this.gl?this.glFrame(t,dt):this.frame(t,dt);};
     this.raf=requestAnimationFrame(tick);
-    if(this.props.gl)this.initGL();
+    if(this.props.gl){this.initGL();
+      // If 3D hasn't drawn after 8 s (slow network, weak GPU), keep the drawn version for good.
+      this.gt=setTimeout(()=>{if(!this.state.glReady)this.glFallback();},8000);}
+    else shot(this.props.kind||'cobble').then(u=>{if(u&&!this.dead)this.setState({shot:u});});
   }
-  componentWillUnmount(){this.dead=true;cancelAnimationFrame(this.raf);this.io&&this.io.disconnect();this.ro&&this.ro.disconnect();clearTimeout(this.ht);
+  componentWillUnmount(){this.dead=true;cancelAnimationFrame(this.raf);this.io&&this.io.disconnect();this.ro&&this.ro.disconnect();clearTimeout(this.ht);clearTimeout(this.gt);
     if(this.gl){const{renderer,mesh,envT}=this.gl;mesh.geometry.dispose();mesh.material.dispose();envT&&envT.dispose();renderer.dispose();try{renderer.forceContextLoss()}catch(e){}renderer.domElement.remove();this.gl=null;}}
   glFallback(){if(this.dead)return;if(this.gl){const{renderer}=this.gl;try{renderer.domElement.remove();renderer.dispose();}catch(e){}this.gl=null;}this.setState({glFail:true});}
-  drewOk(renderer){
-    /* read the centre pixel straight after render: catches GPUs that "succeed" but draw nothing or pure black */
-    if(this.props.kind==='blocket')return true;
-    try{const g=renderer.getContext(),c=renderer.domElement,px=new Uint8Array(4*9);let lum=0,alpha=0;
-      g.readPixels(Math.floor(c.width/2)-1,Math.floor(c.height/2)-1,3,3,g.RGBA,g.UNSIGNED_BYTE,px);
-      for(let i=0;i<9;i++){alpha=Math.max(alpha,px[i*4+3]);lum=Math.max(lum,px[i*4]+px[i*4+1]+px[i*4+2]);}
-      const k=this.props.kind;const minLum=(k==='opal'||k==='diamond')?120:(k==='choc'||k==='emerald'?12:30);
-      return alpha>40&&lum>=minLum;}catch(e){return true;}
-  }
   async initGL(){
     if(/[?&]nogl\b/.test(location.search)){this.setState({glFail:true});return;}
     let L;try{L=await lib();}catch(e){this.setState({glFail:true});return;}if(this.dead||!this.glRef.current)return;const{T,Room}=L;
     let renderer;try{renderer=new T.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});}catch(e){this.setState({glFail:true});return;}
-    renderer.setPixelRatio(Math.min(this.props.dpr||2,window.devicePixelRatio||1));renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.outputColorSpace=T.SRGBColorSpace;
-    let shaderErr=false;renderer.debug.checkShaderErrors=true;renderer.debug.onShaderError=()=>{shaderErr=true;};
+    // Sharper on phones: up to 2.5× pixels, unless the page asks for less (big backgrounds pass dpr).
+    renderer.setPixelRatio(Math.min(this.props.dpr||2.5,window.devicePixelRatio||1));maxAniso=renderer.capabilities.getMaxAnisotropy();renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.outputColorSpace=T.SRGBColorSpace;
     const el=renderer.domElement;el.style.cssText='width:100%;height:100%;display:block;opacity:0;transition:opacity .9s ease';this.glRef.current.appendChild(el);
     el.addEventListener('webglcontextlost',e=>{e.preventDefault();this.glFallback();},false);
-    const scene=new T.Scene();const pm=new T.PMREMGenerator(renderer);const envT=pm.fromScene(new Room(),.04).texture;scene.environment=envT;pm.dispose();
-    const cam=new T.PerspectiveCamera(30,1,.1,50);cam.position.set(0,0,5.4);
-    const key=new T.DirectionalLight('#fff4e6',2.4);key.position.set(3,4,5);scene.add(key);
-    const rim=new T.DirectionalLight('#7fa6c4',2.2);rim.position.set(-4,1.5,-3);scene.add(rim);
-    scene.add(new T.HemisphereLight('#dfe8ee','#132531',.5));
+    const{scene,cam,envT}=stage(T,Room,renderer);
     const mesh=buildMesh(T,this.props.kind||'cobble');const grp=new T.Group();grp.add(mesh);scene.add(grp);
     const size=()=>{const g=this.glRef.current;if(!g||!g.offsetWidth)return;const w=g.offsetWidth,h=g.offsetHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();};
     size();this.ro=new ResizeObserver(size);this.ro.observe(this.glRef.current);
     this.gl={T,renderer,scene,cam,grp,mesh,envT};
-    this.pitch=(this.props.kind==='blocket'||this.props.kind==='emerald'||this.props.kind==='diamond')?.5:.25;this.basePitch=this.pitch;
     const kind=this.props.kind||'cobble';
-    try{renderer.render(scene,cam);}catch(e){shaderErr=true;}
-    let lv=0;
-    for(let level=1;level<=2&&(shaderErr||!this.drewOk(renderer));level++){
-      const old=mesh.material;mesh.material=simpleMat(T,kind,old,level);old.dispose();shaderErr=false;lv=level;
-      try{renderer.render(scene,cam);}catch(e){shaderErr=true;}
-    }
-    if(shaderErr||!this.drewOk(renderer)){if(this.wrapRef.current)this.wrapRef.current.dataset.gl='css';this.glFallback();return;}
+    this.pitch=PITCH[kind]||.25;this.basePitch=this.pitch;
+    const lv=renderChecked(T,renderer,scene,cam,mesh,kind);
+    if(lv<0){if(this.wrapRef.current)this.wrapRef.current.dataset.gl='css';this.glFallback();return;}
     if(this.wrapRef.current)this.wrapRef.current.dataset.gl=String(lv);
-    requestAnimationFrame(()=>{el.style.opacity='1';});
+    // fade the 3D in over the drawn stone, then drop the drawn one
+    clearTimeout(this.gt);requestAnimationFrame(()=>{el.style.opacity='1';});setTimeout(()=>{if(!this.dead&&this.gl)this.setState({glReady:true});},950);
   }
   glFrame(t,dt){
     const{renderer,scene,cam,grp}=this.gl;if(renderer.getContext().isContextLost()){this.glFallback();return;}const spin=this.reduce?0:(this.props.spin??4);
@@ -182,10 +226,11 @@ class Component extends DCLogic {
     renderer.render(scene,cam);
   }
   frame(t,dt){
-    if(this.props.kind==='blocket')return;
     const k=K[this.props.kind]||K.cobble;const spin=this.reduce?0:(this.props.spin??4);
     if(!this.dragging){this.vel*=.94;this.a+=spin*dt/1000+this.vel;}
     let jx=0,jy=0;if(this.state.disturbed){jx=(Math.random()-.5)*5;jy=(Math.random()-.5)*5;}
+    const im=this.shotRef.current;if(im){im.style.transform=`translate(${jx}px,${jy}px) rotate(${this.a}deg)`;this.tx*=.93;this.ty*=.93;return;}
+    if(this.props.kind==='blocket')return;
     const b=this.bodyRef.current;if(!b)return;
     b.style.transform=`perspective(900px) translate(${jx}px,${jy}px) rotateX(${this.ty*20}deg) rotateY(${this.tx*20}deg) rotate(${this.a}deg)`;
     this.tx*=.93;this.ty*=.93;
@@ -209,13 +254,14 @@ class Component extends DCLogic {
   clickCap=e=>{if(this.moved){e.stopPropagation();e.preventDefault();this.moved=false;}};
   ctx=e=>{if(this.props.hold)e.preventDefault();};
   renderVals(){
-    const kind=this.props.kind||'cobble';const k=K[kind]||K.cobble;const L={position:'absolute',inset:0,pointerEvents:'none'};
+    const kind=this.props.kind||'cobble';const k=K[kind]||K.cobble;const L={position:'absolute',top:0,right:0,bottom:0,left:0,pointerEvents:'none'};
     return{
+      shotRef:this.shotRef,shot:this.state.shot||'',showShot:!this.props.gl&&!!this.state.shot,
       wrapRef:this.wrapRef,bodyRef:this.bodyRef,irisRef:this.irisRef,lightRef:this.lightRef,fbRef:this.fbRef,glRef:this.glRef,
       down:this.down,move:this.move,up:this.up,leave:this.leave,clickCap:this.clickCap,ctx:this.ctx,
       alt:NAMES[kind]||'Stone specimen',isBlocket:kind==='blocket',notBlocket:kind!=='blocket',
       touch:this.props.drag?'pan-y':'manipulation',cursor:this.props.drag?'grab':'inherit',
-      disturbed:this.state.disturbed,hasTable:!!k.table,showFb:!this.props.gl||!!this.state.glFail,
+      disturbed:this.state.disturbed,hasTable:!!k.table,showFb:this.props.gl?(!!this.state.glFail||!this.state.glReady):!this.state.shot,
       bodyStyle:{position:'absolute',top:k.box[0],right:k.box[1],bottom:k.box[2],left:k.box[3],borderRadius:k.r||0,clipPath:k.clip||'none',overflow:'hidden',background:k.base,willChange:'transform'},
       mottleStyle:{...L,backgroundImage:N(k.m[0],k.m[1],k.seed+20),backgroundSize:'100% 100%',opacity:k.m[2],mixBlendMode:k.m[3]},
       irisStyle:k.iris?{position:'absolute',inset:'-40%',background:k.iris,opacity:k.io,mixBlendMode:k.ib,filter:'blur(10px)',pointerEvents:'none'}:{display:'none'},

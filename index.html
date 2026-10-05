@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./compat.js"></script>
 <script src="./i18n.js"></script>
 <script src="./support.js"></script>
 </head>
@@ -495,13 +496,14 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <section style="margin-top:22px">
           <h2 style="margin:0;font-size:clamp(28px,7.6vw,40px);line-height:1.08;letter-spacing:-.03em;font-weight:800">Copy the code from telebirr</h2>
           <p style="margin:10px 0 0;font-size:17px;font-weight:600;line-height:1.4">Find <span style="background:#ffd84d;padding:0 4px">Transaction Number</span> <span>on the telebirr receipt.</span></p>
+          <p style="margin:8px 0 0;font-size:16px;line-height:1.45;color:#2c4556">Easier: copy the whole telebirr SMS from <strong>127</strong>, or the receipt link in it, and paste it below. We’ll find the code.</p>
           <figure style="margin:12px 0 0;max-width:420px">
             <img src="assets/telebirr-transaction-number.jpg" width="760" height="283" alt="telebirr receipt with the Transaction Number highlighted" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;background:#fff;border:1px solid rgba(11,23,32,.14);border-radius:14px;box-shadow:0 14px 30px -22px rgba(0,0,0,.45)">
           </figure>
           <form onSubmit="{{ verifyPay }}" style="margin-top:18px;display:flex;flex-direction:column;gap:10px">
-            <label for="dg-txn" style="font-size:17px;font-weight:700">Paste the code here</label>
+            <label for="dg-txn" style="font-size:17px;font-weight:700">Paste the code, the SMS or the link</label>
             <div style="display:flex;gap:8px">
-              <input id="dg-txn" value="{{ po.txnInput }}" onChange="{{ setTxn }}" placeholder="e.g. DJ19BO2MR4" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="40" style="flex:1;min-width:0;height:64px;background:#fff;border:2px solid {{ po.codeBorder }};border-radius:12px;padding:0 14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:22px;letter-spacing:.06em;text-transform:uppercase;outline:none">
+              <input id="dg-txn" value="{{ po.txnInput }}" onChange="{{ setTxn }}" placeholder="e.g. DJ19BO2MR4" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="2000" style="flex:1;min-width:0;height:64px;background:#fff;border:2px solid {{ po.codeBorder }};border-radius:12px;padding:0 14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:22px;letter-spacing:.06em;text-transform:uppercase;outline:none">
               <button type="button" onClick="{{ pasteTxn }}" style="flex:none;min-height:48px;padding:0 16px;background:#ffd84d;color:#0b1720;border:0;border-radius:10px;font-size:13px;font-weight:800;letter-spacing:.06em;cursor:pointer;min-height:64px;border-radius:12px">PASTE</button>
             </div>
             <div style="min-height:1.3em;font-size:15px;font-weight:700;color:{{ po.codeColor }}">{{ po.codeHint }}</div>
@@ -1098,7 +1100,11 @@ class Component extends DCLogic {
   fetchRec(no,key){this.setState({lookupBusy:no});this.api('registry?no='+encodeURIComponent(no)+(key?'&key='+encodeURIComponent(key):'')).then(rec=>{if(rec.private)rec.key=key;this.setState(s=>({regs:{...s.regs,[rec.no]:rec},lookupBusy:''}));},()=>this.setState({lookupBusy:''}));}
   search(q){this.setState({search:{q,busy:true,results:null,error:''}});this.api('registry?q='+encodeURIComponent(q)).then(j=>this.setState({search:{q,busy:false,results:j.results||[],total:j.total||0,error:''}}),e=>this.setState({search:{q,busy:false,results:null,error:e.message}}));}
   sentFlag(id,v){const k='dingay.sent.'+id;try{if(v!==undefined){v?localStorage.setItem(k,'1'):localStorage.removeItem(k);return v;}return localStorage.getItem(k)==='1';}catch(e){return false}}
-  cleanCode(raw){const up=String(raw||'').toUpperCase();const c=up.replace(/[^A-Z0-9]/g,'');if(c.length<=14)return c;
+  // Accepts the code itself, the telebirr SMS from 127, or the receipt link in it.
+  cleanCode(raw){const s=String(raw||'');
+    const link=/receipt\/([A-Za-z0-9]{8,14})/.exec(s);if(link)return link[1].toUpperCase();
+    const said=/transaction\s*(?:number|no\.?|id)?\s*(?:is|:)\s*([A-Za-z0-9]{8,14})\b/i.exec(s);if(said&&/\d/.test(said[1])&&/[A-Za-z]/.test(said[1]))return said[1].toUpperCase();
+    const up=s.toUpperCase();const c=up.replace(/[^A-Z0-9]/g,'');if(c.length<=14)return c;
     const m=up.match(/\b(?=[A-Z0-9]*[A-Z])(?=[A-Z0-9]*\d)[A-Z0-9]{10}\b/);return m?m[0]:c.slice(0,14);}
   setPayStep(n){this.sentFlag(this.state.pay.id,n===2);this.setState(s=>({pay:{...s.pay,step:n,error:''}}),()=>{const el=document.querySelector('[aria-label="Payment steps"]');if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});});}
   pasteTxn=async()=>{try{const t=await navigator.clipboard.readText();const c=this.cleanCode(t);if(c){this.setState(s=>({pay:{...s.pay,txn:c,error:''}}));return;}}catch(e){}
@@ -1134,7 +1140,7 @@ class Component extends DCLogic {
   share(reg){const url=location.href.split('#')[0]+'#/registry/'+reg.no+(reg.key?'/'+reg.key:'');const text=T(`${reg.to} has been registered with ${reg.type}. Registration No. ${reg.no}`);
     if(navigator.share){navigator.share({title:T('DINGUY Registration Office'),text,url}).catch(()=>{});}
     else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>this.toastMsg('Registry link copied.'),()=>this.toastMsg(url));}else this.toastMsg(url);}
-  download(reg){
+  async download(reg){
     const W=1240,H=1711,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
     const F='"Helvetica Neue",Helvetica,Arial,"Noto Sans Ethiopic",sans-serif',M='"IBM Plex Mono",ui-monospace,monospace',ink='#0b1720',mut='#435f73';
     x.fillStyle='#f3f5f6';x.fillRect(0,0,W,H);x.strokeStyle='rgba(11,23,32,.4)';x.lineWidth=2;x.strokeRect(38,38,W-76,H-76);x.strokeStyle='rgba(11,23,32,.14)';x.lineWidth=1.5;x.strokeRect(52,52,W-104,H-104);
@@ -1142,8 +1148,8 @@ class Component extends DCLogic {
     const wrap=(t,y,lh,max)=>{const ws=t.split(' ');let line='';for(const w of ws){const tt=line?line+' '+w:w;if(x.measureText(tt).width>max&&line){x.fillText(line,L,y);y+=lh;line=w}else line=tt}x.fillText(line,L,y);return y;};
     x.fillStyle=ink;x.font=`500 22px ${M}`;x.fillText(T('UNOFFICIAL DINGUY REGISTRATION OFFICE'),L,150);x.textAlign='right';x.fillText(reg.no,R,150);x.textAlign='left';
     x.fillStyle='rgba(11,23,32,.35)';x.fillRect(L,178,R-L,1.5);x.fillStyle=ink;
-    x.font=`600 44px ${F}`;x.fillText(T('CERTIFICATE OF DINGUY REGISTRATION'),L,270);
-    x.fillStyle='#2c4556';x.font=`400 32px ${F}`;x.fillText(T('This certifies that'),L,370);
+    x.font=`600 44px ${F}`;wrap(T('CERTIFICATE OF DINGUY REGISTRATION'),262,52,R-L-260);
+    x.fillStyle='#2c4556';x.font=`400 32px ${F}`;x.fillText(T('This certifies that'),L,380);
     x.fillStyle=ink;fit(reg.to.toUpperCase(),R-L,140,600);x.fillText(reg.to.toUpperCase(),L,510);
     x.fillStyle='#2c4556';x.font=`400 32px ${F}`;x.fillText(T('has been assigned and ceremonially registered with'),L,590);
     x.fillStyle=ink;const ty=T(reg.type).toUpperCase();fit(ty,R-L,66,600);x.fillText(ty,L,680);
@@ -1155,6 +1161,9 @@ class Component extends DCLogic {
     x.fillStyle=mut;x.font=`400 20px ${F}`;wrap(T('This certificate records a symbolic digital registration only. It does not represent ownership of a physical stone or any legal, scientific, mineralogical or property right.'),H-150,28,860);
     x.save();x.translate(R-150,H-400);x.rotate(-12*Math.PI/180);x.strokeStyle='#8f2d22';x.fillStyle='#8f2d22';x.lineWidth=7;x.beginPath();x.arc(0,0,130,0,Math.PI*2);x.stroke();x.lineWidth=2;x.beginPath();x.arc(0,0,112,0,Math.PI*2);x.stroke();
     x.textAlign='center';x.font=`500 20px ${M}`;x.fillText(T('DG REGISTRY'),0,-36);x.font=`600 34px ${M}`;x.fillText(T('REGISTERED'),0,12);x.font=`400 18px ${M}`;x.fillText(new Date(reg.ts||Date.now()).toLocaleDateString('en-GB'),0,50);x.restore();
+    // the stone, top right — the same 3D still the on-screen certificate shows
+    const stone=await Promise.race([window.dgStoneShot?window.dgStoneShot(reg.kind):Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),5000))])||(reg.kind==='blocket'?'assets/blocket.png':null);
+    if(stone){const im=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=stone;});if(im)x.drawImage(im,R-215,186,225,225);}
     const url=c.toDataURL('image/png'),fname=`DINGUY-${reg.no}.png`;
     // On phones, hand the image to the share sheet — it has "Save Image" (iPhone) / "Save to gallery" (Android).
     if(window.matchMedia&&matchMedia('(pointer:coarse)').matches&&navigator.canShare){try{const b=atob(url.split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);

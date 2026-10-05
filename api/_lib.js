@@ -88,6 +88,18 @@ export function publicOrder(o) {
 }
 
 /* ---------- telebirr receipt ---------- */
+// The customer may send the code, the whole telebirr SMS from 127, or the receipt link in it.
+export function txnFrom(raw) {
+  const s = String(raw || '');
+  const link = /receipt\/([A-Za-z0-9]{8,14})/.exec(s);
+  if (link) return link[1].toUpperCase();
+  const said = /transaction\s*(?:number|no\.?|id)?\s*(?:is|:)\s*([A-Za-z0-9]{8,14})\b/i.exec(s);
+  if (said && /\d/.test(said[1]) && /[A-Za-z]/.test(said[1])) return said[1].toUpperCase();
+  const c = s.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (c.length <= 14) return c;
+  const m = s.toUpperCase().match(/\b(?=[A-Z0-9]*[A-Z])(?=[A-Z0-9]*\d)[A-Z0-9]{10}\b/);
+  return m ? m[0] : c;
+}
 export function parseReceipt(html, txn) {
   const text = html
     .replace(/<!--[\s\S]*?-->/g, ' ')
