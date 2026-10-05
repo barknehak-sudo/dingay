@@ -585,7 +585,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <sc-if value="{{ isRecord }}">
 <main style="background:#e6ecef;color:#0b1720;padding:84px clamp(20px,5vw,56px) 140px;min-height:100vh;min-height:100dvh">
   <div style="max-width:1300px;margin:0 auto">
-    <div style="display:flex;justify-content:space-between;gap:12px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>DINGUY Registration Office</span><span>Public record</span></div>
+    <div style="display:flex;justify-content:space-between;gap:12px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>DINGUY Registration Office</span><span>{{ rec.badge }}</span></div>
     <h1 style="margin:12px 0 0;font-size:clamp(40px,9.6vw,120px);line-height:.9;letter-spacing:-.045em;font-weight:600;text-wrap:balance">OFFICIAL REGISTRY RECORD</h1>
     <div style="margin-top:32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:24px 56px;align-items:start">
       <div style="position:relative">
@@ -602,10 +602,10 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
             <div style="padding:14px 18px;border-bottom:1px solid rgba(11,23,32,.12)"><dt style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">{{ r.k }}</dt><dd style="margin:4px 0 0;font-size:18px;font-weight:500;overflow-wrap:anywhere">{{ r.v }}</dd></div>
           </sc-for>
         </dl>
-        <div style="padding:18px;border-bottom:1px solid rgba(11,23,32,.14)">
+        <sc-if value="{{ rec.full }}"><div style="padding:18px;border-bottom:1px solid rgba(11,23,32,.14)">
           <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Dedication</div>
           <div style="margin-top:8px;font-size:clamp(22px,3vw,30px);line-height:1.2;letter-spacing:-.015em;overflow-wrap:anywhere">{{ rec.message }}</div>
-        </div>
+        </div></sc-if>
         <div style="padding:6px 18px 12px">
           <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(11,23,32,.12);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase"><span style="color:#435f73">Registration status</span><span style="display:flex;align-items:center;gap:7px;font-weight:500"><span style="width:8px;height:8px;border-radius:50%;background:#3fb27a;animation:dg-pulse 2s infinite"></span>Active</span></div>
           <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(11,23,32,.12);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase"><span style="color:#435f73">Registration type</span><span style="text-align:right;font-weight:500">Symbolic digital registration</span></div>
@@ -614,12 +614,13 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
       </article>
     </div>
     <div style="margin-top:48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:24px;align-items:start">
-      <button onClick="{{ openCert }}" aria-label="Expand certificate" style="background:none;border:0;padding:0;cursor:zoom-in;text-align:left;max-width:360px">
+      <sc-if value="{{ rec.full }}"><button onClick="{{ openCert }}" aria-label="Expand certificate" style="background:none;border:0;padding:0;cursor:zoom-in;text-align:left;max-width:360px">
         <dc-import name="Certificate" reg="{{ rec.reg }}" hint-size="100%,480px"></dc-import>
         <div style="margin-top:10px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Tap to expand certificate</div>
-      </button>
+      </button></sc-if>
+      <sc-if value="{{ rec.isPublic }}"><p style="margin:0;max-width:36ch;font-size:16px;line-height:1.5;color:#2c4556">The dedication and certificate are private. They open from the link sent to the buyer.</p></sc-if>
       <div style="display:flex;flex-direction:column;gap:8px;max-width:420px">
-        <button onClick="{{ rec.download }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">SAVE CERTIFICATE<span>↓</span></button>
+        <sc-if value="{{ rec.full }}"><button onClick="{{ rec.download }}" style="display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 20px;background:#0b1720;color:#e6ecef;border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">SAVE CERTIFICATE<span>↓</span></button></sc-if>
         <button onClick="{{ openSheet }}" style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 20px;background:transparent;color:#0b1720;border:1px solid rgba(11,23,32,.35);font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">BUY YOUR OWN STONE<span>→</span></button>
         <div style="margin-top:36px;padding-top:18px;border-top:1px solid rgba(11,23,32,.16)">
           <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Experience archived.</div>
@@ -647,12 +648,26 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
   <div style="max-width:900px;margin:0 auto">
     <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">DINGUY Registration Office</div>
     <h1 style="margin:12px 0 0;font-size:clamp(44px,11vw,120px);line-height:.9;letter-spacing:-.045em;font-weight:600">REGISTRY</h1>
-    <p style="margin:18px 0 0;font-size:18px;color:#2c4556;max-width:34ch">Every registered Dinguy has a permanent public record. Enter a registration number to view it.</p>
+    <p style="margin:18px 0 0;font-size:18px;color:#2c4556;max-width:34ch">Every registered Dinguy has a permanent public record. Search by name, registration number or stone.</p>
     <form onSubmit="{{ doLookup }}" style="margin-top:28px;display:flex;gap:8px">
-      <label for="dg-lookup" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Registration number</label>
-      <input id="dg-lookup" value="{{ lookup }}" onChange="{{ setLookup }}" placeholder="DG-004281" autocomplete="off" style="flex:1;min-width:0;height:60px;background:#f3f5f6;border:1px solid rgba(11,23,32,.25);padding:0 16px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:20px;outline:none;border-radius:0;text-transform:uppercase">
-      <button type="submit" style="height:60px;padding:0 18px;background:#0b1720;color:#e6ecef;border:0;font-size:11px;font-weight:600;letter-spacing:.1em;cursor:pointer">VIEW REGISTRY</button>
+      <label for="dg-lookup" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search the registry</label>
+      <input id="dg-lookup" type="search" enterkeyhint="search" value="{{ lookup }}" onChange="{{ setLookup }}" placeholder="Name, DG-004281 or stone" autocomplete="off" style="flex:1;min-width:0;height:60px;background:#f3f5f6;border:1px solid rgba(11,23,32,.25);padding:0 16px;font-size:18px;outline:none;border-radius:0">
+      <button type="submit" style="height:60px;padding:0 18px;background:#0b1720;color:#e6ecef;border:0;font-size:11px;font-weight:600;letter-spacing:.1em;cursor:pointer">SEARCH</button>
     </form>
+    <sc-if value="{{ searching }}"><div style="margin-top:14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Searching records…</div></sc-if>
+    <sc-if value="{{ searchErr }}"><div role="alert" style="margin-top:14px;font-size:15px;color:#b3261e">{{ searchErr }}</div></sc-if>
+    <sc-if value="{{ hasResults }}">
+      <h2 aria-live="polite" style="margin:32px 0 0;display:flex;justify-content:space-between;gap:12px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>{{ searchLabel }}</span><button onClick="{{ clearSearch }}" style="background:none;border:0;padding:0;cursor:pointer;font:inherit;color:#0b1720;text-decoration:underline">Clear</button></h2>
+      <ul style="list-style:none;margin:10px 0 0;padding:0;border-top:1px solid rgba(11,23,32,.2)">
+        <sc-for list="{{ results }}" as="r" hint-placeholder-count="2">
+          <li><button onClick="{{ r.open }}" style="width:100%;display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;padding:12px 0;background:none;border:0;border-bottom:1px solid rgba(11,23,32,.2);text-align:left;cursor:pointer;color:#0b1720">
+            <div><dc-import name="Stone" kind="{{ r.kind }}" spin="{{ 0 }}" hint-size="56px,56px"></dc-import></div>
+            <div><div style="font-size:18px;font-weight:600">{{ r.to }}</div><div style="font-size:13px;color:#435f73;margin-top:2px">{{ r.type }}</div></div>
+            <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12px">{{ r.no }}</div>
+          </button></li>
+        </sc-for>
+      </ul>
+    </sc-if>
     <h2 data-reveal="text" style="margin:56px 0 0;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#435f73">Recent entries</h2>
     <ul style="list-style:none;margin:10px 0 0;padding:0;border-top:1px solid rgba(11,23,32,.2)">
       <sc-for list="{{ recent }}" as="r" hint-placeholder-count="2">
@@ -1011,7 +1026,7 @@ const RVT=['DG-004281','SPECIMEN','REGISTERED','ACTIVE','F-01','L-04','SYMBOLIC'
 class Component extends DCLogic {
   heroStoneRef=React.createRef();bridgeRef=React.createRef();starRef=React.createRef();macroRef=React.createRef();bridgeTitleRef=React.createRef();capARef=React.createRef();capBRef=React.createRef();capPRef=React.createRef();carRef=React.createRef();progRef=React.createRef();zoomRef=React.createRef();parRef=React.createRef();bridgeEndRef=React.createRef();bridgeShadeRef=React.createRef();zoomDepthRef=React.createRef();zTxt=[0,1,2,3].map(()=>React.createRef());
   rv=RVT.map((t,i)=>({t,x:Math.random()*90,y:Math.random()*92,dx:(Math.random()-.5)*1400,dy:(Math.random()-.5)*1400,r:(Math.random()-.5)*180}));
-  state={pay:{id:'',key:'',loading:false,order:null,error:'',txn:'',step:1},busy:false,regErr:'',lookupBusy:'',serverRecent:[],route:this.parse(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),email:''},regs:this.load(),menu:false,sheet:false,toast:'',faqOpen:0,proc:-1,cycleNo:'',stamped:false,archived:false,rvs:0,certOpen:false,carIndex:1,msgPick:-1,lookup:'',lastNo:'',pendingNo:this.newNo(),wide:typeof window!=='undefined'&&window.innerWidth>=900,contact:{name:'',reach:'',need:'Website',msg:''},sent:false};
+  state={pay:{id:'',key:'',loading:false,order:null,error:'',txn:'',step:1},busy:false,regErr:'',lookupBusy:'',serverRecent:[],search:{q:'',busy:false,results:null,error:''},route:this.parse(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),email:''},regs:this.load(),menu:false,sheet:false,toast:'',faqOpen:0,proc:-1,cycleNo:'',stamped:false,archived:false,rvs:0,certOpen:false,carIndex:1,msgPick:-1,lookup:'',lastNo:'',pendingNo:this.newNo(),wide:typeof window!=='undefined'&&window.innerWidth>=900,contact:{name:'',reach:'',need:'Website',msg:''},sent:false};
 
   parse(){const h=(location.hash||'').replace(/^#\/?/,'').replace(/\/$/,'');const p=h.split('/');return{path:h,a:p[0]||'',b:decodeURIComponent(p[1]||''),c:decodeURIComponent(p[2]||'')};}
   load(){try{return{...SEED,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return{...SEED}}}
@@ -1042,7 +1057,7 @@ class Component extends DCLogic {
     if(route.a==='checkout'){location.hash='/friend';return;}
     clearInterval(this.poll);
     if(route.a==='pay'){s.pay={id:route.b.toUpperCase(),key:route.c,loading:true,order:null,error:'',txn:'',step:this.sentFlag(route.b.toUpperCase())?2:1};}
-    if(route.a==='registry'&&route.b){const no=route.b.toUpperCase();if(!this.state.regs[no])this.fetchRec(no);}
+    if(route.a==='registry'&&route.b){const no=route.b.toUpperCase(),have=this.state.regs[no];if(route.c?!(have&&have.by):!have)this.fetchRec(no,route.c);}
     if(route.a==='registry'&&!route.b)this.api('registry').then(j=>this.setState({serverRecent:j.recent||[]}),()=>{});
     if(route.a==='success'&&!this.state.lastNo){location.hash='/registry/DG-004281';return;}
     if(route.a==='contact')s.sent=false;
@@ -1079,7 +1094,9 @@ class Component extends DCLogic {
   upd(k,v){this.setState(s=>({draft:{...s.draft,[k]:v}}));}
   api(path,opts){return fetch('/api/'+path,opts).then(async r=>{const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Network error — check your connection and try again.');return j;});}
   post(path,body){return this.api(path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});}
-  fetchRec(no){this.setState({lookupBusy:no});this.api('registry?no='+encodeURIComponent(no)).then(rec=>{this.setState(s=>({regs:{...s.regs,[rec.no]:rec},lookupBusy:''}));},()=>this.setState({lookupBusy:''}));}
+  // With the private key (from the SMS/email/share link) the full record comes back; without it, only the public part.
+  fetchRec(no,key){this.setState({lookupBusy:no});this.api('registry?no='+encodeURIComponent(no)+(key?'&key='+encodeURIComponent(key):'')).then(rec=>{if(rec.private)rec.key=key;this.setState(s=>({regs:{...s.regs,[rec.no]:rec},lookupBusy:''}));},()=>this.setState({lookupBusy:''}));}
+  search(q){this.setState({search:{q,busy:true,results:null,error:''}});this.api('registry?q='+encodeURIComponent(q)).then(j=>this.setState({search:{q,busy:false,results:j.results||[],total:j.total||0,error:''}}),e=>this.setState({search:{q,busy:false,results:null,error:e.message}}));}
   sentFlag(id,v){const k='dingay.sent.'+id;try{if(v!==undefined){v?localStorage.setItem(k,'1'):localStorage.removeItem(k);return v;}return localStorage.getItem(k)==='1';}catch(e){return false}}
   cleanCode(raw){const up=String(raw||'').toUpperCase();const c=up.replace(/[^A-Z0-9]/g,'');if(c.length<=14)return c;
     const m=up.match(/\b(?=[A-Z0-9]*[A-Z])(?=[A-Z0-9]*\d)[A-Z0-9]{10}\b/);return m?m[0]:c.slice(0,14);}
@@ -1103,7 +1120,7 @@ class Component extends DCLogic {
   waitLeft(){const o=this.state.pay.order;if(!o)return 0;const t0=Math.min(Date.now(),o.submittedAt||Date.now());return Math.max(0,30-Math.floor((Date.now()-t0)/1000));}
   refreshPay(){const p=this.state.pay;if(this.state.route.a!=='pay'){clearInterval(this.poll);return;}
     this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{if(o.status==='paid'){clearInterval(this.poll);this.finishPaid(o);}else if(o.status!=='review'){clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,order:o}}));}},()=>{});}
-  finishPaid(o){const reg=o.reg;const regs={...this.state.regs,[reg.no]:reg};this.save(regs);
+  finishPaid(o){const reg={...o.reg,key:this.state.pay.key};const regs={...this.state.regs,[reg.no]:reg};this.save(regs);
     this.setState({regs,lastNo:reg.no,draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),email:''}},()=>this.go('success'));}
   verifyPay=async e=>{e&&e.preventDefault&&e.preventDefault();const p=this.state.pay;const txn=p.txn.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
     if(txn.length<8){this.setState({pay:{...p,error:'Enter the transaction number from your telebirr SMS.'}});return;}
@@ -1114,7 +1131,7 @@ class Component extends DCLogic {
     catch(err){this.setState(s=>({proc:-1,pay:{...s.pay,error:err.message}}));}};
   copy(text,msg){const done=()=>this.toastMsg(msg);if(navigator.clipboard)navigator.clipboard.writeText(text).then(done,()=>this.toastMsg(text));else this.toastMsg(text);}
   startReveal=()=>{this.setState({menu:false,rvs:1});this.later(()=>this.setState({rvs:2}),700);this.later(()=>this.setState({rvs:3}),1500);this.later(()=>{this.go('sideways');},2500);this.later(()=>this.setState({rvs:0}),2800);};
-  share(reg){const url=location.href.split('#')[0]+'#/registry/'+reg.no;const text=T(`${reg.to} has been registered with ${reg.type}. Registration No. ${reg.no}`);
+  share(reg){const url=location.href.split('#')[0]+'#/registry/'+reg.no+(reg.key?'/'+reg.key:'');const text=T(`${reg.to} has been registered with ${reg.type}. Registration No. ${reg.no}`);
     if(navigator.share){navigator.share({title:T('DINGUY Registration Office'),text,url}).catch(()=>{});}
     else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>this.toastMsg('Registry link copied.'),()=>this.toastMsg(url));}else this.toastMsg(url);}
   download(reg){
@@ -1192,7 +1209,8 @@ class Component extends DCLogic {
     const regSuggest=MS[world].map(m=>{const sel=draft.message===m;return{text:`“${m}”`,bg:sel?'#0b1720':'#f3f5f6',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('message',m)};});
     const sreg=st.regs[st.lastNo]||SEED['DG-004281'];
     const rr=recReg||SEED['DG-004281'];
-    const rec={...rr,reg:rr,message:rr.message?`“${rr.message}”`:'—',rows:[['Registered To',rr.to],['Dinguy Type',rr.type],['Dedicated By',rr.by],['Registered On',rr.date],['Occasion',rr.occasion||'—']].map(([k,v])=>({k,v})),download:()=>this.download(rr),share:()=>this.share(rr)};
+    const full=!!rr.by;
+    const rec={...rr,reg:rr,full,isPublic:!full,badge:full?'Private record':'Public record',message:rr.message?`“${rr.message}”`:'—',rows:(full?[['Registered To',rr.to],['Dinguy Type',rr.type],['Dedicated By',rr.by],['Registered On',rr.date],['Occasion',rr.occasion||'—']]:[['Registered To',rr.to],['Dinguy Type',rr.type],['Registered On',rr.date]]).map(([k,v])=>({k,v})),download:()=>this.download(rr),share:()=>this.share(rr)};
     let showBar=false,barLabel='BUY A STONE',barRight='→',barAction=()=>this.setState({sheet:true});
     if(!wide&&!st.menu){if(a===''||isCatalog)showBar=true;if(isProduct){showBar=true;barLabel='BUY THIS STONE';barRight=prod.priceLabel;barAction=prod.register;}}
     const rvs=st.rvs;
@@ -1229,7 +1247,10 @@ class Component extends DCLogic {
       succ:{...sreg,reg:sreg,download:()=>this.download(sreg),view:go('registry/'+sreg.no),share:()=>this.share(sreg)},cycleNo:st.cycleNo||st.lastNo,stamped:st.stamped,archived:st.archived,
       rec,openCert:()=>this.setState({certOpen:true}),closeCert:()=>this.setState({certOpen:false}),certOpen:st.certOpen,
       lookup:st.lookup,setLookup:e=>this.setState({lookup:e.target.value}),
-      doLookup:e=>{e.preventDefault();let v=st.lookup.trim().toUpperCase();if(!v)return;if(/^\d+$/.test(v))v='DG-'+v.padStart(6,'0');this.go('registry/'+v);},
+      doLookup:e=>{e.preventDefault();const raw=st.lookup.trim();if(!raw)return;const m=/^(?:DG-?)?(\d{6})$/i.exec(raw.replace(/\s+/g,''));if(m){this.go('registry/DG-'+m[1]);return;}this.search(raw);},
+      searching:st.search.busy,hasResults:!!st.search.results,searchErr:st.search.error,
+      searchLabel:st.search.results?(st.search.total?`${st.search.total} ${st.search.total===1?'record':'records'} for “${st.search.q}”`:`No records for “${st.search.q}”`):'',
+      results:(st.search.results||[]).map(r=>({...r,open:go('registry/'+r.no)})),clearSearch:()=>this.setState({search:{q:'',busy:false,results:null,error:''},lookup:''}),
       recent:Object.values({...Object.fromEntries(st.serverRecent.map(r=>[r.no,r])),...st.regs}).sort((x,y)=>(y.ts||0)-(x.ts||0)).slice(0,8).map(r=>({...r,open:go('registry/'+r.no)})),
       missingId:route.b?route.b.toUpperCase():'/'+route.path,
       faq:FAQ.map(([q,ans],i)=>{const open=st.faqOpen===i;return{q,a:ans,open,rot:open?'rotate(45deg)':'none',toggle:()=>this.setState({faqOpen:open?-1:i})};}),

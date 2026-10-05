@@ -12,7 +12,8 @@ export const SW_MAIL = process.env.GMAIL_USER || 'infosideways7@gmail.com';
 const SW_LINK = 'https://dinguy.xyz/#/sideways';
 export const autoOn = () => ({ sms: !!process.env.SMSETHIOPIA_KEY, email: !!process.env.GMAIL_APP_PASSWORD, from: SW_MAIL });
 
-export const links = (o, site = SITE) => ({ payLink: `${site}/#/pay/${o.id}/${o.key}`, recordLink: `${site}/#/registry/${o.id}` });
+export const links = (o, site = SITE) => ({ payLink: `${site}/#/pay/${o.id}/${o.key}`, recordLink: `${site}/#/registry/${o.id}/${o.key}` });
+// recordLink carries the key, so whoever gets the SMS/email sees the full record and certificate.
 
 // The texts — used for automatic sends and for the manual buttons in /office.
 export function messages(o, site = SITE) {

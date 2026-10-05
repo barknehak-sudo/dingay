@@ -67,8 +67,12 @@ const fmtDate = (ms) => new Date(ms).toLocaleDateString('en-GB', { day: 'numeric
 export function recordOf(o) {
   return { no: o.id, to: o.to, by: o.by, type: o.name, occasion: o.occasion || '—', message: o.message, kind: o.kind, slug: o.slug, date: fmtDate(o.approvedAt || Date.now()), ts: o.approvedAt || Date.now() };
 }
+// The public registry only shows who has the stone — never who sent it or the (often private) message.
+// The full record is only shown through the private link that carries the order key.
+export const PUBLIC_FIELDS = ['no', 'to', 'type', 'kind', 'slug', 'date', 'ts'];
+export const publicRecord = (r) => Object.fromEntries(PUBLIC_FIELDS.map((k) => [k, r[k]]));
 export async function publish(o) {
-  await setJSON('reg:' + o.id, recordOf(o));
+  await setJSON('reg:' + o.id, publicRecord(recordOf(o)));
   await kv('LPUSH', 'recent', o.id);
   await kv('LTRIM', 'recent', 0, 49);
 }

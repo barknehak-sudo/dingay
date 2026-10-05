@@ -211,7 +211,10 @@
     "Registry link copied.": "የመዝገብ ሊንኩ ተቀድቷል።", "Certificate downloaded.": "ሰርተፊኬቱ ወርዷል።",
     "DINGUY Registration Office · Searching records": "የDINGUY ምዝገባ ቢሮ · መዝገቦችን በመፈለግ ላይ",
     "Every registered Dinguy has a permanent public record. Enter a registration number to view it.": "እያንዳንዱ የተመዘገበ ድንጋይ ቋሚ የሕዝብ መዝገብ አለው። ለማየት የምዝገባ ቁጥሩን ያስገቡ።",
-    "Registration number": "የምዝገባ ቁጥር", "VIEW REGISTRY": "መዝገቡን ተመልከት", "Recent entries": "የቅርብ ጊዜ ግቤቶች",
+    "Registration number": "የምዝገባ ቁጥር", "Search the registry": "መዝገቡን ይፈልጉ", "Clear": "አጽዳ",
+    "Every registered Dinguy has a permanent public record. Search by name, registration number or stone.": "እያንዳንዱ የተመዘገበ ድንጋይ ቋሚ የሕዝብ መዝገብ አለው። በስም፣ በምዝገባ ቁጥር ወይም በድንጋዩ ዓይነት ይፈልጉ።",
+    "Searching records…": "መዝገቦችን በመፈለግ ላይ…", "Private record": "የግል መዝገብ",
+    "The dedication and certificate are private. They open from the link sent to the buyer.": "መልዕክቱና ሰርተፊኬቱ የግል ናቸው። ለገዢው በተላከው ሊንክ ይከፈታሉ።", "VIEW REGISTRY": "መዝገቡን ተመልከት", "Recent entries": "የቅርብ ጊዜ ግቤቶች",
     "not found": "አልተገኘም", "Error 404 ·": "ስህተት 404 ·", "THIS DINGUY DOES NOT EXIST.": "ይህ ድንጋይ የለም።",
     "At least not in our registry.": "ቢያንስ በእኛ መዝገብ ውስጥ።", "GO HOME": "ወደ መነሻ ገጽ",
 
