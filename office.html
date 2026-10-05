@@ -368,7 +368,7 @@ function followChips(o){
   const f=F(o),c=[];
   const add=(k,label)=>{if(f[k])c.push(`<span class="chip done">✓ ${label}${(o.auto||{})[k]?' (auto)':''} ${ago(f[k])}</span>`);};
   add('help_sms','Help SMS');add('congrats_sms','Congrats SMS');add('email','Emailed');add('call','Called');
-  for(const [k,e] of Object.entries(o.autoErr||{}))if(e&&!f[k])c.push(`<span class="chip bad" title="${esc(e.msg)}">✕ Auto ${k==='email'?'email':'SMS'} failed ${ago(e.at)} — send it by hand</span>`);
+  for(const [k,e] of Object.entries(o.autoErr||{}))if(e&&!f[k])c.push(`<span class="chip bad" title="${esc(e.msg)}">✕ Auto ${k==='email'?'email':'SMS'} failed ${ago(e.at)}${k==='email'&&e.n<3?` (try ${e.n} of 3, retries tomorrow)`:' — send it by hand'}</span>`);
   return c.length?`<div class="chips">${c.join('')}</div>`:'';
 }
 function orderCard(o){

@@ -54,7 +54,11 @@ export async function sendSMS(phone, text) {
 let mailer;
 export async function sendEmail(to, subject, text) {
   mailer ||= nodemailer.createTransport({ service: 'gmail', auth: { user: SW_MAIL, pass: String(process.env.GMAIL_APP_PASSWORD).replace(/\s+/g, '') } });
-  return mailer.sendMail({ from: `SIDEWAYS · DINGUY <${SW_MAIL}>`, replyTo: SW_MAIL, to, subject, text });
+  return mailer.sendMail({
+    from: `DINGUY <${SW_MAIL}>`, replyTo: SW_MAIL, to, subject, text,
+    // Lets Gmail/Outlook show "unsubscribe" instead of "report spam" — good for the sender's reputation.
+    headers: { 'List-Unsubscribe': `<mailto:${SW_MAIL}?subject=unsubscribe>` },
+  });
 }
 
 // A sample certificate email (the real template), so the Gmail setup can be checked.
@@ -64,27 +68,50 @@ export async function sendTestEmail(to) {
   return { from: SW_MAIL, to, id: info.messageId, response: info.response };
 }
 
+/* ---------- email pacing ----------
+   Certificate emails that couldn't go out (Gmail not set up yet, or a failure) are caught up
+   automatically — but slowly, so a fresh Gmail sender doesn't look like a spammer:
+   one email every 2 minutes at most, 30 a day, never two to the same address within 24 h,
+   and an address that fails 3 times is left for a human. */
+const MAIL_GAP_S = 120, MAIL_PER_DAY = 30, MAIL_MAX_TRIES = 3;
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Addis_Ababa' });
+// 'ok' = send now; 'addr' = this address had one in the last 24 h (others may go); 'wait' = nothing goes right now.
+async function mailSlot(addr) {
+  const to = String(addr).toLowerCase();
+  if (await kv('GET', 'mail:to:' + to)) return 'addr';
+  if (Number(await kv('GET', 'mail:day:' + today())) >= MAIL_PER_DAY) return 'wait';
+  if (!(await kv('SET', 'mail:gap', '1', 'NX', 'EX', MAIL_GAP_S))) return 'wait';
+  await kv('SET', 'mail:to:' + to, '1', 'EX', 86400);
+  const n = await kv('INCR', 'mail:day:' + today());
+  if (n === 1) await kv('EXPIRE', 'mail:day:' + today(), 2 * 86400);
+  return 'ok';
+}
+
 /* ---------- what's due ---------- */
 const MIN = 60e3, HOUR = 60 * MIN;
-// Only recent orders are followed up automatically, so turning this on never texts old customers.
+// SMS only for recent orders, so turning it on never texts old customers.
+// Certificate emails have no age limit — every paid recipient should get theirs (paced, see above).
 function due(o, now = Date.now()) {
   const f = o.follow || {}, out = [], on = autoOn();
   const age = now - o.createdAt, sincePaid = now - (o.approvedAt || o.createdAt);
   if (on.sms && o.phone && (o.status === 'awaiting' || o.status === 'rejected') && !f.help_sms && !f.help_skip && age > 30e3 && age < 24 * HOUR) out.push('help_sms');
   if (on.sms && o.phone && o.status === 'paid' && !f.congrats_sms && !f.congrats_skip && sincePaid < 24 * HOUR) out.push('congrats_sms');
-  if (on.email && o.email && o.status === 'paid' && !f.email && !f.email_skip && sincePaid < 24 * HOUR) out.push('email');
+  if (on.email && o.email && o.status === 'paid' && !f.email && !f.email_skip && (((o.autoErr || {}).email || {}).n || 0) < MAIL_MAX_TRIES) out.push('email');
   return out;
 }
 
 // Send whatever is due for this order. Safe to call any number of times, from anywhere.
-export async function followUp(id) {
+// Returns the order; `mailWaiting` is set when an email was due but has to wait for its slot.
+export async function followUp(id, opts = {}) {
   let o = await loadOrder(id);
   if (!o) return null;
-  const todo = due(o);
+  const todo = due(o).filter((w) => !(w === 'email' && opts.noMail));
   if (!todo.length) return o;
   const m = messages(o), sent = {}, failed = {};
   for (const what of todo) {
     // One send per order per kind, even if two requests race. A failure retries after 30 minutes.
+    if (await kv('GET', `auto:${o.id}:${what}`)) continue;
+    if (what === 'email') { const slot = await mailSlot(o.email); if (slot !== 'ok') { if (slot === 'wait') followUp.mailWaiting = true; continue; } }
     if (!(await kv('SET', `auto:${o.id}:${what}`, '1', 'NX', 'EX', 172800))) continue;
     try {
       if (what === 'help_sms') await sendSMS(o.phone, m.help);
@@ -93,7 +120,7 @@ export async function followUp(id) {
       sent[what] = Date.now();
     } catch (e) {
       console.error('auto', what, o.id, e.message);
-      failed[what] = { at: Date.now(), msg: String(e.message).slice(0, 200) };
+      failed[what] = { at: Date.now(), msg: String(e.message).slice(0, 200), n: (((o.autoErr || {})[what] || {}).n || 0) + 1 };
       await kv('EXPIRE', `auto:${o.id}:${what}`, 1800);
     }
   }
@@ -115,13 +142,18 @@ export async function sweep() {
     const on = autoOn();
     if (!on.sms && !on.email) return;
     if (!(await kv('SET', 'sweep', '1', 'NX', 'EX', 10))) return;
-    const ids = await kv('LRANGE', 'orders', 0, 199);
+    const ids = await kv('LRANGE', 'orders', 0, 499);
     const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
     const now = Date.now();
-    for (const r of raw) {
+    let noMail = false; // once one email has to wait, the rest wait too — skip them this round
+    for (const r of raw) { // newest first, so new customers go before the backlog
       if (!r) continue;
       const o = JSON.parse(r);
-      if (due(o, now).length) await followUp(o.id);
+      const d = due(o, now).filter((w) => !(w === 'email' && noMail));
+      if (!d.length) continue;
+      followUp.mailWaiting = false;
+      await followUp(o.id, { noMail });
+      if (followUp.mailWaiting) noMail = true;
     }
   } catch (e) { console.error('sweep', e.message); }
 }
