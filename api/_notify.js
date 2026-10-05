@@ -46,7 +46,8 @@ export async function sendSMS(phone, text) {
   const raw = await r.text();
   let j = null; try { j = JSON.parse(raw); } catch {}
   if (!r.ok || (j && (j.success === false || j.status === 'error' || j.error))) {
-    throw new Error(`smsethiopia ${r.status}: ${(j && (j.message || j.error)) || raw.slice(0, 160)}`);
+    console.error('smsethiopia reply', r.status, raw.slice(0, 1500));
+    throw new Error(`smsethiopia ${r.status}: ${(j && (j.message || j.error || j.error_message)) || raw.slice(0, 160)}`);
   }
   return j || raw;
 }
