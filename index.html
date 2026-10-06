@@ -1022,6 +1022,11 @@ const TIERS=[['STARTER','45,000 ETB','For straightforward websites with a clear 
  ['STANDARD','85,000 ETB','For businesses that need more than a few pages.',['Growing businesses','Service companies','Professional brands','Custom content structures','More advanced interactions']],
  ['EXPERIENCE','135,000 ETB','For websites that need a proper digital experience.',['Custom brand experiences','Complex websites','Interactive experiences','Campaign websites','Unusual ideas']]];
 const RECEIVE=[['Registered Name','The name you give your Dinguy.'],['Dedicated By','Your name or nickname.'],['Personal Message','A message of your choice.'],['Digital Certificate','A professionally designed downloadable certificate.'],['Personal Registry Page','A permanent link you can share.']];
+// Private preview records: never in the registry, the recent list or search — they open only with their key.
+// Remove an entry to take its link down.
+const HIDDEN={'DG-261007':{key:'f41336f187cd38b8d89064af',rec:{no:'DG-261007',to:'Brooks',by:'DINGUY',type:'SLICE OF BIRTHDAY CAKE',kind:'cake',occasion:'Birthday',
+  message:'Happy birthday! 🎂 Sending you a little slice of cake all the way to Spain 🇪🇸',date:'7 October 2026',ts:Date.parse('2026-10-07T12:00:00+03:00')}}};
+const hiddenRec=(no,key)=>{const h=HIDDEN[String(no||'').toUpperCase()];return h&&key===h.key?{...h.rec,key:h.key}:null;};
 const SEED={'DG-004281':{no:'DG-004281',to:'Abel',type:'Certified Heavy',by:'Samuel',occasion:'Birthday',message:'For all the things you carry on your head.',date:'30 September 2026',kind:'blocket',ts:Date.parse('2026-09-30')}};
 const KEY='dingay.registry.v1';
 const fmt=d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
@@ -1061,7 +1066,7 @@ class Component extends DCLogic {
     if(route.a==='checkout'){location.hash='/friend';return;}
     clearInterval(this.poll);
     if(route.a==='pay'){s.pay={id:route.b.toUpperCase(),key:route.c,loading:true,order:null,error:'',txn:'',step:this.sentFlag(route.b.toUpperCase())?2:1};}
-    if(route.a==='registry'&&route.b){const no=route.b.toUpperCase(),have=this.state.regs[no];if(route.c?!(have&&have.by):!have)this.fetchRec(no,route.c);}
+    if(route.a==='registry'&&route.b&&!hiddenRec(route.b,route.c)){const no=route.b.toUpperCase(),have=this.state.regs[no];if(route.c?!(have&&have.by):!have)this.fetchRec(no,route.c);}
     if(route.a==='registry'&&!route.b)this.api('registry').then(j=>this.setState({serverRecent:j.recent||[]}),()=>{});
     if(route.a==='success'&&!this.state.lastNo){location.hash='/registry/DG-004281';return;}
     if(route.a==='contact')s.sent=false;
@@ -1181,13 +1186,18 @@ class Component extends DCLogic {
     const loved=['opal','choc','emerald','diamond'].includes(reg.kind);
     if(loved&&document.fonts)try{await Promise.race([document.fonts.load('italic 64px "Instrument Serif"'),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
     const F='"Helvetica Neue",Helvetica,Arial,"Noto Sans Ethiopic",sans-serif',M='"IBM Plex Mono",ui-monospace,monospace',S='"Instrument Serif",Georgia,"Noto Serif Ethiopic",serif';
-    const C=loved?{ink:'#3a1f24',sub:'#7a4d55',mut:'#9a6b72',acc:'#a83f58',rule:'rgba(184,146,90,.6)',b1:'rgba(184,146,90,.9)',b2:'rgba(184,146,90,.4)',stamp:'#a83f58'}
+    const party=reg.kind==='cake';
+    const C=party?{ink:'#2b1d2e',sub:'#6b5566',mut:'#8c7488',acc:'#d6336c',rule:'rgba(214,51,108,.4)',b1:'rgba(214,51,108,.65)',b2:'rgba(76,201,240,.6)',stamp:'#d6336c'}
+           :loved?{ink:'#3a1f24',sub:'#7a4d55',mut:'#9a6b72',acc:'#a83f58',rule:'rgba(184,146,90,.6)',b1:'rgba(184,146,90,.9)',b2:'rgba(184,146,90,.4)',stamp:'#a83f58'}
                  :{ink:'#0b1720',sub:'#2c4556',mut:'#435f73',acc:'#0b1720',rule:'rgba(11,23,32,.3)',b1:'rgba(11,23,32,.4)',b2:'rgba(11,23,32,.14)',stamp:'#8f2d22'};
     const ink=C.ink,mut=C.mut;
-    if(loved){const g=x.createRadialGradient(W/2,0,60,W/2,H*.35,H);g.addColorStop(0,'#fff8f5');g.addColorStop(.55,'#fbece8');g.addColorStop(1,'#f3dcd9');x.fillStyle=g;}else x.fillStyle='#f3f5f6';
+    if(party){x.fillStyle='#fff7ef';}
+    else if(loved){const g=x.createRadialGradient(W/2,0,60,W/2,H*.35,H);g.addColorStop(0,'#fff8f5');g.addColorStop(.55,'#fbece8');g.addColorStop(1,'#f3dcd9');x.fillStyle=g;}else x.fillStyle='#f3f5f6';
     x.fillRect(0,0,W,H);
     const rr=(i,r)=>{x.beginPath();if(x.roundRect)x.roundRect(i,i,W-2*i,H-2*i,r);else x.rect(i,i,W-2*i,H-2*i);x.stroke();};
-    x.strokeStyle=C.b1;x.lineWidth=2;rr(38,loved?22:0);x.strokeStyle=C.b2;x.lineWidth=1.5;rr(52,loved?16:0);
+    if(party)x.setLineDash([14,9]);x.strokeStyle=C.b1;x.lineWidth=2.5;rr(38,loved||party?22:0);x.setLineDash([]);x.strokeStyle=C.b2;x.lineWidth=1.5;rr(52,loved||party?16:0);
+    if(party)[[6,14,'#ff5c8a',0],[91,11,'#4cc9f0',30],[12,38,'#ffd23f',60],[88,33,'#80ed99',15],[5,62,'#b388ff',45],[94,58,'#ff5c8a',75],[18,86,'#4cc9f0',20],[84,88,'#ffd23f',50],[48,6,'#80ed99',10],[63,94,'#b388ff',35],[33,95,'#ff5c8a',65],[72,4,'#ffd23f',80]]
+      .forEach(([px,py,col,rot],i)=>{x.save();x.translate(px/100*W,py/100*H);x.rotate(rot*Math.PI/180);x.globalAlpha=.85;x.fillStyle=col;if(i%3){x.fillRect(-10,-4,20,8);}else{x.beginPath();x.arc(0,0,6,0,Math.PI*2);x.fill();}x.restore();});
     const heart=(cx,cy,sz,col)=>{x.save();x.translate(cx,cy);x.scale(sz/16,sz/16);x.fillStyle=col;x.beginPath();x.moveTo(0,5);x.bezierCurveTo(-8,-1,-8,-9,-2.5,-9);x.bezierCurveTo(-1,-9,0,-8,0,-6.5);x.bezierCurveTo(0,-8,1,-9,2.5,-9);x.bezierCurveTo(8,-9,8,-1,0,5);x.fill();x.restore();};
     if(loved){ // gold corner flourishes with little hearts
       [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(([sx,sy])=>{x.save();x.translate(sx>0?24:W-24,sy>0?24:H-24);x.scale(sx,sy);x.strokeStyle='#b8925a';x.lineWidth=2;
@@ -1198,19 +1208,19 @@ class Component extends DCLogic {
     x.fillStyle=ink;x.font=`500 22px ${M}`;x.fillText(T('UNOFFICIAL DINGUY REGISTRATION OFFICE'),L,150);x.textAlign='right';x.fillText(reg.no,R,150);x.textAlign='left';
     x.fillStyle=C.rule;x.fillRect(L,178,R-L,1.5);x.fillStyle=ink;
     if(loved){x.font=`italic 400 64px ${S}`;wrap(T('Certificate of Dinguy Registration'),262,66,R-L-270);x.fillStyle=C.acc;x.font=`500 20px ${M}`;x.fillText(T('♥ GIVEN WITH LOVE ♥'),L,372);}
-    else{x.font=`600 44px ${F}`;wrap(T('CERTIFICATE OF DINGUY REGISTRATION'),262,52,R-L-260);}
-    x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(loved?'With love, this certifies that':'This certifies that'),L,loved?432:380);
-    const nm=loved?reg.to:reg.to.toUpperCase();x.fillStyle=ink;if(loved)fit(nm,R-L,170,'italic 400',S);else fit(nm,R-L,140,600);x.fillText(nm,L,loved?580:510);
-    x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(loved?'has been given a little piece of forever, registered as':'has been assigned and ceremonially registered with'),L,loved?650:590);
-    x.fillStyle=C.acc;const ty=T(reg.type).toUpperCase();if(loved)fit(ty,R-L,72,'italic 400',S);else fit(ty,R-L,66,600);x.fillText(ty,L,loved?740:680);
-    x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(loved?'in the DINGUY Registry, for always.':'under the DINGUY Registry.'),L,loved?796:740);
+    else{x.font=`600 44px ${F}`;wrap(T('CERTIFICATE OF DINGUY REGISTRATION'),262,52,R-L-260);if(party){x.fillStyle=C.acc;x.font=`500 22px ${M}`;x.fillText(T('🎂 HAPPY BIRTHDAY 🎂'),L,355);}}
+    x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(party?'Happy birthday! This certifies that':loved?'With love, this certifies that':'This certifies that'),L,loved?432:party?422:380);
+    const nm=loved?reg.to:reg.to.toUpperCase();x.fillStyle=ink;if(loved)fit(nm,R-L,170,'italic 400',S);else fit(nm,R-L,140,600);x.fillText(nm,L,loved?580:party?555:510);
+    x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(party?'has been given a slice of birthday cake, registered as':loved?'has been given a little piece of forever, registered as':'has been assigned and ceremonially registered with'),L,loved?650:party?630:590);
+    x.fillStyle=C.acc;const ty=T(reg.type).toUpperCase();if(loved)fit(ty,R-L,72,'italic 400',S);else fit(ty,R-L,66,600);x.fillText(ty,L,loved?740:party?720:680);
+    x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(party?'in the DINGUY Registry. Make a wish.':loved?'in the DINGUY Registry, for always.':'under the DINGUY Registry.'),L,loved?796:party?780:740);
     x.fillStyle=C.rule;x.fillRect(L,960,R-L,1.5);
     const cells=[[T('REGISTRATION NO.'),reg.no],[T('DEDICATED BY'),reg.by],[T('OCCASION'),T(reg.occasion||'—')],[T('DATE OF REGISTRATION'),T(reg.date)]];
     cells.forEach(([k,v],i)=>{const cx=L+(i%2)*((R-L)/2),cy=1010+Math.floor(i/2)*110;x.fillStyle=mut;x.font=`400 20px ${M}`;x.fillText(k,cx,cy);x.fillStyle=ink;x.font=`500 36px ${F}`;x.fillText(v,cx,cy+48);});
     x.fillStyle=mut;x.font=`400 20px ${M}`;x.fillText(T('DEDICATION'),L,1270);x.fillStyle=ink;x.font=loved?`italic 400 48px ${S}`:`400 40px ${F}`;wrap(`“${reg.message||'—'}”`,1325,loved?56:52,780);
     x.fillStyle=mut;x.font=`400 20px ${F}`;wrap(T('This certificate records a symbolic digital registration only. It does not represent ownership of a physical stone or any legal, scientific, mineralogical or property right.'),H-150,28,860);
     x.save();x.translate(R-150,H-400);x.rotate(-12*Math.PI/180);x.strokeStyle=C.stamp;x.fillStyle=C.stamp;x.lineWidth=7;x.beginPath();x.arc(0,0,130,0,Math.PI*2);x.stroke();x.lineWidth=2;x.beginPath();x.arc(0,0,112,0,Math.PI*2);x.stroke();
-    x.textAlign='center';x.font=`500 20px ${M}`;x.fillText(T('DG REGISTRY'),0,-36);x.font=`600 ${loved?28:34}px ${M}`;x.fillText(T(loved?'WITH LOVE':'REGISTERED'),0,12);x.font=`400 18px ${M}`;x.fillText(new Date(reg.ts||Date.now()).toLocaleDateString('en-GB'),0,50);
+    x.textAlign='center';x.font=`500 20px ${M}`;x.fillText(T('DG REGISTRY'),0,-36);x.font=`600 ${party?24:loved?28:34}px ${M}`;x.fillText(T(party?'HAPPY BIRTHDAY':loved?'WITH LOVE':'REGISTERED'),0,12);x.font=`400 18px ${M}`;x.fillText(new Date(reg.ts||Date.now()).toLocaleDateString('en-GB'),0,50);
     if(loved)heart(0,82,22,C.stamp);x.restore();
     // the stone, top right — the same 3D still the on-screen certificate shows
     const stone=await Promise.race([window.dgStoneShot?window.dgStoneShot(reg.kind):Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),5000))])||(reg.kind==='blocket'?'assets/blocket.png':null);
@@ -1245,7 +1255,7 @@ class Component extends DCLogic {
     const pr=P.find(p=>p.slug===prodSlug);
     const isCatalog=a==='friend'||a==='loved-one';
     const isProduct=a==='dengay'&&!!pr,isRegister=a==='register'&&!!pr,isPay=a==='pay';
-    const recReg=a==='registry'&&route.b?st.regs[route.b.toUpperCase()]:null;
+    const recReg=a==='registry'&&route.b?(hiddenRec(route.b,route.c)||st.regs[route.b.toUpperCase()]):null;
     const known=['','friend','loved-one','pay','success','faq','terms','registry','sideways','contact'].includes(a)||isProduct||isRegister;
     const isRecord=!!recReg,isRegistryIndex=a==='registry'&&!route.b;
     const isSuccess=a==='success'&&!!st.regs[st.lastNo];

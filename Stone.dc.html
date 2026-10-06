@@ -39,6 +39,7 @@
 const N=(f,o,s)=>`url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${f}' numOctaves='${o}' seed='${s}' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")`;
 const OCT='polygon(20% 0,80% 0,100% 14%,100% 86%,80% 100%,20% 100%,0 86%,0 14%)';
 const K={
+  cake:{box:['12%','10%','14%','10%'],clip:'polygon(50% 2%,97% 96%,3% 96%)',base:'linear-gradient(180deg,#f7b6cc 0 15%,#fff3e2 15% 19%,#e9b872 19% 42%,#d94a64 42% 46%,#e9b872 46% 70%,#fff3e2 70% 74%,#e9b872 74% 100%)',g:[.9,2,.22,'overlay'],m:[.05,2,.18,'multiply'],hi:.35,sh:.3,seed:6},
   cobble:{box:['16%','8%','12%','8%'],r:'38% 46% 34% 48% / 44% 36% 52% 40%',base:'radial-gradient(120% 110% at 38% 30%,#aaa498 0%,#7e786e 38%,#4d4943 72%,#2a2825 100%)',g:[.9,3,.55,'overlay'],m:[.03,2,.45,'multiply'],hi:.42,sh:.62,seed:3},
   blocket:{box:['26%','4%','20%','4%'],r:'3%',base:'#a09c94',g:[1.3,4,.8,'overlay'],m:[.06,3,.35,'multiply'],hi:.3,sh:.5,seed:9},
   river:{box:['24%','6%','16%','6%'],r:'52% 48% 46% 54% / 60% 56% 44% 40%',base:'radial-gradient(120% 120% at 40% 30%,#737a7d,#3f4447 45%,#1b1e20 100%)',g:[.6,2,.16,'overlay'],m:[.02,2,.3,'soft-light'],vein:'linear-gradient(118deg,transparent 44%,rgba(236,233,226,.5) 47%,rgba(236,233,226,.18) 50%,transparent 53%)',hi:.62,sh:.6,gloss:true,seed:5},
@@ -48,7 +49,7 @@ const K={
   emerald:{box:['12%','18%','12%','18%'],clip:OCT,base:'linear-gradient(135deg,#27a56d 0%,#0a5a39 34%,#04331f 64%,#0f6e47 100%)',table:{inset:'17% 17%',bg:'linear-gradient(160deg,#35c486,#07402a 58%,#1d9161)',op:.85},iris:'linear-gradient(90deg,transparent 30%,rgba(190,255,220,.35) 50%,transparent 70%)',io:.8,ib:'screen',g:[.8,2,.08,'overlay'],m:[.04,2,.28,'overlay'],hi:.4,sh:.5,seed:4},
   diamond:{box:['12%','12%','12%','12%'],r:'50%',base:'repeating-conic-gradient(from 11deg at 50% 50%,#f8fafc 0deg 11.25deg,#aab2bc 11.25deg 22.5deg,#e4e9ef 22.5deg 33.75deg,#7c858f 33.75deg 45deg)',table:{inset:'27%',bg:'radial-gradient(circle at 45% 40%,#fff,#cdd4dc 60%,#99a2ac)',op:1},iris:'conic-gradient(from 0deg,#ff6b6b,#ffd36b,#6bffb0,#6bc7ff,#b06bff,#ff6b6b)',io:.16,ib:'overlay',g:[.5,1,0,'overlay'],m:[.05,1,0,'overlay'],hi:.7,sh:.3,gloss:true,seed:1}
 };
-const NAMES={cobble:'Cobblestone specimen',blocket:'Concrete block specimen',river:'River stone specimen',foundation:'Foundation stone specimen',opal:'Opal specimen',choc:'Chocolate opal specimen',emerald:'Emerald specimen',diamond:'Diamond specimen'};
+const NAMES={cake:'Slice of birthday cake',cobble:'Cobblestone specimen',blocket:'Concrete block specimen',river:'River stone specimen',foundation:'Foundation stone specimen',opal:'Opal specimen',choc:'Chocolate opal specimen',emerald:'Emerald specimen',diamond:'Diamond specimen'};
 
 /* ---------- 3D ---------- */
 const TV='0.170.0';
@@ -104,10 +105,45 @@ function simpleMat(T,kind,old,level){
   if(level===1&&(kind==='emerald'||kind==='diamond'))return new T.MeshStandardMaterial({color:kind==='emerald'?'#1c9a62':'#e9eef3',roughness:.08,metalness:.15,flatShading:true,envMapIntensity:2,emissive:kind==='emerald'?'#04331f':'#000000',emissiveIntensity:.4});
   return new T.MeshStandardMaterial({map,color:kind==='choc'?'#6e4631':(kind==='emerald'?'#1c9a62':'#ffffff'),roughness:.3,metalness:0,vertexColors:!!(old&&old.vertexColors),flatShading:kind==='emerald'||kind==='diamond'});
 }
+/* A slice of birthday cake: sponge / jam / cream layers, pink frosting, sprinkles, a cream dollop and a candle.
+   Built as one mesh with per-vertex colours so the rest of the renderer treats it like any stone. */
+function cakeGeo(T){
+  const parts=[],R=1.25,A=Math.PI/4.2;
+  const add=(g,col)=>{g=g.index?g.toNonIndexed():g;const c=new T.Color(col),n=g.attributes.position.count,a=new Float32Array(n*3);
+    for(let i=0;i<n;i++){a[i*3]=c.r;a[i*3+1]=c.g;a[i*3+2]=c.b;}g.setAttribute('color',new T.BufferAttribute(a,3));
+    for(const k of Object.keys(g.attributes))if(!['position','normal','color','uv'].includes(k))g.deleteAttribute(k);parts.push(g);};
+  const wedge=(r,h,y,col,bevel=0)=>{const sh=new T.Shape();sh.moveTo(0,0);sh.lineTo(r,0);sh.absarc(0,0,r,0,A,false);sh.lineTo(0,0);
+    const g=new T.ExtrudeGeometry(sh,{depth:h,bevelEnabled:bevel>0,bevelThickness:bevel,bevelSize:bevel,bevelSegments:4,curveSegments:40});g.rotateX(-Math.PI/2);g.translate(0,y,0);add(g,col);};
+  const at=(rad,ang,y)=>[Math.cos(ang)*rad,y,-Math.sin(ang)*rad];
+  wedge(R,.27,0,'#dd9a45');wedge(R,.045,.27,'#c41e45');wedge(R,.25,.315,'#dd9a45');wedge(R,.05,.565,'#fff1d8');wedge(R,.25,.615,'#dd9a45');
+  wedge(R-.02,.1,.865,'#f2789f',.035);
+  // cream dollop on the outer edge
+  {const g=new T.SphereGeometry(.14,28,20);g.scale(1,.75,1);const[px,py,pz]=at(R*.83,A/2,1.03);g.translate(px,py,pz);add(g,'#fff8ef');}
+  // striped candle + flame
+  const[cx,,cz]=at(R*.5,A/2,0);
+  for(let i=0;i<4;i++){const g=new T.CylinderGeometry(.045,.045,.11,20);g.translate(cx,1.06+i*.11,cz);add(g,i%2?'#ffffff':'#7fc6ff');}
+  {const g=new T.CylinderGeometry(.006,.006,.05,6);g.translate(cx,1.52,cz);add(g,'#3a2a1a');}
+  {const g=new T.SphereGeometry(.055,18,14);g.scale(.8,1.6,.8);g.translate(cx,1.62,cz);add(g,'#ffb703');}
+  // sprinkles on the frosting
+  const cols=['#ff5c8a','#ffd23f','#4cc9f0','#80ed99','#ffffff','#b388ff'];
+  for(let i=0;i<34;i++){const rad=.22+Math.random()*(R-.36),ang=.06+Math.random()*(A-.12);const g=new T.BoxGeometry(.075,.022,.022);
+    g.rotateY(Math.random()*Math.PI);const[px,py,pz]=at(rad,ang,1.0);g.translate(px,py,pz);add(g,cols[i%cols.length]);}
+  let n=0;parts.forEach(g=>n+=g.attributes.position.count);
+  const P=new Float32Array(n*3),N=new Float32Array(n*3),C=new Float32Array(n*3),U=new Float32Array(n*2);let o=0,u=0;
+  parts.forEach(g=>{const c=g.attributes.position.count;P.set(g.attributes.position.array,o);N.set(g.attributes.normal.array,o);C.set(g.attributes.color.array,o);
+    if(g.attributes.uv)U.set(g.attributes.uv.array,u);o+=c*3;u+=c*2;g.dispose();});
+  const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(P,3));geo.setAttribute('normal',new T.BufferAttribute(N,3));
+  geo.setAttribute('color',new T.BufferAttribute(C,3));geo.setAttribute('uv',new T.BufferAttribute(U,2));geo.rotateY(-A/2+.35);return geo;
+}
 function buildMesh(T,kind){
   let geo,mat,ready=Promise.resolve();
   if(ROCK[kind]){const c=ROCK[kind];geo=rockGeo(T,c);
     mat=new T.MeshPhysicalMaterial({bumpScale:c.bump,color:c.color,roughness:c.rough,metalness:0,vertexColors:true,clearcoat:c.coat||0,clearcoatRoughness:.25});ready=texInto(T,c.tex,c.rep,mat);}
+  else if(kind==='cake'){geo=cakeGeo(T);
+    // fine crumb on the sponge
+    const bump=canvasTex(T,x=>{x.fillStyle='#808080';x.fillRect(0,0,512,512);for(let i=0;i<9000;i++){const v=90+Math.random()*90|0;x.fillStyle=`rgb(${v},${v},${v})`;x.fillRect(Math.random()*512,Math.random()*512,2+Math.random()*3,2+Math.random()*3);}});
+    bump.repeat.set(3,3);
+    mat=new T.MeshPhysicalMaterial({vertexColors:true,color:'#ffffff',roughness:.62,metalness:0,bumpMap:bump,bumpScale:1.2,sheen:.5,sheenColor:'#fff1e0',sheenRoughness:.5,clearcoat:.12,clearcoatRoughness:.4});}
   else if(kind==='blocket'){geo=blocketGeo(T);
     mat=new T.MeshStandardMaterial({bumpScale:5,color:'#f1eee8',roughness:.97,metalness:0});ready=texInto(T,'assets/tex-concrete-2.png',[.55,.55],mat);}
   else if(kind==='opal'||kind==='choc'){geo=new T.SphereGeometry(1,128,96);const p=geo.attributes.position;
@@ -131,7 +167,7 @@ function stage(T,Room,renderer){
   scene.add(new T.HemisphereLight('#dfe8ee','#132531',.5));
   return{scene,cam,envT};
 }
-const PITCH={blocket:.5,emerald:.5,diamond:.5};
+const PITCH={blocket:.5,emerald:.5,diamond:.5,cake:.55};
 /* reads the centre pixels straight after a render: catches GPUs that "succeed" but draw nothing or pure black */
 function drewOk(renderer,kind){
   if(kind==='blocket')return true;
