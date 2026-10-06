@@ -10,7 +10,7 @@
 // POST /api/admin {inquiry:id, action:'done'|'new'}
 // POST /api/admin {testEmail:'you@x.com'} → sends a sample certificate email through the Gmail setup
 // Orders come back with payLink, recordLink and msgs (the SMS/email texts); `auto` says what is sent automatically.
-import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO } from './_lib.js';
+import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO, ethPhone } from './_lib.js';
 import { messages, links, followUp, sweep, autoOn, sendTestEmail } from './_notify.js';
 
 const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
@@ -29,6 +29,11 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'GET') await sweep();
+    // The verifier (Mac) reports its health about once a minute; /office shows a banner when it's off or stuck.
+    if (req.method === 'GET' && req.headers['x-verifier']) {
+      let h = {}; try { h = JSON.parse(req.headers['x-verifier']); } catch {}
+      await setJSON('verifier', { seen: Date.now(), receipt: ['ok', 'fail'].includes(h.receipt) ? h.receipt : 'unknown', receiptAt: Number(h.receiptAt) || 0, err: String(h.err || '').slice(0, 120) });
+    }
     if (req.method === 'GET' && req.query.pending) {
       const ids = await kv('SMEMBERS', 'review');
       const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
@@ -46,12 +51,12 @@ export default async function handler(req, res) {
       const qids = await kv('LRANGE', 'inquiries', 0, 199);
       const qraw = qids.length ? await kv('MGET', ...qids.map((i) => 'inq:' + i)) : [];
       const inquiries = qraw.filter(Boolean).map((r) => JSON.parse(r));
-      return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn() });
+      return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier') });
     }
     if (req.method === 'POST' && (req.body || {}).testEmail) {
       const to = clean(req.body.testEmail, 120);
       if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(to)) return send(res, 400, { error: 'Email doesn’t look right.' });
-      if (!autoOn().email) return send(res, 400, { error: 'GMAIL_APP_PASSWORD is not set in Vercel (or the site wasn’t redeployed after adding it).' });
+      if (!autoOn().emailReady) return send(res, 400, { error: 'GMAIL_APP_PASSWORD is not set in Vercel (or the site wasn’t redeployed after adding it).' });
       try { return send(res, 200, await sendTestEmail(to)); } catch (e) { return send(res, 502, { error: 'Gmail refused: ' + e.message }); }
     }
     if (req.method === 'POST' && (req.body || {}).inquiry) {
@@ -70,6 +75,8 @@ export default async function handler(req, res) {
       if (!to || !by) return send(res, 400, { error: 'Fill in who it is for and who it is from.' });
       const digits = String(c.phone || '').replace(/[^\d]/g, ''), pm = /^(?:251|0)?([79]\d{8})$/.exec(digits);
       if (digits && !pm) return send(res, 400, { error: 'Phone number doesn’t look right.' });
+      const toPhone = ethPhone(c.toPhone);
+      if (String(c.toPhone || '').trim() && !toPhone) return send(res, 400, { error: 'Their phone number doesn’t look right.' });
       const email = clean(c.email, 120);
       if (email && !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email)) return send(res, 400, { error: 'Email doesn’t look right.' });
       let id;
@@ -78,7 +85,7 @@ export default async function handler(req, res) {
       const now = Date.now();
       const o = { id, key: newKey(), slug: c.slug, name: p.name, kind: p.kind, price: p.price, to, by,
         occasion: OCCASIONS.includes(c.occasion) ? c.occasion : '', message: clean(c.message, 140),
-        phone: pm ? '0' + pm[1] : null, email: email || null, lang: c.lang === 'am' ? 'am' : 'en',
+        phone: pm ? '0' + pm[1] : null, toPhone, email: email || null, lang: c.lang === 'am' ? 'am' : 'en',
         status: 'paid', manual: true, txn: clean(c.note, 60) || null, createdAt: now, approvedBy: 'admin (manual)', approvedAt: now };
       await saveOrder(o);
       await kv('LPUSH', 'orders', id);
@@ -104,7 +111,7 @@ export default async function handler(req, res) {
       if (action === 'receipt') {
         if (!rc) return send(res, 400, { error: 'No receipt.' });
       } else if (action === 'mark') {
-        const FOLLOW = ['help_sms', 'congrats_sms', 'email', 'call', 'help_skip', 'congrats_skip', 'email_skip'];
+        const FOLLOW = ['help_sms', 'congrats_sms', 'to_sms', 'email', 'call', 'help_skip', 'congrats_skip', 'to_skip', 'email_skip'];
         if (!FOLLOW.includes(req.body.what)) return send(res, 400, { error: 'Unknown follow-up.' });
         o.follow = { ...(o.follow || {}), [req.body.what]: req.body.undo ? null : Date.now() };
       } else if (action === 'approve') {

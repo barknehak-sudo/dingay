@@ -23,8 +23,14 @@ let receivers = null; // which accounts count as ours — always taken from the 
 const skipUntil = new Map(); // txn -> time to re-check a receipt that didn't match
 
 let first = true; // first poll reads everything (and re-queues anything waiting); later polls only the pending list
+// Health report for the /office banner: sent with a poll about once a minute.
+const health = { receipt: 'unknown', receiptAt: 0, err: '' };
+let lastReport = 0;
+function receiptResult(ok, err) { Object.assign(health, { receipt: ok ? 'ok' : 'fail', receiptAt: Date.now(), err: ok ? '' : String(err || '').slice(0, 120) }); }
 async function admin(method, body, query = '') {
-  const r = await fetch(SITE + '/api/admin' + query, { method, headers: { 'x-admin-password': PW, 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  const headers = { 'x-admin-password': PW, 'content-type': 'application/json' };
+  if (method === 'GET' && Date.now() - lastReport > 60e3) { headers['x-verifier'] = JSON.stringify(health); lastReport = Date.now(); }
+  const r = await fetch(SITE + '/api/admin' + query, { method, headers, body: body ? JSON.stringify(body) : undefined });
   const j = await r.json();
   if (!r.ok) throw new Error(j.error || r.status);
   return j;
@@ -32,7 +38,8 @@ async function admin(method, body, query = '') {
 
 // Returns { approve } | { reject: note for the customer } | { problems: [...] for you to decide }
 async function check(o, payTo) {
-  const html = await fetchReceipt(o.txn);
+  let html;
+  try { html = await fetchReceipt(o.txn); receiptResult(true); } catch (e) { receiptResult(false, e.message); throw e; }
   const r = parseReceipt(html, o.txn);
   if (!r.found) {
     // Only treat it as a typo when telebirr explicitly says the transaction doesn't exist.
@@ -72,6 +79,14 @@ async function backfill(orders) {
   if (todo.length) console.log(new Date().toISOString(), `backfilled receipts for ${n}/${todo.length} paid orders; ${missing} have no telebirr receipt`);
 }
 
+// When nothing is waiting, still check every 5 minutes that telebirr's receipt site answers.
+let lastProbe = 0;
+async function probe() {
+  if (Date.now() - lastProbe < 5 * 60e3) return;
+  lastProbe = Date.now();
+  try { await fetchReceipt('DJ00000000'); receiptResult(true); } catch (e) { receiptResult(false, e.message); }
+}
+
 async function tick() {
   const j = await admin('GET', null, first ? '' : '?pending=1');
   if (first) backfill(j.orders).catch((e) => console.log(new Date().toISOString(), 'backfill error', e.message));
@@ -79,6 +94,7 @@ async function tick() {
   if (j.receivers) receivers = j.receivers;
   const payTo = j.payTo || {};
   const orders = j.orders;
+  if (!orders.some((x) => x.status === 'review' && x.txn)) await probe();
   for (const o of orders.filter((x) => x.status === 'review' && x.txn)) {
     if ((skipUntil.get(o.txn) || 0) > Date.now()) continue;
     try {

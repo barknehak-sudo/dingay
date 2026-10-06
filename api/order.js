@@ -1,5 +1,5 @@
 // POST /api/order — create an order that is waiting for payment.
-import { PRODUCTS, OCCASIONS, kv, saveOrder, send, ip, limited, newKey } from './_lib.js';
+import { PRODUCTS, OCCASIONS, kv, saveOrder, send, ip, limited, newKey, ethPhone } from './_lib.js';
 
 const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
 
@@ -18,8 +18,9 @@ export default async function handler(req, res) {
     const m = /^(?:251|0)?([79]\d{8})$/.exec(digits);
     if (!m) return send(res, 400, { error: 'Add your phone number to continue.' });
     const phone = '0' + m[1];
-    const email = clean(b.email, 120);
-    if (email && !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email)) return send(res, 400, { error: 'Check the email address.' });
+    // Recipient's phone (optional): they get an SMS with their record once it's paid.
+    const toPhone = ethPhone(b.toPhone);
+    if (String(b.toPhone || '').trim() && !toPhone) return send(res, 400, { error: 'Check their phone number.' });
     const lang = b.lang === 'am' ? 'am' : 'en';
 
     let id;
@@ -29,7 +30,7 @@ export default async function handler(req, res) {
     }
     if (!id) return send(res, 503, { error: 'Please try again.' });
 
-    const o = { id, key: newKey(), slug: b.slug, name: p.name, kind: p.kind, price: p.price, to, by, occasion, message, phone, email: email || null, lang, status: 'awaiting', createdAt: Date.now() };
+    const o = { id, key: newKey(), slug: b.slug, name: p.name, kind: p.kind, price: p.price, to, by, occasion, message, phone, toPhone, lang, status: 'awaiting', createdAt: Date.now() };
     await saveOrder(o);
     await kv('LPUSH', 'orders', id);
     await kv('LTRIM', 'orders', 0, 999);

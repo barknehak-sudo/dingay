@@ -13,45 +13,51 @@
 </style>
 </helmet>
 <div style="container-type:inline-size;width:100%">
-  <div style="position:relative;background:#f3f4f1;color:#16140f;aspect-ratio:1/1.38;padding:8cqw 8cqw 7cqw;display:flex;flex-direction:column;overflow:hidden;font-family:'Neue Haas Grotesk Display Pro','Neue Haas Grotesk Text Pro','Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif;box-shadow:0 1px 0 rgba(0,0,0,.04),0 30px 60px -30px rgba(0,0,0,.45)">
-    <div style="position:absolute;inset:3cqw;border:1px solid rgba(22,20,15,.4);pointer-events:none"></div>
-    <div style="position:absolute;inset:4cqw;border:1px solid rgba(22,20,15,.14);pointer-events:none"></div>
+  <div style="position:relative;background:{{ t.paper }};color:{{ t.ink }};aspect-ratio:1/1.38;padding:8cqw 8cqw 7cqw;display:flex;flex-direction:column;overflow:hidden;border-radius:{{ t.radius }};font-family:'Neue Haas Grotesk Display Pro','Neue Haas Grotesk Text Pro','Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif;box-shadow:0 1px 0 rgba(0,0,0,.04),0 30px 60px -30px rgba(0,0,0,.45)">
+    <div style="position:absolute;inset:3cqw;border:{{ t.border1 }};border-radius:{{ t.radius }};pointer-events:none"></div>
+    <div style="position:absolute;inset:4cqw;border:{{ t.border2 }};border-radius:{{ t.radius }};pointer-events:none"></div>
+    <sc-if value="{{ loved }}">
+      <svg aria-hidden="true" viewBox="0 0 40 40" style="position:absolute;left:1.6cqw;top:1.6cqw;width:7cqw;height:7cqw;fill:none;stroke:#b8925a;stroke-width:1.1"><path d="M4 22C4 12 12 4 22 4M4 30C4 16 16 4 30 4"/><path d="M10 10c0-2.5 3.5-2.5 3.5 0 0-2.5 3.5-2.5 3.5 0 0 2.4-3.5 4.2-3.5 4.2S10 12.4 10 10z" fill="#c25b72" stroke="none"/></svg>
+      <svg aria-hidden="true" viewBox="0 0 40 40" style="position:absolute;right:1.6cqw;top:1.6cqw;width:7cqw;height:7cqw;fill:none;stroke:#b8925a;stroke-width:1.1;transform:scaleX(-1)"><path d="M4 22C4 12 12 4 22 4M4 30C4 16 16 4 30 4"/><path d="M10 10c0-2.5 3.5-2.5 3.5 0 0-2.5 3.5-2.5 3.5 0 0 2.4-3.5 4.2-3.5 4.2S10 12.4 10 10z" fill="#c25b72" stroke="none"/></svg>
+      <svg aria-hidden="true" viewBox="0 0 40 40" style="position:absolute;left:1.6cqw;bottom:1.6cqw;width:7cqw;height:7cqw;fill:none;stroke:#b8925a;stroke-width:1.1;transform:scaleY(-1)"><path d="M4 22C4 12 12 4 22 4M4 30C4 16 16 4 30 4"/></svg>
+      <svg aria-hidden="true" viewBox="0 0 40 40" style="position:absolute;right:1.6cqw;bottom:1.6cqw;width:7cqw;height:7cqw;fill:none;stroke:#b8925a;stroke-width:1.1;transform:scale(-1,-1)"><path d="M4 22C4 12 12 4 22 4M4 30C4 16 16 4 30 4"/></svg>
+    </sc-if>
     <div style="display:flex;justify-content:space-between;gap:3cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:2cqw;letter-spacing:.06em;text-transform:uppercase">
       <span>Unofficial DINGUY Registration Office</span><span>{{ no }}</span>
     </div>
-    <div style="height:1px;background:rgba(22,20,15,.35);margin:2.4cqw 0 4.4cqw"></div>
+    <div style="height:1px;background:{{ t.rule }};margin:2.4cqw 0 4.4cqw"></div>
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4cqw">
-      <div style="font-size:3.6cqw;font-weight:600;letter-spacing:.01em;line-height:1.1;text-transform:uppercase;max-width:60cqw">Certificate of Dinguy Registration</div>
+      <div style="max-width:60cqw"><div style="font-size:{{ t.titleSize }};font-weight:{{ t.titleWeight }};font-family:{{ t.titleFont }};font-style:{{ t.serifStyle }};letter-spacing:.01em;line-height:1.1;text-transform:{{ t.titleCase }}">{{ title }}</div><sc-if value="{{ loved }}"><div style="margin-top:1.2cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.7cqw;letter-spacing:.14em;text-transform:uppercase;color:#b0485f">♥ Given with love ♥</div></sc-if></div>
       <div style="width:17cqw;flex:none;margin-top:-2cqw"><dc-import name="Stone" kind="{{ kind }}" spin="{{ 0 }}" hint-size="100%,100%"></dc-import></div>
     </div>
-    <div style="font-size:2.8cqw;margin-top:4cqw;color:#4a463e">This certifies that</div>
-    <div style="font-size:{{ nameSize }};font-weight:600;letter-spacing:-.035em;line-height:.95;text-transform:uppercase;margin-top:1.6cqw;color:{{ toColor }};overflow-wrap:anywhere">{{ to }}</div>
-    <div style="font-size:2.8cqw;margin-top:3cqw;color:#4a463e">has been assigned and ceremonially registered with</div>
-    <div style="font-size:5.4cqw;font-weight:600;letter-spacing:-.02em;line-height:1.05;text-transform:uppercase;margin-top:1.4cqw">{{ type }}</div>
-    <div style="font-size:2.8cqw;margin-top:1.4cqw;color:#4a463e">under the DINGUY Registry.</div>
+    <div style="font-size:2.8cqw;margin-top:4cqw;color:{{ t.sub }}">{{ line1 }}</div>
+    <div style="font-size:{{ nameSize }};font-weight:{{ t.nameWeight }};font-family:{{ t.nameFont }};font-style:{{ t.serifStyle }};letter-spacing:{{ t.nameTrack }};line-height:.95;text-transform:{{ t.nameCase }};margin-top:1.6cqw;color:{{ toColor }};overflow-wrap:anywhere">{{ to }}</div>
+    <div style="font-size:2.8cqw;margin-top:3cqw;color:{{ t.sub }}">{{ line2 }}</div>
+    <div style="font-size:5.4cqw;font-weight:{{ t.titleWeight }};font-family:{{ t.titleFont }};font-style:{{ t.serifStyle }};letter-spacing:-.02em;line-height:1.05;text-transform:uppercase;margin-top:1.4cqw;color:{{ t.accent }}">{{ type }}</div>
+    <div style="font-size:2.8cqw;margin-top:1.4cqw;color:{{ t.sub }}">{{ line3 }}</div>
     <div style="flex:1"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2.6cqw 4cqw;border-top:1px solid rgba(22,20,15,.25);padding-top:3cqw">
-      <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:#6b665c">Registration No.</div><div style="font-size:3cqw;font-weight:500;margin-top:.6cqw">{{ no }}</div></div>
-      <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:#6b665c">Dedicated by</div><div style="font-size:3cqw;font-weight:500;margin-top:.6cqw;overflow-wrap:anywhere">{{ by }}</div></div>
-      <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:#6b665c">Occasion</div><div style="font-size:3cqw;font-weight:500;margin-top:.6cqw">{{ occasion }}</div></div>
-      <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:#6b665c">Date of Registration</div><div style="font-size:3cqw;font-weight:500;margin-top:.6cqw">{{ date }}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2.6cqw 4cqw;border-top:1px solid {{ t.rule }};padding-top:3cqw">
+      <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:{{ t.mut }}">Registration No.</div><div style="font-size:3cqw;font-weight:500;margin-top:.6cqw">{{ no }}</div></div>
+      <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:{{ t.mut }}">Dedicated by</div><div style="font-size:3cqw;font-weight:500;margin-top:.6cqw;overflow-wrap:anywhere">{{ by }}</div></div>
+      <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:{{ t.mut }}">Occasion</div><div style="font-size:3cqw;font-weight:500;margin-top:.6cqw">{{ occasion }}</div></div>
+      <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:{{ t.mut }}">Date of Registration</div><div style="font-size:3cqw;font-weight:500;margin-top:.6cqw">{{ date }}</div></div>
     </div>
     <div style="margin-top:3.6cqw;max-width:66cqw">
-      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:#6b665c">Dedication</div>
+      <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:{{ t.mut }}">Dedication</div>
       <div style="font-size:3.4cqw;line-height:1.25;margin-top:1cqw;color:{{ msgColor }};overflow-wrap:anywhere">{{ message }}</div>
     </div>
-    <div style="margin-top:4cqw;font-size:1.65cqw;line-height:1.45;color:#6b665c;max-width:70cqw">This certificate records a symbolic digital registration only. It does not represent ownership of a physical stone or any legal, scientific, mineralogical or property right.</div>
+    <div style="margin-top:4cqw;font-size:1.65cqw;line-height:1.45;color:{{ t.mut }};max-width:70cqw">This certificate records a symbolic digital registration only. It does not represent ownership of a physical stone or any legal, scientific, mineralogical or property right.</div>
     <sc-if value="{{ pending }}">
       <div style="position:absolute;right:7cqw;bottom:13cqw;width:21cqw;height:21cqw;border-radius:50%;border:.4cqw dashed rgba(22,20,15,.35);display:flex;align-items:center;justify-content:center;transform:rotate(-12deg);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:2.2cqw;letter-spacing:.1em;color:rgba(22,20,15,.45)">PENDING</div>
     </sc-if>
     <sc-if value="{{ stampAnim }}">
-      <div style="position:absolute;right:7cqw;bottom:13cqw;width:21cqw;height:21cqw;border-radius:50%;border:.6cqw solid #23465e;color:#23465e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;text-transform:uppercase;opacity:0;animation:dgc-stamp .7s cubic-bezier(.2,.9,.3,1.2) .15s forwards;mix-blend-mode:multiply">
-        <span style="font-size:1.5cqw;letter-spacing:.14em">DG Registry</span><span style="font-size:2.7cqw;font-weight:500;letter-spacing:.06em">Registered</span><span style="font-size:1.5cqw;letter-spacing:.1em">{{ shortDate }}</span>
+      <div style="position:absolute;right:7cqw;bottom:13cqw;width:21cqw;height:21cqw;border-radius:50%;border:.6cqw solid {{ t.stamp }};color:{{ t.stamp }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;text-transform:uppercase;opacity:0;animation:dgc-stamp .7s cubic-bezier(.2,.9,.3,1.2) .15s forwards;mix-blend-mode:multiply">
+        <span style="font-size:1.5cqw;letter-spacing:.14em">DG Registry</span><span style="font-size:{{ stampSize }};font-weight:500;letter-spacing:.06em">{{ stampWord }}</span><span style="font-size:1.5cqw;letter-spacing:.1em">{{ shortDate }}</span>
       </div>
     </sc-if>
     <sc-if value="{{ stampStatic }}">
-      <div style="position:absolute;right:7cqw;bottom:13cqw;width:21cqw;height:21cqw;border-radius:50%;border:.6cqw solid #23465e;color:#23465e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;text-transform:uppercase;transform:rotate(-12deg);mix-blend-mode:multiply">
-        <span style="font-size:1.5cqw;letter-spacing:.14em">DG Registry</span><span style="font-size:2.7cqw;font-weight:500;letter-spacing:.06em">Registered</span><span style="font-size:1.5cqw;letter-spacing:.1em">{{ shortDate }}</span>
+      <div style="position:absolute;right:7cqw;bottom:13cqw;width:21cqw;height:21cqw;border-radius:50%;border:.6cqw solid {{ t.stamp }};color:{{ t.stamp }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;text-transform:uppercase;transform:rotate(-12deg);mix-blend-mode:multiply">
+        <span style="font-size:1.5cqw;letter-spacing:.14em">DG Registry</span><span style="font-size:{{ stampSize }};font-weight:500;letter-spacing:.06em">{{ stampWord }}</span><span style="font-size:1.5cqw;letter-spacing:.1em">{{ shortDate }}</span>
       </div>
     </sc-if>
   </div>
@@ -61,15 +67,30 @@
 class Component extends DCLogic {
   renderVals(){
     const r=this.props.reg||{};const pending=!!this.props.pending;const to=(r.to||'').trim();
+    // Loved-one stones get a romantic certificate: blush paper, gold hairlines, serif italics, rose accents.
+    const loved=['opal','choc','emerald','diamond'].includes(r.kind);
+    const SERIF="'Instrument Serif',Georgia,'Noto Serif Ethiopic',serif";
+    const t=loved
+      ?{paper:'radial-gradient(120% 80% at 50% 0%,#fff8f5 0%,#fbece8 55%,#f5dfdc 100%)',ink:'#3a1f24',sub:'#7a4d55',mut:'#9a6b72',accent:'#a83f58',rule:'rgba(184,146,90,.55)',
+        border1:'1px solid rgba(184,146,90,.85)',border2:'1px solid rgba(184,146,90,.35)',radius:'1.6cqw',stamp:'#a83f58',
+        titleFont:SERIF,titleWeight:400,titleSize:'4.6cqw',titleCase:'none',serifStyle:'italic',nameFont:SERIF,nameWeight:400,nameTrack:'-.01em',nameCase:'none'}
+      :{paper:'#f3f4f1',ink:'#16140f',sub:'#4a463e',mut:'#6b665c',accent:'#16140f',rule:'rgba(22,20,15,.3)',
+        border1:'1px solid rgba(22,20,15,.4)',border2:'1px solid rgba(22,20,15,.14)',radius:'0',stamp:'#23465e',
+        titleFont:'inherit',titleWeight:600,titleSize:'3.6cqw',titleCase:'uppercase',serifStyle:'normal',nameFont:'inherit',nameWeight:600,nameTrack:'-.035em',nameCase:'uppercase'};
     const len=(to||'RECIPIENT').length;
     return{
-      no:r.no||'DG-——————',to:to||'Recipient',toColor:to?'#16140f':'rgba(22,20,15,.25)',
-      nameSize:len>16?'6.4cqw':len>10?'8.4cqw':'11cqw',
+      no:r.no||'DG-——————',to:to||'Recipient',toColor:to?t.ink:'rgba(22,20,15,.25)',
+      nameSize:loved?(len>16?'7.6cqw':len>10?'9.8cqw':'13cqw'):(len>16?'6.4cqw':len>10?'8.4cqw':'11cqw'),
       type:r.type||'—',by:(r.by||'').trim()||'—',occasion:r.occasion||'—',date:r.date||'—',
       shortDate:r.date?new Date(r.ts||Date.now()).toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}):'',
       message:r.message?`“${r.message}”`:'“Your dedication will appear here.”',
-      msgColor:r.message?'#16140f':'rgba(22,20,15,.3)',
-      kind:r.kind||'cobble',pending,stampAnim:!pending&&!!this.props.stamp,stampStatic:!pending&&!this.props.stamp&&!this.props.hideStamp
+      msgColor:r.message?t.ink:'rgba(22,20,15,.3)',
+      kind:r.kind||'cobble',pending,loved,t,
+      title:'Certificate of Dinguy Registration',
+      line1:loved?'With love, this certifies that':'This certifies that',
+      line2:loved?'has been given a little piece of forever, registered as':'has been assigned and ceremonially registered with',
+      line3:loved?'in the DINGUY Registry, for always.':'under the DINGUY Registry.',
+      stampWord:loved?'With love':'Registered',stampSize:loved?'2.3cqw':'2.7cqw',stampAnim:!pending&&!!this.props.stamp,stampStatic:!pending&&!this.props.stamp&&!this.props.hideStamp
     };
   }
 }

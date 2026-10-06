@@ -62,6 +62,12 @@ export function sameSecret(a, b) {
   return x.length === y.length && x.length > 0 && crypto.timingSafeEqual(x, y);
 }
 
+// Ethiopian mobile → 09XXXXXXXX / 07XXXXXXXX, or null if it doesn't look like one.
+export function ethPhone(raw) {
+  const m = /^(?:251|0)?([79]\d{8})$/.exec(String(raw || '').replace(/[^\d]/g, ''));
+  return m ? '0' + m[1] : null;
+}
+
 /* ---------- registry ---------- */
 const fmtDate = (ms) => new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Addis_Ababa' });
 export function recordOf(o) {
