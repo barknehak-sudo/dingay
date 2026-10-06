@@ -145,10 +145,10 @@ export function receiverCheck(r, receivers = RECEIVERS) {
   return verdict;
 }
 export const receiverOk = (r, receivers) => receiverCheck(r, receivers) === 'ok';
-export async function fetchReceipt(txn) {
+export async function fetchReceipt(txn, timeoutMs = 9000) {
   const r = await fetch(RECEIPT_URL + encodeURIComponent(txn), {
     headers: { 'user-agent': 'Mozilla/5.0 (DINGUY registry)' },
-    signal: AbortSignal.timeout(9000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   if (!r.ok) throw new Error('receipt http ' + r.status);
   return r.text();

@@ -1024,7 +1024,7 @@ const TIERS=[['STARTER','45,000 ETB','For straightforward websites with a clear 
 const RECEIVE=[['Registered Name','The name you give your Dinguy.'],['Dedicated By','Your name or nickname.'],['Personal Message','A message of your choice.'],['Digital Certificate','A professionally designed downloadable certificate.'],['Personal Registry Page','A permanent link you can share.']];
 // Private preview records: never in the registry, the recent list or search — they open only with their key.
 // Remove an entry to take its link down.
-const HIDDEN={'DG-261007':{key:'f41336f187cd38b8d89064af',rec:{no:'DG-261007',to:'Brooks',by:'DINGUY',type:'SLICE OF BIRTHDAY CAKE',kind:'cake',occasion:'Birthday',
+const HIDDEN={'DG-261007':{key:'f41336f187cd38b8d89064af',rec:{no:'DG-261007',to:'Brooks',by:'Barkneh',type:'SLICE OF BIRTHDAY CAKE',kind:'cake',occasion:'Birthday',
   message:'Happy birthday! 🎂 Sending you a little slice of cake all the way to Spain 🇪🇸',date:'7 October 2026',ts:Date.parse('2026-10-07T12:00:00+03:00')}}};
 const hiddenRec=(no,key)=>{const h=HIDDEN[String(no||'').toUpperCase()];return h&&key===h.key?{...h.rec,key:h.key}:null;};
 const SEED={'DG-004281':{no:'DG-004281',to:'Abel',type:'Certified Heavy',by:'Samuel',occasion:'Birthday',message:'For all the things you carry on your head.',date:'30 September 2026',kind:'blocket',ts:Date.parse('2026-09-30')}};

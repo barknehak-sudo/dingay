@@ -9,7 +9,16 @@
 //   or on a Mac, store the password once in Keychain (service "dingay-admin") — see verifier/install-mac.sh.
 // Needs: Node 20+.  Optional: DINGUY_SITE (default https://dingay.vercel.app)
 import { execFileSync } from 'node:child_process';
-import { parseReceipt, parseEAT, receiverCheck, fetchReceipt } from '../api/_lib.js';
+import { parseReceipt, parseEAT, receiverCheck, fetchReceipt as fetchOnce } from '../api/_lib.js';
+
+// Ethio Telecom's receipt site is patchy: give it up to 25 s and two quick retries before calling it a failure.
+async function fetchReceipt(txn) {
+  let err;
+  for (let i = 0; i < 3; i++) {
+    try { return await fetchOnce(txn, 25000); } catch (e) { err = e; await new Promise((r) => setTimeout(r, 1500)); }
+  }
+  throw err;
+}
 
 const SITE = process.env.DINGUY_SITE || 'https://dingay.vercel.app';
 function password() {
@@ -30,7 +39,12 @@ function receiptResult(ok, err) { Object.assign(health, { receipt: ok ? 'ok' : '
 async function admin(method, body, query = '') {
   const headers = { 'x-admin-password': PW, 'content-type': 'application/json' };
   if (method === 'GET' && Date.now() - lastReport > 60e3) { headers['x-verifier'] = JSON.stringify(health); lastReport = Date.now(); }
-  const r = await fetch(SITE + '/api/admin' + query, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  // The connection to the site also drops now and then — retry twice before giving up on this round.
+  let r;
+  for (let i = 0; ; i++) {
+    try { r = await fetch(SITE + '/api/admin' + query, { method, headers, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(30000) }); break; }
+    catch (e) { if (i >= 2) throw e; await new Promise((res) => setTimeout(res, 2000)); }
+  }
   const j = await r.json();
   if (!r.ok) throw new Error(j.error || r.status);
   return j;
