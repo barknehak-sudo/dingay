@@ -75,6 +75,11 @@ dl.kv dt{color:var(--mut)}dl.kv dd{margin:0;overflow-wrap:anywhere}
 .chip.bad{background:var(--bad-bg);color:var(--bad)}
 .warnbar{margin:12px 0 0;padding:12px 14px;border-radius:12px;background:var(--warn-bg);color:var(--ink);border:1px solid var(--warn);font-size:14px;line-height:1.45;display:flex;gap:8px;align-items:flex-start}
 .warnbar b{color:var(--warn)}
+.newhits .nh-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.newhits .v{font-size:44px;font-weight:800;letter-spacing:-.03em;line-height:1}.newhits .s{font-size:13px;color:var(--mut);margin-top:4px}
+.newhits .nh-side{font-size:14px;color:var(--ink-2);text-align:right;line-height:1.6}
+.newhits .nh-bars{margin-top:14px;height:56px;display:flex;align-items:flex-end;gap:4px}
+.newhits .nh-bars i{flex:1;background:linear-gradient(180deg,#c86bff,#5f8bff);border-radius:4px 4px 0 0;min-height:3px}
 button.chip{border:1px solid var(--line);cursor:pointer;font:inherit;font-size:13px;padding:6px 12px;min-height:34px}
 button.chip.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
 .lbs{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))}
@@ -169,7 +174,7 @@ async function api(method,body,query=''){
 }
 async function load(){
   $('#err').textContent='';
-  try{const j=await api('GET');S.orders=j.orders;S.inquiries=j.inquiries||[];S.auto=j.auto||{};S.verifier=j.verifier||null;if(S.auto.from)SW_MAIL=S.auto.from;S.loadedAt=Date.now();
+  try{const j=await api('GET');S.orders=j.orders;S.inquiries=j.inquiries||[];S.auto=j.auto||{};S.verifier=j.verifier||null;S.newHits=j.newHits||null;if(S.auto.from)SW_MAIL=S.auto.from;S.loadedAt=Date.now();
     try{sessionStorage.setItem('dg-admin',pw)}catch(e){}
     $('#login').hidden=true;$('#app').hidden=false;render();}
   catch(e){$('#err').textContent=e.message;$('#login').hidden=false;$('#app').hidden=true;}
@@ -291,6 +296,19 @@ function leaders(r){
 }
 function postText(b,r){const t=b.rows[0];if(!t)return'';
   return `${b.ic} DINGUY ${b.title.toUpperCase()} — ${LB_RANGES[r].toLowerCase()}\n\n${t.name}\n${t.n} ${t.n===1?'Dinguy':'Dinguys'} ${b.unit}\n\nRegister one for someone: dinguy.xyz`;}
+// Interest in new Dinguys: taps on the "NEW" button in the site header.
+function viewNewHits(){
+  const h=S.newHits;if(!h)return '';
+  const last7=h.days.slice(-7).reduce((a,d)=>a+d.n,0),today=h.days[h.days.length-1].n,max=Math.max(1,...h.days.map(d=>d.n));
+  const bars=h.days.map(d=>`<i title="${esc(d.d)}: ${d.n}" style="height:${Math.max(4,d.n/max*100).toFixed(0)}%;${d.n?'':'opacity:.25'}"></i>`).join('');
+  return `<h2 class="sec"><span>Want new Dinguys? · “NEW” button</span></h2>
+  <div class="card newhits">
+    <div class="nh-top"><div><div class="v">${h.people}</div><div class="s">people tapped it</div></div>
+      <div class="nh-side"><div><b>${h.taps}</b> taps in total</div><div><b>${last7}</b> people this week · <b>${today}</b> today</div></div></div>
+    <div class="nh-bars" role="img" aria-label="People per day, last 14 days">${bars}</div>
+    <div class="readout" style="margin-top:6px">People per day, last 14 days. A person counts once per phone, however many times they tap.</div>
+  </div>`;
+}
 function viewLeaders(){
   const L=leaders(S.lb);
   const tabs=Object.entries(LB_RANGES).map(([k,l])=>`<button class="chip${S.lb===k?' on':''}" data-lb="${k}" ${S.lb===k?'aria-pressed="true"':'aria-pressed="false"'}>${l}</button>`).join('');
@@ -321,6 +339,7 @@ function viewDash(){
   const tot=Math.max(1,st.fr+st.lv);
   return `
   ${ts.length?`<h2 class="sec"><span>Next up · ${ts.length}</span><button data-tab="tasks">See all</button></h2><div class="grid">${ts.slice(0,3).map(taskCard).join('')}</div>`:`<h2 class="sec"><span>Next up</span></h2><div class="card empty">✓ All caught up.</div>`}
+  ${viewNewHits()}
   ${viewLeaders()}
   <h2 class="sec"><span>Money</span></h2>
   <div class="kpis">

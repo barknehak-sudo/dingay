@@ -12,6 +12,7 @@
 // Orders come back with payLink, recordLink and msgs (the SMS/email texts); `auto` says what is sent automatically.
 import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO, ethPhone } from './_lib.js';
 import { messages, links, followUp, sweep, autoOn, sendTestEmail } from './_notify.js';
+import { day as hitDay } from './hit.js';
 
 const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
 
@@ -51,7 +52,11 @@ export default async function handler(req, res) {
       const qids = await kv('LRANGE', 'inquiries', 0, 199);
       const qraw = qids.length ? await kv('MGET', ...qids.map((i) => 'inq:' + i)) : [];
       const inquiries = qraw.filter(Boolean).map((r) => JSON.parse(r));
-      return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier') });
+      // "NEW" button interest: people (first tap per phone), taps, and people per day for the last 14 days
+      const days = Array.from({ length: 14 }, (_, i) => hitDay(Date.now() - (13 - i) * 864e5));
+      const [taps, people, ...perDay] = await kv('MGET', 'hits:new:taps', 'hits:new:people', ...days.map((d) => 'hits:new:day:' + d));
+      const newHits = { taps: Number(taps) || 0, people: Number(people) || 0, days: days.map((d, i) => ({ d, n: Number(perDay[i]) || 0 })) };
+      return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier'), newHits });
     }
     if (req.method === 'POST' && (req.body || {}).testEmail) {
       const to = clean(req.body.testEmail, 120);

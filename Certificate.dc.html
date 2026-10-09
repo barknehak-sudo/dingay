@@ -16,6 +16,11 @@
   <div style="position:relative;background:{{ t.paper }};color:{{ t.ink }};aspect-ratio:1/1.38;padding:8cqw 8cqw 7cqw;display:flex;flex-direction:column;overflow:hidden;border-radius:{{ t.radius }};font-family:'Neue Haas Grotesk Display Pro','Neue Haas Grotesk Text Pro','Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif;box-shadow:0 1px 0 rgba(0,0,0,.04),0 30px 60px -30px rgba(0,0,0,.45)">
     <div style="position:absolute;inset:3cqw;border:{{ t.border1 }};border-radius:{{ t.radius }};pointer-events:none"></div>
     <div style="position:absolute;inset:4cqw;border:{{ t.border2 }};border-radius:{{ t.radius }};pointer-events:none"></div>
+    <sc-if value="{{ friend }}">
+      <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:2cqw;background:repeating-linear-gradient(-45deg,#0b0b0b 0 1.3cqw,#f2c230 1.3cqw 2.6cqw)"></div>
+      <div aria-hidden="true" style="position:absolute;left:0;right:0;bottom:0;height:2cqw;background:repeating-linear-gradient(-45deg,#0b0b0b 0 1.3cqw,#f2c230 1.3cqw 2.6cqw)"></div>
+      <div aria-hidden="true" style="position:absolute;right:10cqw;top:12.5cqw;width:13cqw;height:3.2cqw;background:rgba(242,194,48,.62);transform:rotate(-9deg);box-shadow:0 .3cqw .6cqw rgba(0,0,0,.12);z-index:2"></div>
+    </sc-if>
     <sc-if value="{{ party }}">
       <sc-for list="{{ confetti }}" as="c" hint-placeholder-count="6"><div aria-hidden="true" style="{{ c.style }}"></div></sc-for>
     </sc-if>
@@ -30,7 +35,7 @@
     </div>
     <div style="height:1px;background:{{ t.rule }};margin:2.4cqw 0 4.4cqw"></div>
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4cqw">
-      <div style="max-width:60cqw"><div style="font-size:{{ t.titleSize }};font-weight:{{ t.titleWeight }};font-family:{{ t.titleFont }};font-style:{{ t.serifStyle }};letter-spacing:.01em;line-height:1.1;text-transform:{{ t.titleCase }}">{{ title }}</div><sc-if value="{{ loved }}"><div style="margin-top:1.2cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.7cqw;letter-spacing:.14em;text-transform:uppercase;color:#b0485f">♥ Given with love ♥</div></sc-if><sc-if value="{{ party }}"><div style="margin-top:1.2cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.14em;text-transform:uppercase;color:#d6336c">🎂 Happy birthday 🎂</div></sc-if></div>
+      <div style="max-width:60cqw"><div style="font-size:{{ t.titleSize }};font-weight:{{ t.titleWeight }};font-family:{{ t.titleFont }};font-style:{{ t.serifStyle }};letter-spacing:.01em;line-height:1.1;text-transform:{{ t.titleCase }}">{{ title }}</div><sc-if value="{{ loved }}"><div style="margin-top:1.2cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.7cqw;letter-spacing:.14em;text-transform:uppercase;color:#b0485f">♥ Given with love ♥</div></sc-if><sc-if value="{{ friend }}"><div style="margin-top:1.4cqw;display:inline-block;padding:.5cqw 1.2cqw;background:#f2c230;color:#0b0b0b;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.7cqw;font-weight:600;letter-spacing:.12em;text-transform:uppercase">Friend grade · Load-bearing</div></sc-if><sc-if value="{{ party }}"><div style="margin-top:1.2cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.14em;text-transform:uppercase;color:#d6336c">🎂 Happy birthday 🎂</div></sc-if></div>
       <div style="width:17cqw;flex:none;margin-top:-2cqw"><dc-import name="Stone" kind="{{ kind }}" spin="{{ 0 }}" hint-size="100%,100%"></dc-import></div>
     </div>
     <div style="font-size:2.8cqw;margin-top:4cqw;color:{{ t.sub }}">{{ line1 }}</div>
@@ -45,10 +50,10 @@
       <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:{{ t.mut }}">Occasion</div><div style="font-size:3cqw;font-weight:500;margin-top:.6cqw">{{ occasion }}</div></div>
       <div><div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:{{ t.mut }}">Date of Registration</div><div style="font-size:3cqw;font-weight:500;margin-top:.6cqw">{{ date }}</div></div>
     </div>
-    <div style="margin-top:3.6cqw;max-width:66cqw">
+    <sc-if value="{{ showMsg }}"><div style="margin-top:3.6cqw;max-width:66cqw">
       <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.06em;text-transform:uppercase;color:{{ t.mut }}">Dedication</div>
       <div style="font-size:3.4cqw;line-height:1.25;margin-top:1cqw;color:{{ msgColor }};overflow-wrap:anywhere">{{ message }}</div>
-    </div>
+    </div></sc-if>
     <div style="margin-top:4cqw;font-size:1.65cqw;line-height:1.45;color:{{ t.mut }};max-width:70cqw">This certificate records a symbolic digital registration only. It does not represent ownership of a physical stone or any legal, scientific, mineralogical or property right.</div>
     <sc-if value="{{ pending }}">
       <div style="position:absolute;right:7cqw;bottom:13cqw;width:21cqw;height:21cqw;border-radius:50%;border:.4cqw dashed rgba(22,20,15,.35);display:flex;align-items:center;justify-content:center;transform:rotate(-12deg);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:2.2cqw;letter-spacing:.1em;color:rgba(22,20,15,.45)">PENDING</div>
@@ -73,11 +78,18 @@ const CONFETTI=[[6,14,'#ff5c8a',0],[91,11,'#4cc9f0',30],[12,38,'#ffd23f',60],[88
 class Component extends DCLogic {
   renderVals(){
     const r=this.props.reg||{};const pending=!!this.props.pending;const to=(r.to||'').trim();
+    // A public record (no private key) shows the certificate without the sender and the message.
+    const pub=!!r.no&&!r.by&&!pending;
     // Loved-one stones get a romantic certificate: blush paper, gold hairlines, serif italics, rose accents.
     const loved=['opal','choc','emerald','diamond'].includes(r.kind);
     const SERIF="'Instrument Serif',Georgia,'Noto Serif Ethiopic',serif";
-    const party=r.kind==='cake';
-    const t=party
+    const party=r.kind==='cake',friend=['cobble','blocket','river','foundation'].includes(r.kind);
+    const t=friend
+      ?{paper:'linear-gradient(rgba(11,11,11,.045) 1px,transparent 1px) 0 0/4cqw 4cqw,linear-gradient(90deg,rgba(11,11,11,.045) 1px,transparent 1px) 0 0/4cqw 4cqw,#f4f3ee',
+        ink:'#0b0b0b',sub:'#3b3b3b',mut:'#6a6a64',accent:'#0b0b0b',rule:'rgba(11,11,11,.5)',
+        border1:'1.5px solid #0b0b0b',border2:'1px solid rgba(11,11,11,.18)',radius:'0',stamp:'#0b0b0b',
+        titleFont:'inherit',titleWeight:800,titleSize:'3.8cqw',titleCase:'uppercase',serifStyle:'normal',nameFont:'inherit',nameWeight:800,nameTrack:'-.045em',nameCase:'uppercase'}
+      :party
       ?{paper:'linear-gradient(180deg,#fffaf3 0%,#fff3ea 100%)',ink:'#2b1d2e',sub:'#6b5566',mut:'#8c7488',accent:'#d6336c',rule:'rgba(214,51,108,.35)',
         border1:'1.5px dashed rgba(214,51,108,.6)',border2:'1px solid rgba(76,201,240,.55)',radius:'1.6cqw',stamp:'#d6336c',
         titleFont:'inherit',titleWeight:600,titleSize:'3.6cqw',titleCase:'uppercase',serifStyle:'normal',nameFont:'inherit',nameWeight:700,nameTrack:'-.035em',nameCase:'uppercase'}
@@ -92,16 +104,16 @@ class Component extends DCLogic {
     return{
       no:r.no||'DG-——————',to:to||'Recipient',toColor:to?t.ink:'rgba(22,20,15,.25)',
       nameSize:loved?(len>16?'7.6cqw':len>10?'9.8cqw':'13cqw'):(len>16?'6.4cqw':len>10?'8.4cqw':'11cqw'),
-      type:r.type||'—',by:(r.by||'').trim()||'—',occasion:r.occasion||'—',date:r.date||'—',
+      type:r.type||'—',by:(r.by||'').trim()||(pub?'Private':'—'),showMsg:!pub,occasion:r.occasion||'—',date:r.date||'—',
       shortDate:r.date?new Date(r.ts||Date.now()).toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}):'',
       message:r.message?`“${r.message}”`:'“Your dedication will appear here.”',
       msgColor:r.message?t.ink:'rgba(22,20,15,.3)',
-      kind:r.kind||'cobble',pending,loved:loved&&!party,party,t,confetti:party?CONFETTI:[],
+      kind:r.kind||'cobble',pending,loved:loved&&!party,party,friend,t,confetti:party?CONFETTI:[],
       title:'Certificate of Dinguy Registration',
-      line1:party?'Happy birthday! This certifies that':loved?'With love, this certifies that':'This certifies that',
-      line2:party?'has been given a slice of birthday cake, registered as':loved?'has been given a little piece of forever, registered as':'has been assigned and ceremonially registered with',
-      line3:party?'in the DINGUY Registry. Make a wish.':loved?'in the DINGUY Registry, for always.':'under the DINGUY Registry.',
-      stampWord:party?'Happy birthday':loved?'With love':'Registered',stampSize:party?'1.9cqw':loved?'2.3cqw':'2.7cqw',stampAnim:!pending&&!!this.props.stamp,stampStatic:!pending&&!this.props.stamp&&!this.props.hideStamp
+      line1:friend?'This certifies that':party?'Happy birthday! This certifies that':loved?'With love, this certifies that':'This certifies that',
+      line2:friend?'has been found structurally sound and is hereby registered with':party?'has been given a slice of birthday cake, registered as':loved?'has been given a little piece of forever, registered as':'has been assigned and ceremonially registered with',
+      line3:friend?'under the DINGUY Registry. Handle with care.':party?'in the DINGUY Registry. Make a wish.':loved?'in the DINGUY Registry, for always.':'under the DINGUY Registry.',
+      stampWord:friend?'Certified':party?'Happy birthday':loved?'With love':'Registered',stampSize:party?'1.9cqw':loved?'2.3cqw':'2.7cqw',stampAnim:!pending&&!!this.props.stamp,stampStatic:!pending&&!this.props.stamp&&!this.props.hideStamp
     };
   }
 }
