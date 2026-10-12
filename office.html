@@ -389,7 +389,7 @@ function viewDash(){
 }
 function autoLine(){
   const a=S.auto||{},on=x=>x?'<strong>on</strong>':'off';
-  return `<div class="readout" style="margin-top:14px">Automatic SMS ${on(a.sms)}. ${a.sms?'Help texts go out 30 s after an unpaid order; the buyer’s congrats and the recipient’s record link as soon as it’s paid. Anything that fails stays here.':'Set SMSETHIOPIA_KEY in Vercel to turn it on.'} Automatic email is off (it was landing in spam).${a.emailReady?` <button class="btn ghost" data-testmail style="margin-left:6px;min-height:30px;padding:0 10px">Send test email</button>`:''}</div>`;
+  return `<div class="readout" style="margin-top:14px">Automatic SMS ${on(a.sms)}. ${a.sms?'Help texts go out 30 s after an unpaid order; the buyer’s congrats and the recipient’s record link as soon as it’s paid. Anything that fails stays here.':'Set SMSETHIOPIA_KEY in Vercel to turn it on.'} ${a.email?`Automatic email <strong>on</strong> from ${esc(a.from)}: the recipient’s certificate, the buyer’s receipt, and a help email 10 min after an unpaid order (paced, max 60 a day).`:'Automatic email is off — set GMAIL_APP_PASSWORD in Vercel.'}${a.emailReady?` <button class="btn ghost" data-testmail style="margin-left:6px;min-height:30px;padding:0 10px">Send test email</button>`:''}</div>`;
 }
 function viewTasks(){
   const ts=tasks();const groups=[['review','Check these payments'],['congrats','Say congrats'],['to','Text the recipient'],['email','Email certificates'],['help','Help them pay'],['inq','SIDEWAYS inquiries']];
@@ -399,8 +399,8 @@ function viewTasks(){
 function followChips(o){
   const f=F(o),c=[];
   const add=(k,label)=>{if(f[k])c.push(`<span class="chip done">✓ ${label}${(o.auto||{})[k]?' (auto)':''} ${ago(f[k])}</span>`);};
-  add('help_sms','Help SMS');add('congrats_sms','Congrats SMS');add('to_sms','Texted them');add('email','Emailed');add('call','Called');
-  for(const [k,e] of Object.entries(o.autoErr||{}))if(e&&!f[k])c.push(`<span class="chip bad" title="${esc(e.msg)}">✕ Auto ${k==='email'?'email':'SMS'} failed ${ago(e.at)}${k==='email'&&e.n<3?` (try ${e.n} of 3, retries tomorrow)`:' — send it by hand'}</span>`);
+  add('help_sms','Help SMS');add('congrats_sms','Congrats SMS');add('to_sms','Texted them');add('buyer_email','Receipt emailed');add('help_email','Help emailed');add('email','Emailed');add('call','Called');
+  for(const [k,e] of Object.entries(o.autoErr||{}))if(e&&!f[k])c.push(`<span class="chip bad" title="${esc(e.msg)}">✕ Auto ${/email/.test(k)?'email':'SMS'} failed ${ago(e.at)}${/email/.test(k)&&e.n<3?` (try ${e.n} of 3, retries tomorrow)`:' — send it by hand'}</span>`);
   return c.length?`<div class="chips">${c.join('')}</div>`:'';
 }
 function orderCard(o){
@@ -424,6 +424,7 @@ function orderCard(o){
       ${o.phone?`<dt>Phone</dt><dd><a href="tel:${esc(o.phone)}" data-mark="call" data-id="${esc(o.id)}">${esc(o.phone)}</a></dd>`:''}
       ${o.toPhone?`<dt>Their phone</dt><dd><a href="tel:${esc(o.toPhone)}">${esc(o.toPhone)}</a></dd>`:''}
       ${o.email?`<dt>Their email</dt><dd>${esc(o.email)}</dd>`:''}
+      ${o.byEmail?`<dt>Buyer email</dt><dd>${esc(o.byEmail)}</dd>`:''}
       ${o.txn?`<dt>Transaction</dt><dd>${o.manual?esc(o.txn):`<a href="https://transactioninfo.ethiotelecom.et/receipt/${encodeURIComponent(o.txn)}" target="_blank" rel="noopener noreferrer">${esc(o.txn)} ↗</a>`}</dd>`:''}
       ${o.paidAmount!=null?`<dt>Received</dt><dd>${esc(o.paidAmount)} Birr${o.paidTo?' → …'+esc(o.paidTo):''}${o.payer?' · from '+esc(o.payer):''}</dd>`:''}
       ${o.approvedBy?`<dt>Approved</dt><dd>${esc(o.approvedBy)} · ${when(o.approvedAt)}</dd>`:''}
@@ -437,7 +438,7 @@ function orderCard(o){
 function viewOrders(){
   const FIL=[['all','All'],['review','Check'],['awaiting','Not paid'],['paid','Paid'],['rejected','Rejected'],['removed','Removed']];
   const q=S.q.trim().toLowerCase();
-  const list=S.orders.filter(o=>(S.filter==='all'||o.status===S.filter)&&(!q||[o.id,o.to,o.by,o.phone,o.toPhone,o.txn,o.email].some(v=>String(v||'').toLowerCase().includes(q))));
+  const list=S.orders.filter(o=>(S.filter==='all'||o.status===S.filter)&&(!q||[o.id,o.to,o.by,o.phone,o.toPhone,o.txn,o.email,o.byEmail].some(v=>String(v||'').toLowerCase().includes(q))));
   const cnt=k=>k==='all'?S.orders.length:S.orders.filter(o=>o.status===k).length;
   return `<div style="margin-top:14px"><input class="search" id="q" type="search" placeholder="Search name, phone, DG-…, transaction" value="${esc(S.q)}">
     <div class="filters">${FIL.map(([k,l])=>`<button data-filter="${k}" aria-pressed="${S.filter===k}">${l} · ${cnt(k)}</button>`).join('')}</div></div>
@@ -463,6 +464,7 @@ function newForm(){
       <label>Occasion<select name="occasion"><option value="">—</option>${['Birthday','Anniversary','Graduation','Farewell','Apology','Just because'].map(o=>`<option>${o}</option>`).join('')}</select></label>
       <label>Message<textarea name="message" maxlength="140"></textarea></label>
       <div class="two"><label>Buyer phone<input name="phone" type="tel" inputmode="tel" placeholder="09XX XXX XXX"></label><label>Recipient phone<input name="toPhone" type="tel" inputmode="tel" placeholder="09XX XXX XXX"></label></div>
+      <div class="two"><label>Buyer email<input name="byEmail" type="email"></label><label>Recipient email<input name="email" type="email"></label></div>
       <div class="two"><label>Language<select name="lang"><option value="en">English</option><option value="am">አማርኛ</option></select></label><label>Payment note<input name="note" maxlength="60" placeholder="cash, DJ…"></label></div>
       <button class="btn" type="submit" style="min-height:52px">Register — mark as paid</button>
       <div id="newdone"></div>

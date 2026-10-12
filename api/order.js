@@ -21,6 +21,10 @@ export default async function handler(req, res) {
     // Recipient's phone (optional): they get an SMS with their record once it's paid.
     const toPhone = ethPhone(b.toPhone);
     if (String(b.toPhone || '').trim() && !toPhone) return send(res, 400, { error: 'Check their phone number.' });
+    // Optional emails: the recipient gets the certificate, the buyer gets the receipt (from offscriptet@gmail.com).
+    const okMail = (v) => !v || /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);
+    const email = clean(b.email, 120), byEmail = clean(b.byEmail, 120);
+    if (!okMail(email) || !okMail(byEmail)) return send(res, 400, { error: 'Check the email address.' });
     const lang = b.lang === 'am' ? 'am' : 'en';
 
     let id;
@@ -30,7 +34,7 @@ export default async function handler(req, res) {
     }
     if (!id) return send(res, 503, { error: 'Please try again.' });
 
-    const o = { id, key: newKey(), slug: b.slug, name: p.name, kind: p.kind, price: p.price, to, by, occasion, message, phone, toPhone, lang, status: 'awaiting', createdAt: Date.now() };
+    const o = { id, key: newKey(), slug: b.slug, name: p.name, kind: p.kind, price: p.price, to, by, occasion, message, phone, toPhone, email: email || null, byEmail: byEmail || null, lang, status: 'awaiting', createdAt: Date.now() };
     await saveOrder(o);
     await kv('LPUSH', 'orders', id);
     await kv('LTRIM', 'orders', 0, 999);

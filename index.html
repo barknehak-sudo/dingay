@@ -421,9 +421,19 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
           <div style="margin-top:6px;font-size:13px;line-height:1.4;color:{{ phoneHintColor }}">{{ phoneHint }}</div>
         </div>
         <div>
-          <label for="dg-tophone" style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>06 — Their phone number</span><span>Optional</span></label>
+          <label for="dg-byemail" style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>06 — Your email</span><span>Optional</span></label>
+          <input id="dg-byemail" type="email" inputmode="email" autocomplete="off" autocapitalize="off" spellcheck="false" value="{{ draft.byEmail }}" onChange="{{ setByEmail }}" placeholder="name@example.com" maxlength="120" style="display:block;width:100%;height:60px;margin-top:6px;background:transparent;border:0;border-bottom:1.5px solid #0b1720;font-weight:500;letter-spacing:-.01em;padding:0;outline:none;border-radius:0;font-size:20px">
+          <div style="margin-top:6px;font-size:13px;line-height:1.4;color:{{ byEmailHintColor }}">{{ byEmailHint }}</div>
+        </div>
+        <div>
+          <label for="dg-tophone" style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>07 — Their phone number</span><span>Optional</span></label>
           <input id="dg-tophone" type="tel" inputmode="tel" autocomplete="off" value="{{ draft.toPhone }}" onChange="{{ setToPhone }}" placeholder="09XX XXX XXX" maxlength="16" style="display:block;width:100%;height:60px;margin-top:6px;background:transparent;border:0;border-bottom:1.5px solid #0b1720;font-weight:500;letter-spacing:-.01em;padding:0;outline:none;border-radius:0;font-size:26px">
           <div style="margin-top:6px;font-size:13px;line-height:1.4;color:{{ toPhoneHintColor }}">{{ toPhoneHint }}</div>
+        </div>
+        <div>
+          <label for="dg-email" style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#435f73"><span>08 — Their email</span><span>Optional</span></label>
+          <input id="dg-email" type="email" inputmode="email" autocomplete="off" autocapitalize="off" spellcheck="false" value="{{ draft.email }}" onChange="{{ setEmail }}" placeholder="name@example.com" maxlength="120" style="display:block;width:100%;height:60px;margin-top:6px;background:transparent;border:0;border-bottom:1.5px solid #0b1720;font-weight:500;letter-spacing:-.01em;padding:0;outline:none;border-radius:0;font-size:20px">
+          <div style="margin-top:6px;font-size:13px;line-height:1.4;color:{{ emailHintColor }}">{{ emailHint }}</div>
         </div>
         <div style="padding:16px;border:1px solid rgba(11,23,32,.2)">
           <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase">Before you register</div>
@@ -1051,7 +1061,7 @@ const RVT=['DG-004281','SPECIMEN','REGISTERED','ACTIVE','F-01','L-04','SYMBOLIC'
 class Component extends DCLogic {
   heroStoneRef=React.createRef();bridgeRef=React.createRef();starRef=React.createRef();macroRef=React.createRef();bridgeTitleRef=React.createRef();capARef=React.createRef();capBRef=React.createRef();capPRef=React.createRef();carRef=React.createRef();progRef=React.createRef();zoomRef=React.createRef();parRef=React.createRef();bridgeEndRef=React.createRef();bridgeShadeRef=React.createRef();zoomDepthRef=React.createRef();zTxt=[0,1,2,3].map(()=>React.createRef());
   rv=RVT.map((t,i)=>({t,x:Math.random()*90,y:Math.random()*92,dx:(Math.random()-.5)*1400,dy:(Math.random()-.5)*1400,r:(Math.random()-.5)*180}));
-  state={pay:{id:'',key:'',loading:false,order:null,error:'',txn:'',step:1},busy:false,regErr:'',lookupBusy:'',serverRecent:[],search:{q:'',busy:false,results:null,error:''},route:this.parse(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),toPhone:''},regs:this.load(),menu:false,sheet:false,toast:'',faqOpen:0,proc:-1,cycleNo:'',stamped:false,archived:false,rvs:0,certOpen:false,carIndex:1,msgPick:-1,lookup:'',lastNo:'',pendingNo:this.newNo(),wide:typeof window!=='undefined'&&window.innerWidth>=900,contact:{name:'',reach:'',need:'Website',msg:''},sent:false};
+  state={pay:{id:'',key:'',loading:false,order:null,error:'',txn:'',step:1},busy:false,regErr:'',lookupBusy:'',serverRecent:[],search:{q:'',busy:false,results:null,error:''},route:this.parse(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),toPhone:'',email:'',byEmail:''},regs:this.load(),menu:false,sheet:false,toast:'',faqOpen:0,proc:-1,cycleNo:'',stamped:false,archived:false,rvs:0,certOpen:false,carIndex:1,msgPick:-1,lookup:'',lastNo:'',pendingNo:this.newNo(),wide:typeof window!=='undefined'&&window.innerWidth>=900,contact:{name:'',reach:'',need:'Website',msg:''},sent:false};
 
   parse(){const h=(location.hash||'').replace(/^#\/?/,'').replace(/\/$/,'');const p=h.split('/');return{path:h,a:p[0]||'',b:decodeURIComponent(p[1]||''),c:decodeURIComponent(p[2]||'')};}
   load(){try{return{...SEED,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return{...SEED}}}
@@ -1135,7 +1145,7 @@ class Component extends DCLogic {
   savedPhone(){try{return localStorage.getItem('dingay.phone')||''}catch(e){return''}}
   rememberOrder(id,key){try{const k='dingay.orders.v1';const m=JSON.parse(localStorage.getItem(k)||'{}');m[id]=key;localStorage.setItem(k,JSON.stringify(m));}catch(e){}}
   createOrder=async()=>{const d=this.state.draft;if(this.state.busy)return;this.setState({busy:true,regErr:''});
-    try{const j=await this.post('order',{slug:d.slug,to:d.to,by:d.by,occasion:d.occasion,message:d.message,phone:d.phone,toPhone:d.toPhone.trim(),lang:LANG});this.rememberOrder(j.id,j.key);try{localStorage.setItem('dingay.phone',d.phone)}catch(e){}this.setState({busy:false});this.go('pay/'+j.id+'/'+j.key);}
+    try{const j=await this.post('order',{slug:d.slug,to:d.to,by:d.by,occasion:d.occasion,message:d.message,phone:d.phone,toPhone:d.toPhone.trim(),email:(d.email||'').trim(),byEmail:(d.byEmail||'').trim(),lang:LANG});this.rememberOrder(j.id,j.key);try{localStorage.setItem('dingay.phone',d.phone)}catch(e){}this.setState({busy:false});this.go('pay/'+j.id+'/'+j.key);}
     catch(e){this.setState({busy:false,regErr:e.message});}};
   loadPay(){const p=this.state.pay;if(!p.id||!p.key){this.setState({pay:{...p,loading:false,error:'This link is incomplete.'}});return;}
     this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{
@@ -1150,7 +1160,7 @@ class Component extends DCLogic {
   refreshPay(){const p=this.state.pay;if(this.state.route.a!=='pay'){clearInterval(this.poll);return;}
     this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{if(o.status==='paid'){clearInterval(this.poll);this.finishPaid(o);}else if(o.status!=='review'){clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,order:o}}));}},()=>{});}
   finishPaid(o){const reg={...o.reg,key:this.state.pay.key};const regs={...this.state.regs,[reg.no]:reg};this.save(regs);
-    this.setState({regs,lastNo:reg.no,draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),toPhone:''}},()=>this.go('success'));}
+    this.setState({regs,lastNo:reg.no,draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),toPhone:'',email:'',byEmail:''}},()=>this.go('success'));}
   verifyPay=async e=>{e&&e.preventDefault&&e.preventDefault();const p=this.state.pay;const txn=p.txn.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
     if(txn.length<8){this.setState({pay:{...p,error:'Enter the transaction number from your telebirr SMS.'}});return;}
     const t0=Date.now();this.setState({proc:0,pay:{...p,error:''}});this.later(()=>{if(this.state.proc===0)this.setState({proc:1});},700);
@@ -1303,7 +1313,8 @@ class Component extends DCLogic {
     const hasDed=!!(draft.to.trim()&&draft.by.trim());
     const phoneDigits=(draft.phone||'').replace(/[^\d+]/g,'');const phoneOk=/^(?:\+?251|0)?[79]\d{8}$/.test(phoneDigits);
     const tp=(draft.toPhone||'').replace(/[^\d+]/g,'');const toPhoneOk=!tp||/^(?:\+?251|0)?[79]\d{8}$/.test(tp);
-    const regOk=hasDed&&phoneOk&&toPhoneOk&&draft.agree&&!st.busy;
+    const okMail=v=>{v=(v||'').trim();return !v||/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);};const emailOk=okMail(draft.email),byEmailOk=okMail(draft.byEmail);
+    const regOk=hasDed&&phoneOk&&toPhoneOk&&emailOk&&byEmailOk&&draft.agree&&!st.busy;
     const progress=[['Specimen selected',true],['Dedication recorded',hasDed],['Registry entry prepared',hasDed&&!!draft.message.trim()],['Certificate generated',false]].map(([label,d])=>({label,dot:d?'#0b1720':'transparent',c:d?'#0b1720':'#6f8797'}));
     const regSuggest=MS[world].map(m=>{const sel=draft.message===m;return{text:`“${m}”`,bg:sel?'#0b1720':'#f3f5f6',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('message',m)};});
     const sreg=st.regs[st.lastNo]||SEED['DG-004281'];
@@ -1335,13 +1346,15 @@ class Component extends DCLogic {
       prod,receive:RECEIVE.map(([k,v],i)=>({n:'0'+(i+1),k,v})),stickyPos:wide?'sticky':'relative',stickyTopA:wide?'72px':'auto',stickyTopB:wide?'84px':'auto',
       draft,pendingNo:st.pendingNo,previewReg,progress,regSuggest,
       previewOrder:wide?0:-1,previewPad:wide?'40px':'4px',previewMax:wide?'520px':'340px',
-      setTo:e=>this.upd('to',e.target.value),setBy:e=>this.upd('by',e.target.value),setMsg:e=>this.upd('message',e.target.value),setPhone:e=>this.upd('phone',e.target.value),setToPhone:e=>this.upd('toPhone',e.target.value),
+      setTo:e=>this.upd('to',e.target.value),setBy:e=>this.upd('by',e.target.value),setMsg:e=>this.upd('message',e.target.value),setPhone:e=>this.upd('phone',e.target.value),setToPhone:e=>this.upd('toPhone',e.target.value),setEmail:e=>this.upd('email',e.target.value),setByEmail:e=>this.upd('byEmail',e.target.value),
+      emailHint:emailOk?'We’ll also email them the certificate once it’s paid.':'That email doesn’t look right.',emailHintColor:emailOk?'#435f73':'#b3261e',
+      byEmailHint:byEmailOk?'We’ll email you the receipt and your private record link.':'That email doesn’t look right.',byEmailHintColor:byEmailOk?'#435f73':'#b3261e',
       phoneHint:phoneOk?'✓ We’ll text you if you need help paying, and when it’s confirmed.':'So we can help you pay and text you the confirmation. Never shared.',phoneHintColor:phoneOk?'#1f8a55':'#435f73',
       toPhoneHint:tp&&!toPhoneOk?'That phone number doesn’t look right.':'We’ll text them their record and certificate once it’s paid.',toPhoneHintColor:tp&&!toPhoneOk?'#b3261e':'#435f73',toggleAgree:e=>this.upd('agree',e.target.checked),
       msgCount:`${draft.message.length} / 140`,
       occasions:OCC.map(o=>{const sel=draft.occasion===o;return{label:o,sel,bg:sel?'#0b1720':'transparent',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('occasion',sel?'':o)};}),
       generate:()=>{const l=MS[world].filter(m=>m!==draft.message);this.upd('message',l[Math.floor(Math.random()*l.length)]);},
-      regBlocked:!regOk,regOpacity:regOk?1:.35,regBtn:st.busy?'CREATING ORDER…':'CONTINUE TO PAYMENT',regHintColor:st.regErr?'#b3261e':'#435f73',regHint:st.regErr||(st.busy?'Reserving your registration number…':(regOk?'Next: pay with telebirr.':(!hasDed?'Add a recipient and your name to continue.':(!phoneOk?'Add your phone number to continue.':(!toPhoneOk?'Check their phone number.':'Please confirm the registration type.'))))),
+      regBlocked:!regOk,regOpacity:regOk?1:.35,regBtn:st.busy?'CREATING ORDER…':'CONTINUE TO PAYMENT',regHintColor:st.regErr?'#b3261e':'#435f73',regHint:st.regErr||(st.busy?'Reserving your registration number…':(regOk?'Next: pay with telebirr.':(!hasDed?'Add a recipient and your name to continue.':(!phoneOk?'Add your phone number to continue.':(!toPhoneOk?'Check their phone number.':!byEmailOk||!emailOk?'Check the email address.':'Please confirm the registration type.'))))),
       submitReg:()=>{if(regOk)this.createOrder();},
       processing:st.proc>=0,procNo:st.pay.id,procSteps:['Finding your telebirr receipt','Confirming the payment','Registry entry created','Certificate issued'].map((label,i)=>({label:label.toUpperCase(),op:st.proc>=i?1:.25,dot:st.proc>i?'#eef2f4':'transparent'})),
       succ:{...sreg,reg:sreg,download:()=>this.download(sreg),story:()=>this.story(sreg),view:go('registry/'+sreg.no),share:()=>this.share(sreg)},cycleNo:st.cycleNo||st.lastNo,stamped:st.stamped,archived:st.archived,

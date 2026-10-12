@@ -34,7 +34,20 @@ export function messages(o, site = SITE) {
   const body = am
     ? `ሰላም ${o.to}፣\n\n${o.by} በDINGUY መዝገብ ውስጥ ${o.name}ን በስምዎ አስመዝግበዋል።\n\n${o.message ? `“${o.message}”\n\n` : ''}የምዝገባ ቁ. ${o.id}\nመዝገብዎና ሰርተፊኬትዎ፦ ${recordLink}\n\nDINGUY® — ከልክ በላይ ትርጉም ላላቸው አጋጣሚዎች የተመዘገቡ ድንጋዮች።\nዲጂታል ምዝገባ። አካላዊ ድንጋይ አይካተትም።\n\n—\nDINGUY የSIDEWAYS ስራ ነው።\nSIDEWAYS ሰዎች ቆም ብለው፣ ደግመው አይተው እንዲያስታውሱ የሚያደርጉ ድረ-ገጾችን፣ ዘመቻዎችንና ሀሳቦችን ይሰራል።\nየእርስዎን ሀሳብ እንስራው፦ ${SW_LINK}\n${SW_CONTACT} · 0996 567 218`
     : `Hi ${o.to},\n\n${o.by} has registered ${o.name} in your name with the DINGUY Registry.\n\n${o.message ? `“${o.message}”\n\n` : ''}Registration No. ${o.id}\nYour record and certificate: ${recordLink}\n\nDINGUY® — Registered stones for unreasonably meaningful occasions.\nDigital registration. No physical stone included.\n\n—\nDINGUY is a SIDEWAYS project.\nSIDEWAYS makes websites, campaigns and ideas that make people stop, look twice and remember.\nGot an idea? Let’s make people talk: ${SW_LINK}\n${SW_CONTACT} · 0996 567 218`;
-  return { help, congrats, gift, subject, body };
+  const foot = am
+    ? `\n\n—\nDINGUY የSIDEWAYS ስራ ነው። ጥያቄ ካለዎት ይህን ኢሜይል ይመልሱ ወይም ይደውሉ፦ ${num}`
+    : `\n\n—\nDINGUY is a SIDEWAYS project. Questions? Just reply to this email or call ${num}.`;
+  // to the buyer, once paid: receipt + the private link to send to the recipient
+  const buyerSubject = am ? `ደረሰኝ፦ ${o.name} ለ${o.to} ተመዝግቧል · ${o.id}` : `Receipt: ${o.name} is registered to ${o.to} · ${o.id}`;
+  const buyerBody = am
+    ? `ሰላም ${o.by}፣\n\nክፍያዎ ደርሷል — እናመሰግናለን! 🎉\n\n${o.to} በይፋ በ${o.name} ተመዝግቧል።\nየምዝገባ ቁ. ${o.id}\nዋጋ፦ ${o.price} ብር${o.txn ? `\nየቴሌብር ግብይት፦ ${o.txn}` : ''}\n\nየግል መዝገብና ሰርተፊኬት (መልዕክትዎን ጨምሮ)፦\n${recordLink}\n\nይህን ሊንክ ለ${o.to} ይላኩ — ሰርተፊኬቱን ማስቀመጥና በኢንስታግራም ስቶሪ ማጋራት ይችላሉ።${foot}`
+    : `Hi ${o.by},\n\nYour payment is in — thank you! 🎉\n\n${o.to} is now officially registered with ${o.name}.\nRegistration No. ${o.id}\nPrice: ${o.price} Birr${o.txn ? `\ntelebirr transaction: ${o.txn}` : ''}\n\nThe private record and certificate (with your message):\n${recordLink}\n\nSend this link to ${o.to} — they can save the certificate and share it to their Instagram story.${foot}`;
+  // to the buyer, if they haven't paid yet
+  const helpSubject = am ? `ለ${o.to} ያዘዙት ${o.name} ክፍያ እየጠበቀ ነው` : `Your ${o.name} for ${o.to} is waiting for payment`;
+  const helpBody = am
+    ? `ሰላም ${o.by}፣\n\nለ${o.to} ያዘዙት ${o.name} (ቁ. ${o.id}) ክፍያ እየጠበቀ ነው።\n\n1) ቴሌብርን ይክፈቱ → Send Money\n2) ${o.price} ብር ወደ ${num}${nm} ይላኩ\n3) ከ127 የመጣውን SMS ሊንክ ቀድተው እዚህ ይለጥፉ፦\n${payLink}${foot}`
+    : `Hi ${o.by},\n\nYour ${o.name} for ${o.to} (No. ${o.id}) is waiting for payment.\n\n1) Open telebirr → Send Money\n2) Send ${o.price} Birr to ${num}${nm}\n3) Copy the link from the telebirr SMS (from 127) and paste it here:\n${payLink}${foot}`;
+  return { help, congrats, gift, subject, body, buyerSubject, buyerBody, helpSubject, helpBody };
 }
 
 /* ---------- senders ---------- */
@@ -76,14 +89,17 @@ export async function sendTestEmail(to) {
 /* ---------- email pacing ----------
    Certificate emails that couldn't go out (Gmail not set up yet, or a failure) are caught up
    automatically — but slowly, so a fresh Gmail sender doesn't look like a spammer:
-   one email every 2 minutes at most, 30 a day, never two to the same address within 24 h,
+   one email every 45 s at most, 60 a day, never two of the same kind to one address within 24 h,
    and an address that fails 3 times is left for a human. */
-const AUTO_EMAIL = false;
-const MAIL_GAP_S = 120, MAIL_PER_DAY = 30, MAIL_MAX_TRIES = 3;
+const AUTO_EMAIL = true;
+// Gmail allows ~500/day; a newer sender stays well under that, spaced out.
+const MAIL_GAP_S = 45, MAIL_PER_DAY = 60, MAIL_MAX_TRIES = 3;
+const MAIL_KINDS = ['email', 'buyer_email', 'help_email'];
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Addis_Ababa' });
 // 'ok' = send now; 'addr' = this address had one in the last 24 h (others may go); 'wait' = nothing goes right now.
-async function mailSlot(addr) {
-  const to = String(addr).toLowerCase();
+// The 24 h limit is per kind of email, so a buyer can get the help email and then their receipt.
+async function mailSlot(addr, kind) {
+  const to = kind + ':' + String(addr).toLowerCase();
   if (await kv('GET', 'mail:to:' + to)) return 'addr';
   if (Number(await kv('GET', 'mail:day:' + today())) >= MAIL_PER_DAY) return 'wait';
   if (!(await kv('SET', 'mail:gap', '1', 'NX', 'EX', MAIL_GAP_S))) return 'wait';
@@ -103,8 +119,13 @@ function due(o, now = Date.now()) {
   if (on.sms && o.phone && (o.status === 'awaiting' || o.status === 'rejected') && !f.help_sms && !f.help_skip && age > 30e3 && age < 24 * HOUR) out.push('help_sms');
   if (on.sms && o.phone && o.status === 'paid' && !f.congrats_sms && !f.congrats_skip && sincePaid < 24 * HOUR) out.push('congrats_sms');
   if (on.sms && o.toPhone && o.status === 'paid' && !f.to_sms && !f.to_skip && sincePaid < 48 * HOUR) out.push('to_sms');
-  // Automatic certificate emails are off: too many landed in spam. Recipients get an SMS instead (to_sms).
-  if (AUTO_EMAIL && on.email && o.email && o.status === 'paid' && !f.email && !f.email_skip && (((o.autoErr || {}).email || {}).n || 0) < MAIL_MAX_TRIES) out.push('email');
+  // Emails from offscriptet@gmail.com (paced, see mailSlot). An address that failed 3 times is left for a human.
+  const tries = (k) => (((o.autoErr || {})[k] || {}).n || 0) < MAIL_MAX_TRIES;
+  if (AUTO_EMAIL && on.email) {
+    if (o.email && o.status === 'paid' && !f.email && !f.email_skip && tries('email')) out.push('email');
+    if (o.byEmail && o.status === 'paid' && !f.buyer_email && sincePaid < 7 * 24 * HOUR && tries('buyer_email')) out.push('buyer_email');
+    if (o.byEmail && (o.status === 'awaiting' || o.status === 'rejected') && !f.help_email && !f.help_skip && age > 10 * MIN && age < 24 * HOUR && tries('help_email')) out.push('help_email');
+  }
   return out;
 }
 
@@ -113,19 +134,21 @@ function due(o, now = Date.now()) {
 export async function followUp(id, opts = {}) {
   let o = await loadOrder(id);
   if (!o) return null;
-  const todo = due(o).filter((w) => !(w === 'email' && opts.noMail));
+  const todo = due(o).filter((w) => !(MAIL_KINDS.includes(w) && opts.noMail));
   if (!todo.length) return o;
   const m = messages(o), sent = {}, failed = {};
   for (const what of todo) {
     // One send per order per kind, even if two requests race. A failure retries after 30 minutes.
     if (await kv('GET', `auto:${o.id}:${what}`)) continue;
-    if (what === 'email') { const slot = await mailSlot(o.email); if (slot !== 'ok') { if (slot === 'wait') followUp.mailWaiting = true; continue; } }
+    if (MAIL_KINDS.includes(what)) { const slot = await mailSlot(what === 'email' ? o.email : o.byEmail, what); if (slot !== 'ok') { if (slot === 'wait') followUp.mailWaiting = true; continue; } }
     if (!(await kv('SET', `auto:${o.id}:${what}`, '1', 'NX', 'EX', 172800))) continue;
     try {
       if (what === 'help_sms') await sendSMS(o.phone, m.help);
       if (what === 'congrats_sms') await sendSMS(o.phone, m.congrats);
       if (what === 'to_sms') await sendSMS(o.toPhone, m.gift);
       if (what === 'email') await sendEmail(o.email, m.subject, m.body);
+      if (what === 'buyer_email') await sendEmail(o.byEmail, m.buyerSubject, m.buyerBody);
+      if (what === 'help_email') await sendEmail(o.byEmail, m.helpSubject, m.helpBody);
       sent[what] = Date.now();
     } catch (e) {
       console.error('auto', what, o.id, e.message);
@@ -158,7 +181,7 @@ export async function sweep() {
     for (const r of raw) { // newest first, so new customers go before the backlog
       if (!r) continue;
       const o = JSON.parse(r);
-      const d = due(o, now).filter((w) => !(w === 'email' && noMail));
+      const d = due(o, now).filter((w) => !(MAIL_KINDS.includes(w) && noMail));
       if (!d.length) continue;
       followUp.mailWaiting = false;
       await followUp(o.id, { noMail });

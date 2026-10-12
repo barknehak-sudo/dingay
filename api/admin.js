@@ -82,7 +82,8 @@ export default async function handler(req, res) {
       if (digits && !pm) return send(res, 400, { error: 'Phone number doesn’t look right.' });
       const toPhone = ethPhone(c.toPhone);
       if (String(c.toPhone || '').trim() && !toPhone) return send(res, 400, { error: 'Their phone number doesn’t look right.' });
-      const email = clean(c.email, 120);
+      const email = clean(c.email, 120), byEmail = clean(c.byEmail, 120);
+      if (byEmail && !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(byEmail)) return send(res, 400, { error: 'Buyer email doesn’t look right.' });
       if (email && !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email)) return send(res, 400, { error: 'Email doesn’t look right.' });
       let id;
       for (let i = 0; i < 8 && !id; i++) { const cand = 'DG-' + String(100000 + Math.floor(Math.random() * 900000)); if (await kv('SET', 'lock:' + cand, '1', 'NX')) id = cand; }
@@ -90,7 +91,7 @@ export default async function handler(req, res) {
       const now = Date.now();
       const o = { id, key: newKey(), slug: c.slug, name: p.name, kind: p.kind, price: p.price, to, by,
         occasion: OCCASIONS.includes(c.occasion) ? c.occasion : '', message: clean(c.message, 140),
-        phone: pm ? '0' + pm[1] : null, toPhone, email: email || null, lang: c.lang === 'am' ? 'am' : 'en',
+        phone: pm ? '0' + pm[1] : null, toPhone, email: email || null, byEmail: byEmail || null, lang: c.lang === 'am' ? 'am' : 'en',
         status: 'paid', manual: true, txn: clean(c.note, 60) || null, createdAt: now, approvedBy: 'admin (manual)', approvedAt: now };
       await saveOrder(o);
       await kv('LPUSH', 'orders', id);
@@ -116,7 +117,7 @@ export default async function handler(req, res) {
       if (action === 'receipt') {
         if (!rc) return send(res, 400, { error: 'No receipt.' });
       } else if (action === 'mark') {
-        const FOLLOW = ['help_sms', 'congrats_sms', 'to_sms', 'email', 'call', 'help_skip', 'congrats_skip', 'to_skip', 'email_skip'];
+        const FOLLOW = ['help_sms', 'congrats_sms', 'to_sms', 'email', 'buyer_email', 'help_email', 'call', 'help_skip', 'congrats_skip', 'to_skip', 'email_skip'];
         if (!FOLLOW.includes(req.body.what)) return send(res, 400, { error: 'Unknown follow-up.' });
         o.follow = { ...(o.follow || {}), [req.body.what]: req.body.undo ? null : Date.now() };
       } else if (action === 'approve') {
