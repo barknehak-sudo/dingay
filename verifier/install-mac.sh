@@ -1,5 +1,7 @@
 #!/bin/zsh
 # Installs the DINGAY verifier as a background login agent on this Mac.
+# It runs under caffeinate -i, so the Mac doesn't idle-sleep (and drop the internet) while it's checking payments.
+# Closing the lid still sleeps the Mac.
 # Before running: store the admin password in Keychain (you'll be prompted, it isn't echoed):
 #   security add-generic-password -a "$USER" -s dingay-admin -w
 set -euo pipefail
@@ -23,7 +25,7 @@ cat > "$PLIST" <<EOF
 <plist version="1.0">
 <dict>
   <key>Label</key><string>com.dingay.verifier</string>
-  <key>ProgramArguments</key><array><string>$NODE</string><string>$DEST/verify.mjs</string></array>
+  <key>ProgramArguments</key><array><string>/usr/bin/caffeinate</string><string>-i</string><string>$NODE</string><string>$DEST/verify.mjs</string></array>
   <key>WorkingDirectory</key><string>$DEST</string>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
