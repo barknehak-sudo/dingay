@@ -1,18 +1,20 @@
 // JamiDev payments (https://dev.jami.bio/docs): the buyer approves Telebirr / M-Pesa / CBE Birr on their phone,
 // Jami confirms it, and the order is marked paid — no transaction code, no verifier.
 //   JAMI_TOKEN            — API token from Jami → Developer → API Tokens (jamidev_test_… sandbox, jamidev_live_… live)
-//   JAMI_PRODUCT_FRIEND   — the public product id (p_…) of the 89 ETB product in Jami
-//   JAMI_PRODUCT_LOVED    — the public product id (p_…) of the 199 ETB product in Jami
+//   JAMI_PRODUCT_FRIEND   — optional: public product id (p_…) of the 89 ETB product (default: the DINGUY org's)
+//   JAMI_PRODUCT_LOVED    — optional: public product id (p_…) of the 199 ETB product (default: the DINGUY org's)
 //   JAMI_WEBHOOK_SECRET   — secret of the webhook pointing at https://dinguy.xyz/api/jami-webhook
-// Without JAMI_TOKEN and both product ids, the pay page keeps the paste-the-code flow only.
+// Without JAMI_TOKEN the pay page keeps the paste-the-code flow only.
 import crypto from 'node:crypto';
 import { kv, loadOrder, saveOrder, publish } from './_lib.js';
 import { followUp } from './_notify.js';
 
 const BASE = 'https://jami.bio/api/jamidev';
 export const GATEWAYS = ['telebirr', 'mpesa', 'cbe'];
-const productFor = (price) => (price === 89 ? process.env.JAMI_PRODUCT_FRIEND : process.env.JAMI_PRODUCT_LOVED);
-export const jamiOn = () => !!(process.env.JAMI_TOKEN && process.env.JAMI_PRODUCT_FRIEND && process.env.JAMI_PRODUCT_LOVED);
+// Products in the DINGUY organization on JamiDev (public ids, safe to keep in code).
+const PRODUCT = { friend: process.env.JAMI_PRODUCT_FRIEND || 'p_4js0GdCu_nM8', loved: process.env.JAMI_PRODUCT_LOVED || 'p_Ny9Z5_qIBIVc' };
+const productFor = (price) => (price === 89 ? PRODUCT.friend : PRODUCT.loved);
+export const jamiOn = () => !!process.env.JAMI_TOKEN;
 export const jamiSandbox = () => String(process.env.JAMI_TOKEN || '').startsWith('jamidev_test_');
 
 // Start a payment for one of our orders. Returns { mode: 'direct' | 'redirect', checkoutUrl, sessionId }.
