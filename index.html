@@ -504,7 +504,6 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
             <button onClick="{{ jamiRetry }}" style="margin-top:12px;background:none;border:0;padding:8px 0;font-size:15px;font-weight:600;color:#0b1720;text-decoration:underline;cursor:pointer">Didn’t get the request? Send it again</button>
           </sc-if>
           <div role="alert" style="min-height:1.3em;margin-top:8px;font-size:15px;font-weight:600;color:#b3261e">{{ po.error }}</div>
-          <button onClick="{{ payManual }}" style="margin-top:6px;background:none;border:0;padding:8px 0;font-size:15px;font-weight:600;color:#435f73;text-decoration:underline;cursor:pointer">Pay manually with the telebirr code instead</button>
         </section>
       </sc-if>
       <sc-if value="{{ po.showManual }}">
