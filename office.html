@@ -357,7 +357,7 @@ function viewDash(){
   </div>
   <h2 class="sec"><span>Money check</span></h2>
   <div class="card">
-    ${Object.entries(st.byAcct).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${k==='7218'?'0996 567 218 (…7218)':k==='5467'?'Old number (…5467)':'Account …'+esc(k)}</span><strong>${fmtBirr(v)}</strong></div>`).join('')}
+    ${Object.entries(st.byAcct).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${k==='jami'?'JamiDev (Telebirr / M-Pesa / CBE Birr)':k==='7218'?'0996 567 218 (…7218)':k==='5467'?'Old number (…5467)':'Account …'+esc(k)}</span><strong>${fmtBirr(v)}</strong></div>`).join('')}
     ${st.noReceipt.length?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Not checked against a receipt yet</span><strong>${fmtBirr(st.noReceipt.reduce((a,o)=>a+o.price,0))}</strong></div>`:''}
     ${st.missing.length?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Marked paid, but telebirr has no such transaction</span><strong>${st.missing.length} · 0 Birr</strong></div>`:''}
     <div class="row" style="padding:8px 0"><span>Added by hand (not counted)</span><strong>${st.manual.length}</strong></div>

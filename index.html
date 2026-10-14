@@ -482,8 +482,34 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
       </ol>
       <sc-if value="{{ po.note }}"><div role="alert" style="margin-top:16px;padding:14px 16px;background:#fbe9e7;border-left:4px solid #b3261e;font-size:16px;font-weight:600;line-height:1.4">{{ po.note }}</div></sc-if>
 
-      <sc-if value="{{ po.step1 }}">
+      <sc-if value="{{ po.showJami }}">
         <section style="margin-top:22px">
+          <h2 style="margin:0;font-size:clamp(28px,7.6vw,40px);line-height:1.08;letter-spacing:-.03em;font-weight:800">Pay <span style="background:#ffd84d;padding:0 6px;white-space:nowrap">{{ po.price }} Birr</span></h2>
+          <sc-if value="{{ po.jamiIdle }}">
+            <p style="margin:10px 0 0;font-size:17px;line-height:1.4;color:#2c4556">Choose how to pay. We’ll send the request to your phone — just approve it there.</p>
+            <div role="radiogroup" aria-label="Payment method" style="margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+              <sc-for list="{{ po.gateways }}" as="g" hint-placeholder-count="3"><button role="radio" aria-checked="{{ g.on }}" onClick="{{ g.pick }}" style="min-height:58px;border-radius:12px;border:2px solid {{ g.border }};background:{{ g.bg }};color:#0b1720;font-size:15px;font-weight:800;cursor:pointer">{{ g.label }}</button></sc-for>
+            </div>
+            <div style="margin-top:12px;font-size:15px;color:#2c4556">Request goes to <strong style="font-family:'IBM Plex Mono',ui-monospace,monospace">{{ po.jamiPhone }}</strong></div>
+            <button onClick="{{ payJami }}" disabled="{{ po.jamiBusy }}" style="margin-top:16px;width:100%;min-height:64px;padding:0 18px;background:#1f8a55;color:#fff;border:0;border-radius:14px;font-size:17px;font-weight:800;letter-spacing:.04em;cursor:pointer;opacity:{{ po.jamiOpacity }};box-shadow:0 14px 30px -16px rgba(31,138,85,.9)">{{ po.jamiBtn }}</button>
+            <sc-if value="{{ po.jamiExpired }}"><div role="alert" style="margin-top:10px;font-size:15px;font-weight:600;color:#b3261e">The last request expired or wasn’t approved. Tap PAY NOW to send a new one.</div></sc-if>
+          </sc-if>
+          <sc-if value="{{ po.jamiWaiting }}">
+            <div style="margin-top:16px;padding:20px 18px;border-radius:16px;background:#0b1720;color:#e6ecef">
+              <div style="font-size:34px;line-height:1" aria-hidden="true">📱</div>
+              <div style="margin-top:10px;font-size:22px;font-weight:800;letter-spacing:-.02em">Check your phone</div>
+              <p style="margin:8px 0 0;font-size:16px;line-height:1.45;color:#b9c9d4">Approve the <strong style="color:#ffd84d">{{ po.jamiGwLabel }}</strong> request for <strong style="color:#ffd84d">{{ po.price }} Birr</strong>. This page updates by itself once it’s paid.</p>
+              <div style="margin-top:14px;height:4px;border-radius:2px;background:rgba(230,236,239,.15);overflow:hidden"><div style="height:100%;width:40%;background:#ffd84d;animation:dg-slidebg 1.6s linear infinite"></div></div>
+            </div>
+            <button onClick="{{ jamiRetry }}" style="margin-top:12px;background:none;border:0;padding:8px 0;font-size:15px;font-weight:600;color:#0b1720;text-decoration:underline;cursor:pointer">Didn’t get the request? Send it again</button>
+          </sc-if>
+          <div role="alert" style="min-height:1.3em;margin-top:8px;font-size:15px;font-weight:600;color:#b3261e">{{ po.error }}</div>
+          <button onClick="{{ payManual }}" style="margin-top:6px;background:none;border:0;padding:8px 0;font-size:15px;font-weight:600;color:#435f73;text-decoration:underline;cursor:pointer">Pay manually with the telebirr code instead</button>
+        </section>
+      </sc-if>
+      <sc-if value="{{ po.showManual }}">
+        <section style="margin-top:22px">
+          <sc-if value="{{ po.jamiBack }}"><button onClick="{{ payAuto }}" style="margin:0 0 10px;background:none;border:0;padding:6px 0;font-size:15px;font-weight:600;color:#0b1720;text-decoration:underline;cursor:pointer">← Back to Pay now (no code needed)</button></sc-if>
           <h2 style="margin:0;font-size:clamp(28px,7.6vw,40px);line-height:1.08;letter-spacing:-.03em;font-weight:800">Send <span style="background:#ffd84d;padding:0 6px;white-space:nowrap">{{ po.price }} Birr</span> with telebirr</h2>
           <div style="margin-top:16px;background:#0b1720;color:#e6ecef;padding:18px 16px;border-radius:16px">
             <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9fb6c6">To this number</div>
@@ -1147,11 +1173,24 @@ class Component extends DCLogic {
   createOrder=async()=>{const d=this.state.draft;if(this.state.busy)return;this.setState({busy:true,regErr:''});
     try{const j=await this.post('order',{slug:d.slug,to:d.to,by:d.by,occasion:d.occasion,message:d.message,phone:d.phone,toPhone:d.toPhone.trim(),email:(d.email||'').trim(),byEmail:(d.byEmail||'').trim(),lang:LANG});this.rememberOrder(j.id,j.key);try{localStorage.setItem('dingay.phone',d.phone)}catch(e){}this.setState({busy:false});this.go('pay/'+j.id+'/'+j.key);}
     catch(e){this.setState({busy:false,regErr:e.message});}};
+  // JamiDev: push a payment request to the buyer's phone, then poll until Jami confirms it.
+  payJami=async()=>{const p=this.state.pay;if(p.jamiBusy)return;this.setState(s=>({pay:{...s.pay,jamiBusy:true,error:''}}));
+    try{const j=await this.post('pay-jami',{id:p.id,key:p.key,gateway:p.gw||'telebirr'});
+      if(j.order&&j.order.status==='paid'){this.finishPaid(j.order);return;}
+      if(j.mode==='redirect'&&j.checkoutUrl){location.href=j.checkoutUrl;return;}
+      this.setState(s=>({pay:{...s.pay,jamiBusy:false,order:{...s.pay.order,jami:{...((s.pay.order||{}).jami||{}),on:true,state:'open',gateway:p.gw||'telebirr'}}}}),()=>this.startJamiPoll());}
+    catch(e){this.setState(s=>({pay:{...s.pay,jamiBusy:false,error:e.message}}));}};
+  startJamiPoll(){clearInterval(this.poll);const t0=Date.now();
+    this.poll=setInterval(()=>{const p=this.state.pay;if(this.state.route.a!=='pay'||Date.now()-t0>12*60e3){clearInterval(this.poll);return;}
+      this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{
+        if(o.status==='paid'){clearInterval(this.poll);this.finishPaid(o);return;}
+        if(!o.jami||o.jami.state!=='open')clearInterval(this.poll);
+        this.setState(s=>({pay:{...s.pay,order:o}}));},()=>{});},3000);}
   loadPay(){const p=this.state.pay;if(!p.id||!p.key){this.setState({pay:{...p,loading:false,error:'This link is incomplete.'}});return;}
     this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{
       if(this.state.route.a!=='pay')return;if(o.status==='paid'){this.finishPaid(o);return;}
       this.setState(s=>({pay:{...s.pay,loading:false,order:o,error:''}}));
-      clearInterval(this.poll);if(o.status==='review')this.startWait();
+      clearInterval(this.poll);if(o.status==='review')this.startWait();else if(o.jami&&o.jami.state==='open')this.startJamiPoll();
     },e=>this.setState(s=>({pay:{...s.pay,loading:false,error:e.message}})));}
   startWait(){clearInterval(this.poll);clearInterval(this.waitTk);let n=0;
     this.poll=setInterval(()=>{n++;if(this.waitLeft()>0||n%4===0)this.refreshPay();},4000);
@@ -1274,6 +1313,11 @@ class Component extends DCLogic {
     const labels={awaiting:'Awaiting payment',review:'Being confirmed',rejected:'Payment not confirmed',paid:'Paid',removed:'Removed'};
     const ph=o?o.payTo.phone:'';
     return{id:p.id||'—',loading:p.loading,missing:!p.loading&&!o,ready:!p.loading&&!!o,error:p.error,txnInput:p.txn,
+      ...(()=>{const jm=o&&o.jami,on=!!(jm&&jm.on),first=(st==='awaiting'||st==='rejected')&&p.step!==2&&st!=='rejected';
+        const GW=[['telebirr','telebirr'],['mpesa','M-Pesa'],['cbe','CBE Birr']],gw=p.gw||'telebirr',waiting=on&&jm.state==='open'&&!p.jamiBusy;
+        return{jamiBack:on&&!!p.manual,showJami:on&&!p.manual&&st==='awaiting'&&p.step!==2,showManual:first&&(!on||!!p.manual),jamiIdle:!waiting,jamiWaiting:waiting,jamiExpired:on&&jm.state==='expired',
+          jamiBusy:!!p.jamiBusy,jamiOpacity:p.jamiBusy?.5:1,jamiBtn:p.jamiBusy?'SENDING THE REQUEST…':'PAY NOW →',jamiPhone:(jm&&jm.phone)||'',jamiGwLabel:(GW.find(x=>x[0]===(jm&&jm.gateway||gw))||GW[0])[1],
+          gateways:GW.map(([k,label])=>({label,on:gw===k?'true':'false',bg:gw===k?'#ffd84d':'#f3f5f6',border:gw===k?'#0b1720':'rgba(11,23,32,.15)',pick:()=>this.setState(s=>({pay:{...s.pay,gw:k}}))}))};})(),
       statusLabel:p.loading?'Loading':(labels[st]||'Not found'),canPay:st==='awaiting'||st==='rejected',step1:(st==='awaiting'||st==='rejected')&&p.step!==2&&st!=='rejected',step2:(st==='awaiting'&&p.step===2)||st==='rejected',inReview:st==='review',note:o&&o.note||'',
       name:o?o.name:'',to:o?o.to:'',by:o?o.by:'',kind:o?o.kind:'cobble',price:o?o.price:'',txn:o&&o.txn||'',payName:o?o.payTo.name:'',
       phoneFmt:ph.replace(/^(\d{4})(\d{3})(\d{3})$/,'$1 $2 $3'),hasName:!!(o&&o.payTo.name),
@@ -1325,7 +1369,7 @@ class Component extends DCLogic {
     if(!wide&&!st.menu){if(a===''||isCatalog)showBar=true;if(isProduct){showBar=true;barLabel='BUY THIS STONE';barRight=prod.priceLabel;barAction=prod.register;}}
     const rvs=st.rvs;
     return{
-      isDinguy:!isSW,isSW,isHome:a===''&&!isNotFound,isCatalog,isProduct,isRegister,isPay,isLoadingRec,lookupBusy:st.lookupBusy,po:this.payVals(),setTxn:e=>{const v=this.cleanCode(e.target.value);this.setState(s=>({pay:{...s.pay,txn:v,error:''}}));},pasteTxn:this.pasteTxn,sentMoney:()=>this.setPayStep(2),notSentYet:()=>this.setPayStep(1),verifyPay:this.verifyPay,
+      isDinguy:!isSW,isSW,isHome:a===''&&!isNotFound,isCatalog,isProduct,isRegister,isPay,isLoadingRec,lookupBusy:st.lookupBusy,po:this.payVals(),setTxn:e=>{const v=this.cleanCode(e.target.value);this.setState(s=>({pay:{...s.pay,txn:v,error:''}}));},pasteTxn:this.pasteTxn,sentMoney:()=>this.setPayStep(2),payJami:this.payJami,payAuto:()=>this.setState(s=>({pay:{...s.pay,manual:false,error:''}})),payManual:()=>{clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,manual:true,error:''}}));},jamiRetry:()=>{clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,order:{...s.pay.order,jami:{...s.pay.order.jami,state:'retry'}}}}));},notSentYet:()=>this.setPayStep(1),verifyPay:this.verifyPay,
       copyPhone:()=>this.copy((st.pay.order&&st.pay.order.payTo.phone)||'0996567218','Number copied.'),copyOrderLink:()=>this.copy(location.href,'Order link copied.'),isSuccess,isRecord,isRegistryIndex,isNotFound,isFaq:a==='faq',isTerms:a==='terms',isSWHome,isWebsites,isGuerrilla,isContact,
       wide,narrow:!wide,isTouch:typeof window!=='undefined'&&!!window.matchMedia&&matchMedia('(pointer:coarse)').matches,langLabel:LANG==='am'?'English':'አማርኛ',langOther:LANG==='am'?'en':'am',toggleLang:()=>window.dgLang&&window.dgLang.set(LANG==='am'?'en':'am'),swLabel:wide?'MADE BY SIDEWAYS':'SIDEWAYS',progRef:this.progRef,menu:st.menu,sheet:st.sheet,spinRate,heroKind:this.props.heroStone||'cobble',
       bar1:st.menu?'translateY(3.25px) rotate(45deg)':'none',bar2:st.menu?'translateY(-3.25px) rotate(-45deg)':'none',
