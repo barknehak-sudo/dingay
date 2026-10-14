@@ -32,6 +32,7 @@ export async function startJami(o, gateway, site) {
     signal: AbortSignal.timeout(20000),
   });
   const j = await r.json().catch(() => ({}));
+  console.log('jami start', o.id, gateway, r.status, JSON.stringify(j).slice(0, 400));
   if (!r.ok) throw new Error(j.error || 'Jami ' + r.status);
   await kv('SET', 'jami:' + j.sessionId, o.id, 'EX', 3 * 86400);
   return { sessionId: j.sessionId, mode: j.mode || (j.checkoutUrl ? 'redirect' : 'direct'), checkoutUrl: j.checkoutUrl || null, orderId: j.orderId || null };
@@ -67,6 +68,8 @@ export async function checkJami(o) {
   if (!s || o.status === 'paid' || o.status === 'removed') return o;
   try {
     const st = await jamiSession(s);
+    if (st.status !== 'open') console.log('jami session', o.id, s, JSON.stringify(st).slice(0, 600));
+    o.jami = { ...o.jami, last: { status: st.status, at: Date.now(), raw: JSON.stringify(st).slice(0, 300) } };
     if (st.status === 'completed' && st.orderId) return (await markPaidByJami(o.id, { sessionId: s, amount: Number(st.amount), jamiOrderId: st.orderId })) || o;
     if (st.status === 'expired' && o.jami.state !== 'expired') { o.jami = { ...o.jami, state: 'expired' }; await saveOrder(o); }
   } catch (e) { console.error('jami status', o.id, e.message); }
