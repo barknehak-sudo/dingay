@@ -20,7 +20,13 @@ export const links = (o, site = SITE) => ({ payLink: `${site}/#/pay/${o.id}/${o.
 export function messages(o, site = SITE) {
   const am = o.lang === 'am', { payLink, recordLink } = links(o, site);
   const num = PAY_TO.phone, nm = PAY_TO.name ? ` (${PAY_TO.name})` : '';
-  const help = am
+  // With JamiDev on, buyers pay with one tap (PAY NOW → approve on the phone); otherwise the old telebirr-code steps.
+  const jami = !!process.env.JAMI_TOKEN;
+  const help = jami
+    ? (am
+      ? `ሰላም ${o.by}፣ ከDINGUY ነው 👋 ለ${o.to} ያዘዙት ${o.name} ክፍያ እየጠበቀ ነው።\nይህን ሊንክ ይክፈቱ፣ “አሁን ይክፈሉ”ን ይንኩና በስልክዎ ላይ የሚመጣውን ጥያቄ ያጽድቁ (ቴሌብር፣ M-Pesa ወይም CBE Birr)፦\n${payLink}\nጥያቄ ካለዎት፦ ${num}`
+      : `Hi ${o.by}, this is DINGUY 👋 Your ${o.name} for ${o.to} is waiting for payment.\nOpen this link, tap PAY NOW and approve the request on your phone (telebirr, M-Pesa or CBE Birr):\n${payLink}\nQuestions? Call ${num}`)
+    : am
     ? `ሰላም ${o.by}፣ ከDINGUY ነው 👋 ለ${o.to} ያዘዙት ${o.name} ክፍያ እየጠበቀ ነው።\n1) ቴሌብርን ይክፈቱ → Send Money\n2) ${o.price} ብር ወደ ${num}${nm} ይላኩ\n3) ከደረሰኙ ላይ የግብይት ቁጥሩን (Transaction Number) ይቅዱ\n4) እዚህ ያስገቡት፦ ${payLink}\nጥያቄ ካለዎት፦ ${num}`
     : `Hi ${o.by}, this is DINGUY 👋 Your ${o.name} for ${o.to} is waiting for payment.\n1) Open telebirr → Send Money\n2) Send ${o.price} Birr to ${num}${nm}\n3) Copy the Transaction Number from the receipt\n4) Paste it here: ${payLink}\nQuestions? Call ${num}`;
   const congrats = am
@@ -44,7 +50,11 @@ export function messages(o, site = SITE) {
     : `Hi ${o.by},\n\nYour payment is in — thank you! 🎉\n\n${o.to} is now officially registered with ${o.name}.\nRegistration No. ${o.id}\nPrice: ${o.price} Birr${o.txn ? `\ntelebirr transaction: ${o.txn}` : ''}\n\nThe private record and certificate (with your message):\n${recordLink}\n\nSend this link to ${o.to} — they can save the certificate and share it to their Instagram story.${foot}`;
   // to the buyer, if they haven't paid yet
   const helpSubject = am ? `ለ${o.to} ያዘዙት ${o.name} ክፍያ እየጠበቀ ነው` : `Your ${o.name} for ${o.to} is waiting for payment`;
-  const helpBody = am
+  const helpBody = jami
+    ? (am
+      ? `ሰላም ${o.by}፣\n\nለ${o.to} ያዘዙት ${o.name} (ቁ. ${o.id}) ክፍያ እየጠበቀ ነው።\n\nይህን ሊንክ ይክፈቱ፣ “አሁን ይክፈሉ”ን ይንኩና በስልክዎ ላይ የሚመጣውን ጥያቄ ያጽድቁ — ቴሌብር፣ M-Pesa ወይም CBE Birr፦\n${payLink}${foot}`
+      : `Hi ${o.by},\n\nYour ${o.name} for ${o.to} (No. ${o.id}) is waiting for payment.\n\nOpen this link, tap PAY NOW and approve the request on your phone — telebirr, M-Pesa or CBE Birr:\n${payLink}${foot}`)
+    : am
     ? `ሰላም ${o.by}፣\n\nለ${o.to} ያዘዙት ${o.name} (ቁ. ${o.id}) ክፍያ እየጠበቀ ነው።\n\n1) ቴሌብርን ይክፈቱ → Send Money\n2) ${o.price} ብር ወደ ${num}${nm} ይላኩ\n3) ከ127 የመጣውን SMS ሊንክ ቀድተው እዚህ ይለጥፉ፦\n${payLink}${foot}`
     : `Hi ${o.by},\n\nYour ${o.name} for ${o.to} (No. ${o.id}) is waiting for payment.\n\n1) Open telebirr → Send Money\n2) Send ${o.price} Birr to ${num}${nm}\n3) Copy the link from the telebirr SMS (from 127) and paste it here:\n${payLink}${foot}`;
   return { help, congrats, gift, subject, body, buyerSubject, buyerBody, helpSubject, helpBody };
