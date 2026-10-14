@@ -492,7 +492,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
             </div>
             <div style="margin-top:12px;font-size:15px;color:#2c4556">Request goes to <strong style="font-family:'IBM Plex Mono',ui-monospace,monospace">{{ po.jamiPhone }}</strong></div>
             <button onClick="{{ payJami }}" disabled="{{ po.jamiBusy }}" style="margin-top:16px;width:100%;min-height:64px;padding:0 18px;background:#1f8a55;color:#fff;border:0;border-radius:14px;font-size:17px;font-weight:800;letter-spacing:.04em;cursor:pointer;opacity:{{ po.jamiOpacity }};box-shadow:0 14px 30px -16px rgba(31,138,85,.9)">{{ po.jamiBtn }}</button>
-            <sc-if value="{{ po.jamiExpired }}"><div role="alert" style="margin-top:10px;font-size:15px;font-weight:600;color:#b3261e">The last request expired or wasn’t approved. Tap PAY NOW to send a new one.</div></sc-if>
+            <sc-if value="{{ po.jamiFailed }}"><div role="alert" style="margin-top:12px;padding:12px 14px;border-radius:12px;background:#fbe9e7;font-size:15px;font-weight:600;line-height:1.4;color:#7a1d16">Online payment didn’t go through. You can tap PAY NOW to try again — or pay by sending the money yourself, just below.</div></sc-if>
           </sc-if>
           <sc-if value="{{ po.jamiWaiting }}">
             <div style="margin-top:16px;padding:20px 18px;border-radius:16px;background:#0b1720;color:#e6ecef">
@@ -1178,7 +1178,7 @@ class Component extends DCLogic {
       if(j.order&&j.order.status==='paid'){this.finishPaid(j.order);return;}
       if(j.mode==='redirect'&&j.checkoutUrl){location.href=j.checkoutUrl;return;}
       this.setState(s=>({pay:{...s.pay,jamiBusy:false,order:{...s.pay.order,jami:{...((s.pay.order||{}).jami||{}),on:true,state:'open',gateway:p.gw||'telebirr'}}}}),()=>this.startJamiPoll());}
-    catch(e){this.setState(s=>({pay:{...s.pay,jamiBusy:false,error:e.message}}));}};
+    catch(e){this.setState(s=>({pay:{...s.pay,jamiBusy:false,jamiFailed:true,error:''}}));}};
   startJamiPoll(){clearInterval(this.poll);const t0=Date.now();
     this.poll=setInterval(()=>{const p=this.state.pay;if(this.state.route.a!=='pay'||Date.now()-t0>12*60e3){clearInterval(this.poll);return;}
       this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{
@@ -1314,7 +1314,8 @@ class Component extends DCLogic {
     return{id:p.id||'—',loading:p.loading,missing:!p.loading&&!o,ready:!p.loading&&!!o,error:p.error,txnInput:p.txn,
       ...(()=>{const jm=o&&o.jami,on=!!(jm&&jm.on),first=(st==='awaiting'||st==='rejected')&&p.step!==2&&st!=='rejected';
         const GW=[['telebirr','telebirr'],['mpesa','M-Pesa'],['cbe','CBE Birr']],gw=p.gw||'telebirr',waiting=on&&jm.state==='open'&&!p.jamiBusy;
-        return{jamiBack:on&&!!p.manual,showJami:on&&!p.manual&&st==='awaiting'&&p.step!==2,showManual:first&&(!on||!!p.manual),jamiIdle:!waiting,jamiWaiting:waiting,jamiExpired:on&&jm.state==='expired',
+        const jamiFailed=on&&(jm.state==='expired'||!!p.jamiFailed);
+        return{jamiFailed,jamiBack:on&&!!p.manual,showJami:on&&!p.manual&&st==='awaiting'&&p.step!==2,showManual:first&&(!on||!!p.manual||jamiFailed),jamiIdle:!waiting,jamiWaiting:waiting,jamiExpired:on&&jm.state==='expired',
           jamiBusy:!!p.jamiBusy,jamiOpacity:p.jamiBusy?.5:1,jamiBtn:p.jamiBusy?'SENDING THE REQUEST…':'PAY NOW →',jamiPhone:(jm&&jm.phone)||'',jamiGwLabel:(GW.find(x=>x[0]===(jm&&jm.gateway||gw))||GW[0])[1],
           gateways:GW.map(([k,label])=>({label,on:gw===k?'true':'false',bg:gw===k?'#ffd84d':'#f3f5f6',border:gw===k?'#0b1720':'rgba(11,23,32,.15)',pick:()=>this.setState(s=>({pay:{...s.pay,gw:k}}))}))};})(),
       statusLabel:p.loading?'Loading':(labels[st]||'Not found'),canPay:st==='awaiting'||st==='rejected',step1:(st==='awaiting'||st==='rejected')&&p.step!==2&&st!=='rejected',step2:(st==='awaiting'&&p.step===2)||st==='rejected',inReview:st==='review',note:o&&o.note||'',

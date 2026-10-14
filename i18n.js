@@ -170,7 +170,7 @@
     "✓ I’VE SENT THE MONEY": "✓ ገንዘቡን ልኬያለሁ", "Tap this only after telebirr says the payment is done.": "ይህን የሚጫኑት ቴሌብር ክፍያው መጠናቀቁን ካሳየ በኋላ ብቻ ነው።",
     "Copy the code from telebirr": "ኮዱን ከቴሌብር ይቅዱ", "Find": "በቴሌብር ደረሰኙ ላይ", "on the telebirr receipt.": "የሚለውን ይፈልጉ።",
     "Paste the code here": "ኮዱን እዚህ ይለጥፉ", "Paste the telebirr SMS": "የቴሌብር መልዕክቱን ይለጥፉ", "Pay": "ይክፈሉ", "Choose how to pay. We’ll send the request to your phone — just approve it there.": "የመክፈያ መንገድ ይምረጡ። ጥያቄውን ወደ ስልክዎ እንልካለን — እዚያ ያጽድቁት።",
-    "Request goes to": "ጥያቄው የሚላከው ወደ", "PAY NOW →": "አሁን ይክፈሉ →", "SENDING THE REQUEST…": "ጥያቄውን በመላክ ላይ…", "Check your phone": "ስልክዎን ይመልከቱ",
+    "Request goes to": "ጥያቄው የሚላከው ወደ", "PAY NOW →": "አሁን ይክፈሉ →", "Online payment didn’t go through. You can tap PAY NOW to try again — or pay by sending the money yourself, just below.": "የመስመር ላይ ክፍያው አልተሳካም። “አሁን ይክፈሉ”ን በመንካት እንደገና መሞከር ይችላሉ — ወይም ከታች እንዳለው ገንዘቡን ራስዎ በመላክ ይክፈሉ።", "SENDING THE REQUEST…": "ጥያቄውን በመላክ ላይ…", "Check your phone": "ስልክዎን ይመልከቱ",
     "Approve the": "የ", "request for": "ጥያቄን ለ", "This page updates by itself once it’s paid.": "ሲከፈል ይህ ገጽ በራሱ ይዘመናል።",
     "Didn’t get the request? Send it again": "ጥያቄው አልደረሰዎትም? እንደገና ይላኩ", "Pay manually with the telebirr code instead": "በምትኩ በቴሌብር ኮድ በእጅ ይክፈሉ", "← Back to Pay now (no code needed)": "← ወደ “አሁን ይክፈሉ” ይመለሱ (ኮድ አያስፈልግም)",
     "The last request expired or wasn’t approved. Tap PAY NOW to send a new one.": "ያለፈው ጥያቄ ጊዜው አልፏል ወይም አልጸደቀም። አዲስ ለመላክ “አሁን ይክፈሉ”ን ይንኩ።", "Open the SMS from": "ከ", "link at the end": "መጨረሻ ላይ ያለውን ሊንክ",
