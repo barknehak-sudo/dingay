@@ -4,145 +4,224 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#0b1720">
+<meta name="theme-color" content="#f4f4f1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>DINGUY Office</title>
 <style>
 :root{
   color-scheme:light;
-  --bg:#eef1f3;--card:#ffffff;--card-2:#f6f8f9;--ink:#0b1720;--ink-2:#3d5566;--mut:#6f8797;--line:rgba(11,23,32,.12);
-  --brand:#0b1720;--on-brand:#eef2f4;--accent:#ffd84d;
-  --series-1:#2a78d6;--series-2:#eb6834;--track:rgba(11,23,32,.07);
-  --ok:#1f8a55;--ok-bg:#e3f3ea;--warn:#a96a00;--warn-bg:#fdf1d8;--bad:#b3261e;--bad-bg:#fbe7e5;--info-bg:#e7eef8;
+  --bg:#e8e8e5;--panel:#f4f4f1;--card:#ffffff;--card-2:#f4f4f1;--ink:#141414;--ink-2:#4f4f4b;--mut:#8b8b86;--line:rgba(20,20,20,.08);
+  --brand:#141414;--on-brand:#ffffff;--accent:#f05a28;--accent-2:#ff8f5e;--accent-bg:#fde9e1;
+  --tele:#1c1c1a;--jami:#f05a28;--jami-2:#ff8a5c;
+  --series-1:#1c1c1a;--series-2:#f05a28;--track:rgba(20,20,20,.06);
+  --ok:#1e8a50;--ok-bg:#e3f4ea;--warn:#a96a00;--warn-bg:#fdf1d8;--bad:#c4321f;--bad-bg:#fde6e2;--info-bg:#e9eef7;
+  --shadow:0 1px 2px rgba(20,20,20,.04),0 8px 24px -16px rgba(20,20,20,.18);
 }
 @media (prefers-color-scheme: dark){
   :root:where(:not([data-theme="light"])){
     color-scheme:dark;
-    --bg:#0c1216;--card:#151d23;--card-2:#1b252c;--ink:#eef2f4;--ink-2:#b9c9d4;--mut:#8aa0ae;--line:rgba(238,242,244,.12);
-    --brand:#eef2f4;--on-brand:#0b1720;
-    --series-1:#3987e5;--series-2:#d95926;--track:rgba(238,242,244,.08);
-    --ok:#3fb27a;--ok-bg:rgba(63,178,122,.14);--warn:#e0a63a;--warn-bg:rgba(224,166,58,.14);--bad:#ef6b62;--bad-bg:rgba(239,107,98,.14);--info-bg:rgba(57,135,229,.14);
+    --bg:#0b0b0b;--panel:#121212;--card:#1b1b1a;--card-2:#232322;--ink:#f3f3f0;--ink-2:#c2c2bc;--mut:#8d8d88;--line:rgba(255,255,255,.08);
+    --brand:#f3f3f0;--on-brand:#141414;--accent:#ff6a33;--accent-2:#ff9a6b;--accent-bg:rgba(255,106,51,.14);
+    --tele:#e6e6e2;--jami:#ff6a33;--jami-2:#ff9a6b;
+    --series-1:#e6e6e2;--series-2:#ff6a33;--track:rgba(255,255,255,.07);
+    --ok:#46b77d;--ok-bg:rgba(70,183,125,.14);--warn:#e0a63a;--warn-bg:rgba(224,166,58,.14);--bad:#ef6b5a;--bad-bg:rgba(239,107,90,.14);--info-bg:rgba(120,150,230,.14);
+    --shadow:none;
   }
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,'Noto Sans Ethiopic',sans-serif;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;font-feature-settings:"cv11","ss01"}
 button,input,select,textarea{font:inherit;color:inherit;touch-action:manipulation}
 a{color:inherit}
 .mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
-.wrap{max-width:980px;margin:0 auto;padding:0 14px max(96px,calc(env(safe-area-inset-bottom) + 84px))}
-header.top{position:sticky;top:0;z-index:20;background:var(--bg);padding:max(12px,env(safe-area-inset-top)) 0 10px;border-bottom:1px solid var(--line)}
-.brandrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.brandrow h1{margin:0;font-size:22px;letter-spacing:-.03em}
-.iconbtn{min-height:44px;min-width:44px;padding:0 12px;border:1px solid var(--line);background:var(--card);border-radius:12px;cursor:pointer;font-size:13px;font-weight:600}
-nav.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px}
-nav.tabs button{min-height:44px;border:0;background:transparent;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:6px}
+.wrap{max-width:1280px;margin:0 auto;padding:max(10px,env(safe-area-inset-top)) 10px max(40px,env(safe-area-inset-bottom))}
+#app{background:var(--panel);border-radius:28px;padding:14px 14px 28px;min-height:calc(100vh - 20px)}
+@media (min-width:760px){.wrap{padding:24px 24px 48px}#app{padding:18px 22px 36px}}
+/* header */
+header.top{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:6px 0 12px;background:var(--panel)}
+.brand{display:inline-flex;align-items:center;gap:10px;background:var(--card);border-radius:999px;padding:6px 16px 6px 6px;box-shadow:var(--shadow);justify-self:start}
+.brand .logo{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px}
+.brand b{font-size:15px;letter-spacing:-.01em}.brand small{color:var(--mut);font-size:13px}
+.tools{display:flex;gap:8px;align-items:center;grid-row:1;grid-column:2;justify-self:end}
+@media (max-width:420px){.rl,.upd{display:none}header.top nav.tabs button{flex:1 1 auto;padding:0 8px;font-size:13px}.wl{gap:6px}.w{padding:9px}.w .wv{font-size:14px}.w .wv small{display:none}}
+.upd{font-size:12px;color:var(--mut);white-space:nowrap}
+.iconbtn{min-height:44px;min-width:44px;padding:0 14px;border:0;background:var(--card);border-radius:999px;cursor:pointer;font-size:13px;font-weight:600;box-shadow:var(--shadow);display:inline-flex;align-items:center;gap:6px}
+nav.tabs{grid-column:1/-1;display:flex;gap:2px;background:var(--card);border-radius:999px;padding:5px;box-shadow:var(--shadow);overflow-x:auto;scrollbar-width:none}
+nav.tabs button{flex:1 0 auto;min-height:40px;padding:0 16px;border:0;background:transparent;border-radius:999px;font-size:14px;font-weight:500;cursor:pointer;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+nav.tabs button:hover{color:var(--ink)}
 nav.tabs button[aria-current=page]{background:var(--brand);color:var(--on-brand)}
-.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;display:inline-grid;place-items:center}
-nav.tabs button[aria-current=page] .badge{background:var(--accent);color:#0b1720}
-h2.sec{margin:22px 0 10px;font-size:13px;font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:500;display:flex;justify-content:space-between;align-items:baseline}
-h2.sec a,h2.sec button{font-family:inherit;font-size:12px;text-transform:none;letter-spacing:0;background:none;border:0;color:var(--ink);text-decoration:underline;cursor:pointer;padding:8px 0}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
-.grid{display:grid;gap:10px}
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-@media (min-width:760px){.kpis{grid-template-columns:repeat(4,1fr)}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
-.kpi .v{margin-top:6px;font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1}
-.kpi .s{margin-top:6px;font-size:12px;color:var(--ink-2)}
+@media (min-width:900px){header.top{grid-template-columns:1fr auto 1fr}nav.tabs{grid-column:2;grid-row:1}.tools{grid-column:3}nav.tabs button{flex:none}}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:inline-grid;place-items:center}
+nav.tabs button[aria-current=page] .badge{background:var(--accent);color:#fff}
+.hello{margin:14px 2px 18px}.hello h1{margin:0;font-size:clamp(26px,4vw,38px);font-weight:600;letter-spacing:-.03em;line-height:1.1}
+.hello p{margin:6px 0 0;color:var(--ink-2);font-size:14px}
+h2.sec{margin:26px 2px 12px;font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:10px}
+h2.sec a,h2.sec button{font-size:13px;font-weight:500;background:var(--card);border:0;border-radius:999px;color:var(--ink);cursor:pointer;padding:8px 14px;text-decoration:none;box-shadow:var(--shadow)}
+.card{background:var(--card);border-radius:22px;padding:18px;box-shadow:var(--shadow);min-width:0}
+.grid{display:grid;gap:12px}
+@media (min-width:760px){.grid{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}}
+/* dashboard grid */
+.dgrid{display:grid;gap:14px;grid-template-columns:1fr}
+@media (min-width:760px){.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.s12,.s8{grid-column:1/-1}}
+@media (min-width:1120px){.dgrid{grid-template-columns:repeat(12,minmax(0,1fr))}.s4{grid-column:span 4}.s6{grid-column:span 6}.s8{grid-column:span 8}.s12{grid-column:1/-1}}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.ch h3{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}.ch p{margin:3px 0 0;font-size:13px;color:var(--mut)}
+.link{font-size:13px;font-weight:500;background:var(--card-2);border:0;border-radius:999px;color:var(--ink);cursor:pointer;padding:8px 14px;white-space:nowrap;text-decoration:none}
+.big{font-size:clamp(30px,3.4vw,38px);font-weight:600;letter-spacing:-.035em;line-height:1.05;font-variant-numeric:tabular-nums}
+.big small{font-size:.45em;font-weight:500;color:var(--mut);letter-spacing:0;margin-left:4px}
+.delta{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:var(--ok-bg);color:var(--ok)}
+.delta.dn{background:var(--bad-bg);color:var(--bad)}.delta.flat{background:var(--card-2);color:var(--mut)}
+.sub{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;color:var(--mut);flex-wrap:wrap}
+.pillbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.pillbtns .btn{min-height:50px;border-radius:999px;font-size:14px}
+.wallets{background:var(--card-2);border-radius:18px;padding:12px}
+.wallets .wh{font-size:13px;color:var(--ink-2);margin:2px 4px 10px}.wallets .wh span{color:var(--mut)}
+.wl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.w{background:var(--card);border-radius:14px;padding:10px;min-width:0}
+.w .wn{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600}.w .dot{width:10px;height:10px;border-radius:50%;flex:none}
+.w .wv{margin-top:8px;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.w .ws{font-size:10.5px;color:var(--mut);margin-top:2px;line-height:1.3}
+.w .st{font-size:11px;margin-top:4px;color:var(--ok)}.w .st.bad{color:var(--bad)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--card-2);border-radius:18px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;min-height:128px;min-width:0}
+.tile .tl{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--ink-2);gap:6px}
+.tile .ti{width:30px;height:30px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:14px;flex:none}
+.tile .tv{font-size:clamp(22px,2.4vw,28px);font-weight:600;letter-spacing:-.03em;margin-top:10px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tile .sub{margin-top:6px}
+.tile.hot{background:linear-gradient(160deg,var(--accent-2),var(--accent) 60%);color:#fff;box-shadow:0 18px 30px -18px var(--accent)}
+.tile.hot .tl{color:rgba(255,255,255,.9)}.tile.hot .ti{background:rgba(255,255,255,.22)}.tile.hot .sub{color:rgba(255,255,255,.85)}
+.tile.hot .delta{background:rgba(255,255,255,.22);color:#fff}
+/* stacked money chart */
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend b{width:10px;height:10px;border-radius:3px;display:inline-block}
+.hatch{background:repeating-linear-gradient(135deg,var(--jami) 0 4px,var(--jami-2) 4px 7px)}
+.plot{background:var(--card-2);border-radius:18px;padding:14px 12px 10px}
+.plot-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;font-size:13px;font-weight:600}
+.cols{position:relative;height:190px;margin:10px 0 0 34px;display:flex;align-items:flex-end;gap:5px}
+.cols .gl{position:absolute;left:0;right:0;border-top:1px dashed var(--line);pointer-events:none}
+.cols .gl span{position:absolute;left:-34px;top:-8px;font-size:10.5px;color:var(--mut);width:30px;text-align:right}
+.col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;cursor:pointer;position:relative;gap:2px;min-width:0}
+.col i{display:block;width:100%;border-radius:6px;min-height:0}
+.col i.t{background:var(--tele)}.col i.j{background:repeating-linear-gradient(135deg,var(--jami) 0 4px,var(--jami-2) 4px 7px)}
+.col.zero::before{content:"";display:block;height:3px;background:var(--track);border-radius:2px}
+.col:hover i,.col.sel i{filter:brightness(1.12)}
+.col.sel::after{content:"";position:absolute;inset:-4px -2px;background:var(--track);border-radius:8px;z-index:-1}
+.xlab{display:flex;gap:5px;margin:6px 0 0 34px;font-size:10.5px;color:var(--mut)}.xlab span{flex:1;text-align:center;min-width:0;overflow:hidden}
+.readout{font-size:13px;color:var(--ink-2);min-height:1.3em}
+/* tables */
+.tw{overflow-x:auto;margin:0 -4px;border:1px solid var(--line);border-radius:16px}
+table.act{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+table.act th{background:var(--card-2);font-weight:500;color:var(--mut);font-size:12.5px;text-align:left;padding:12px 14px}
+table.act td{padding:13px 14px;border-top:1px solid var(--line);white-space:nowrap}
+table.act tr[data-open]{cursor:pointer}table.act tr[data-open]:hover td{background:var(--card-2)}
+table.act td.num{font-variant-numeric:tabular-nums;font-weight:600}
+.stn{display:inline-flex;align-items:center;gap:10px}.stn i{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-style:normal;font-size:13px;background:var(--card-2)}
+.sdot{display:inline-flex;align-items:center;gap:7px}.sdot::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.c-paid{color:var(--ok)}.c-review{color:var(--warn)}.c-awaiting{color:var(--mut)}.c-rejected{color:var(--bad)}.c-removed{color:var(--mut)}
+.via{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--card-2);color:var(--ink-2)}.via.j{background:var(--accent-bg);color:var(--accent)}
+/* progress (Jami success) */
+.prog{height:16px;border-radius:999px;background:repeating-linear-gradient(135deg,var(--track) 0 4px,transparent 4px 8px),var(--card-2);overflow:hidden;margin-top:12px}
+.prog i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.progl{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--mut)}.progl b{color:var(--ink);font-weight:600}
+/* best times */
+.ins{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:640px){.ins{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.in{background:var(--card-2);border-radius:16px;padding:12px 14px;min-width:0}
+.in .il{font-size:12px;color:var(--mut)}.in .iv{margin-top:6px;font-size:18px;font-weight:600;letter-spacing:-.02em}.in .is{font-size:12px;color:var(--ink-2);margin-top:2px}
+.in.up .iv{color:var(--accent)}
+.heat{display:grid;grid-template-columns:34px repeat(24,minmax(0,1fr));gap:3px;margin-top:16px;font-size:10.5px;color:var(--mut);align-items:center}
+.heat i{aspect-ratio:1;border-radius:4px;background:var(--track);display:block;min-height:8px}
+.heat .hx{text-align:left;grid-column:span 6}
+.wbars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:110px;margin-top:6px}
+.wbars div{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;font-size:11px;color:var(--mut)}
+.wbars i{display:block;width:100%;max-width:38px;border-radius:8px;background:var(--tele);min-height:3px}.wbars .top i{background:var(--accent)}
 /* tasks */
 .task{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
 .task .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:18px}
 .t-review .ic{background:var(--warn-bg)}.t-help .ic{background:var(--info-bg)}.t-congrats .ic{background:var(--ok-bg)}.t-email .ic{background:var(--info-bg)}.t-to .ic{background:var(--ok-bg)}.t-inq .ic{background:var(--bad-bg)}
-.task .tt{font-size:15px;font-weight:700;line-height:1.25}
+.task .tt{font-size:15px;font-weight:600;line-height:1.25}
 .task .ts{margin-top:2px;font-size:13px;color:var(--ink-2);line-height:1.35}
+.nextl .card{box-shadow:none;background:none;border-radius:0;padding:12px 0}.nextl .task{padding:12px 0;border-top:1px solid var(--line)}.nextl .task:first-child{border-top:0;padding-top:0}
 .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 14px;border:0;border-radius:12px;background:var(--brand);color:var(--on-brand);font-size:13px;font-weight:700;letter-spacing:.02em;cursor:pointer;text-decoration:none}
-.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border:0;border-radius:999px;background:var(--brand);color:var(--on-brand);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none}
+.btn.ghost{background:var(--card-2);color:var(--ink);border:0}
 .btn.ok{background:var(--ok);color:#fff}.btn.bad{background:var(--bad);color:#fff}
+.btn.accent{background:var(--accent);color:#fff}
 .btn[disabled]{opacity:.5}
 .empty{padding:22px 14px;text-align:center;color:var(--ink-2);font-size:14px}
 /* orders */
 .filters{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.filters button{flex:none;min-height:40px;padding:0 12px;border:1px solid var(--line);background:var(--card);border-radius:999px;cursor:pointer;font-size:13px;font-weight:600}
-.filters button[aria-pressed=true]{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
-input.search{width:100%;min-height:46px;padding:0 14px;border:1px solid var(--line);background:var(--card);border-radius:12px;font-size:16px;margin-bottom:8px}
+.filters button{flex:none;min-height:40px;padding:0 14px;border:0;background:var(--card);border-radius:999px;cursor:pointer;font-size:13px;font-weight:500;box-shadow:var(--shadow)}
+.filters button[aria-pressed=true]{background:var(--brand);color:var(--on-brand)}
+input.search{width:100%;min-height:48px;padding:0 18px;border:0;background:var(--card);border-radius:999px;font-size:16px;margin-bottom:10px;box-shadow:var(--shadow)}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.oid{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:15px;font-weight:600}
-.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.04em}
+.oid{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:14px;font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.04em}
 .s-paid{background:var(--ok-bg);color:var(--ok)}.s-review{background:var(--warn-bg);color:var(--warn)}.s-rejected{background:var(--bad-bg);color:var(--bad)}.s-awaiting{background:var(--card-2);color:var(--ink-2)}.s-removed{background:var(--card-2);color:var(--mut)}
-dl.kv{display:grid;grid-template-columns:110px 1fr;gap:4px 10px;margin:10px 0 0;font-size:14px}
+dl.kv{display:grid;grid-template-columns:110px 1fr;gap:5px 10px;margin:12px 0 0;font-size:14px}
 dl.kv dt{color:var(--mut)}dl.kv dd{margin:0;overflow-wrap:anywhere}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{font-size:12px;padding:4px 8px;border-radius:8px;background:var(--card-2);color:var(--ink-2)}
+.chip{font-size:12px;padding:5px 10px;border-radius:999px;background:var(--card-2);color:var(--ink-2)}
 .chip.done{background:var(--ok-bg);color:var(--ok)}
 .chip.bad{background:var(--bad-bg);color:var(--bad)}
-.btn.tg{background:#229ED9;color:#fff;border-color:#229ED9;display:inline-flex;align-items:center;gap:6px}
-.warnbar{margin:12px 0 0;padding:12px 14px;border-radius:12px;background:var(--warn-bg);color:var(--ink);border:1px solid var(--warn);font-size:14px;line-height:1.45;display:flex;gap:8px;align-items:flex-start}
+.btn.tg{background:#229ED9;color:#fff;display:inline-flex;align-items:center;gap:6px}
+.warnbar{margin:4px 0 8px;padding:12px 16px;border-radius:18px;background:var(--warn-bg);color:var(--ink);font-size:14px;line-height:1.45;display:flex;gap:8px;align-items:flex-start}
 .warnbar b{color:var(--warn)}
 .newhits .nh-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
-.newhits .v{font-size:44px;font-weight:800;letter-spacing:-.03em;line-height:1}.newhits .s{font-size:13px;color:var(--mut);margin-top:4px}
-.newhits .nh-side{font-size:14px;color:var(--ink-2);text-align:right;line-height:1.6}
-.newhits .nh-bars{margin-top:14px;height:56px;display:flex;align-items:flex-end;gap:4px}
-.newhits .nh-bars i{flex:1;background:linear-gradient(180deg,#c86bff,#5f8bff);border-radius:4px 4px 0 0;min-height:3px}
-.newhits.jami .nh-bars i{background:#1f8a55}.newhits.jami .hbar .tr i{background:#1f8a55}
-button.chip{border:1px solid var(--line);cursor:pointer;font:inherit;font-size:13px;padding:6px 12px;min-height:34px}
-button.chip.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
-.lbs{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))}
-.lb{display:flex;flex-direction:column;gap:10px}
-.lb-h{display:flex;gap:10px;align-items:center}.lb-h .ic{font-size:26px;line-height:1}
-.lb-h .tt{font-weight:700}.lb-h .ts{font-size:13px;color:var(--mut)}
+.newhits .nh-side{font-size:13px;color:var(--ink-2);text-align:right;line-height:1.6}
+.nh-bars{margin-top:14px;height:64px;display:flex;align-items:flex-end;gap:4px}
+.nh-bars i{flex:1;background:var(--tele);border-radius:5px;min-height:3px}
+button.chip{border:0;cursor:pointer;font:inherit;font-size:13px;padding:7px 14px;min-height:36px;background:var(--card-2)}
+button.chip.on{background:var(--brand);color:var(--on-brand)}
+.lbs{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr))}
+.lb{display:flex;flex-direction:column;gap:10px;background:var(--card-2);border-radius:18px;padding:14px}
+.lb-h{display:flex;gap:10px;align-items:center}.lb-h .ic{font-size:24px;line-height:1}
+.lb-h .tt{font-weight:600}.lb-h .ts{font-size:12.5px;color:var(--mut)}
 .lb-l{list-style:none;margin:0;padding:0;display:grid;gap:4px;flex:1}
 .lb-l li{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line)}
 .lb-l li:last-child{border-bottom:0}
 .lb-l .pos{font-family:'IBM Plex Mono',ui-monospace,monospace;color:var(--mut);font-size:13px}
 .lb-l .nm{overflow-wrap:anywhere}.lb-l small{display:block;font-size:12px;color:var(--mut)}
-.lb-l .ct{font-weight:700;text-align:right}.lb-l .ct small{display:inline;font-weight:400}
-.lb-l li.win .nm{font-weight:700;font-size:18px}.lb-l li.win .ct{font-size:18px}
-.reason{margin-top:10px;padding:8px 10px;background:var(--warn-bg);border-radius:10px;font-size:14px}
-/* charts */
-.chart-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-.chart-h .t{font-size:15px;font-weight:700}
-.readout{font-size:13px;color:var(--ink-2);min-height:1.3em}
-.cols{position:relative;height:150px;margin-top:12px;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid var(--line)}
-.cols .gl{position:absolute;left:0;right:0;border-top:1px dashed var(--line);pointer-events:none}
-.cols .gl span{position:absolute;right:0;top:-16px;font-size:11px;color:var(--mut)}
-.col{flex:1;height:100%;display:flex;align-items:flex-end;cursor:pointer;position:relative}
-.col i{display:block;width:100%;background:var(--series-1);border-radius:4px 4px 0 0;min-height:0}
-.col.zero i{height:2px!important;background:var(--track);border-radius:2px}
-.col:hover i,.col.sel i{filter:brightness(1.12)}
-.col.sel::after{content:"";position:absolute;inset:0;background:var(--track);border-radius:4px 4px 0 0;z-index:-1}
-.xlab{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--mut)}
-.hbar{display:grid;grid-template-columns:minmax(96px,38%) 1fr auto;gap:10px;align-items:center;margin-top:10px;font-size:13px}
+.lb-l .ct{font-weight:600;text-align:right}.lb-l .ct small{display:inline;font-weight:400}
+.lb-l li.win .nm{font-weight:600;font-size:17px}.lb-l li.win .ct{font-size:17px;color:var(--accent)}
+.lb .btn.ghost{background:var(--card)}
+.reason{margin-top:10px;padding:8px 12px;background:var(--warn-bg);border-radius:12px;font-size:14px}
+.hbar{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;gap:10px;align-items:center;margin-top:12px;font-size:13px}
+.hbar:first-child{margin-top:0}
 .hbar .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
-.hbar .tr{height:12px;background:var(--track);border-radius:0 4px 4px 0;overflow:hidden}
-.hbar .tr i{display:block;height:100%;background:var(--series-1);border-radius:0 4px 4px 0}
-.hbar .val{font-variant-numeric:tabular-nums;font-weight:700;min-width:3ch;text-align:right}
-.split{display:flex;height:14px;margin-top:12px;gap:2px}
-.split i{display:block;height:100%}
-.split i:first-child{border-radius:4px 0 0 4px}.split i:last-child{border-radius:0 4px 4px 0}
-.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:13px;color:var(--ink-2)}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.legend b{width:10px;height:10px;border-radius:3px;display:inline-block}
+.hbar .tr{height:12px;background:var(--track);border-radius:999px;overflow:hidden}
+.hbar .tr i{display:block;height:100%;background:var(--tele);border-radius:999px}
+.hbar .val{font-variant-numeric:tabular-nums;font-weight:600;min-width:3ch;text-align:right}
+.hbar.j .tr i{background:var(--accent)}
+.split{display:flex;height:16px;gap:3px}
+.split i{display:block;height:100%;border-radius:999px}
+.mrow{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid var(--line);font-size:14px}.mrow:first-child{border-top:0;padding-top:0}
+.mrow span{color:var(--ink-2)}.mrow strong{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 /* forms */
-details.new{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 14px}
-details.new summary{min-height:52px;display:flex;align-items:center;font-weight:700;font-size:14px;cursor:pointer;list-style:none}
+details.new{background:var(--card);border-radius:22px;padding:0 18px;box-shadow:var(--shadow)}
+details.new summary{min-height:56px;display:flex;align-items:center;font-weight:600;font-size:14px;cursor:pointer;list-style:none}
 details.new summary::-webkit-details-marker{display:none}
 .f{display:grid;gap:10px;padding:4px 0 16px}.f label{display:grid;gap:4px;font-size:13px;color:var(--mut)}
-.f input,.f select,.f textarea{font-size:16px;min-height:48px;padding:0 12px;border:1px solid var(--line);background:var(--card-2);border-radius:10px;color:var(--ink)}
-.f textarea{padding:10px 12px;min-height:80px;resize:vertical}.f .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.done-box{margin-top:6px;padding:12px;background:var(--ok-bg);border-radius:12px;font-size:14px}
-.login{max-width:420px;margin:12vh auto 0}
-.login input{width:100%;min-height:52px;padding:0 14px;border:1px solid var(--line);background:var(--card);border-radius:12px;font-size:16px}
+.f input,.f select,.f textarea{font-size:16px;min-height:48px;padding:0 14px;border:1px solid var(--line);background:var(--card-2);border-radius:14px;color:var(--ink)}
+.f textarea{padding:10px 14px;min-height:80px;resize:vertical}.f .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.done-box{margin-top:6px;padding:12px;background:var(--ok-bg);border-radius:14px;font-size:14px}
+.login{max-width:420px;margin:12vh auto 0;background:var(--card);border-radius:28px;padding:28px;box-shadow:var(--shadow)}
+.login input{width:100%;min-height:52px;padding:0 18px;border:1px solid var(--line);background:var(--card-2);border-radius:999px;font-size:16px}
+.login .btn{border-radius:999px}
 .err{color:var(--bad);margin-top:10px;min-height:1.2em;font-size:14px}
-.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--brand);color:var(--on-brand);padding:12px 16px;border-radius:12px;font-size:14px;font-weight:600;z-index:50;box-shadow:0 12px 30px -10px rgba(0,0,0,.5)}
+.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--brand);color:var(--on-brand);padding:12px 18px;border-radius:999px;font-size:14px;font-weight:600;z-index:50;box-shadow:0 12px 30px -10px rgba(0,0,0,.5)}
 table.data{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
-table.data th,table.data td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+table.data th,table.data td{text-align:left;padding:7px 4px;border-bottom:1px solid var(--line)}
 table.data td:last-child,table.data th:last-child{text-align:right;font-variant-numeric:tabular-nums}
-details.tbl summary{margin-top:10px;font-size:12px;color:var(--ink-2);cursor:pointer}
+details.tbl summary{margin-top:12px;font-size:12.5px;color:var(--ink-2);cursor:pointer}
 </style>
 </head>
 <body>
 <div class="wrap">
   <section class="login" id="login">
-    <div class="mono">DINGUY Registration Office · Staff only</div>
-    <h1 style="margin:6px 0 18px;font-size:36px;letter-spacing:-.04em">Office</h1>
+    <div class="brand" style="box-shadow:none;padding:0;margin-bottom:18px"><span class="logo">D</span><b>DINGUY</b><small>Office · staff only</small></div>
+    <h1 style="margin:0 0 18px;font-size:32px;font-weight:600;letter-spacing:-.03em">Sign in</h1>
     <form id="loginForm" style="display:grid;gap:10px">
       <input id="pw" type="password" placeholder="Admin password" autocomplete="current-password">
       <button class="btn" type="submit" style="min-height:52px">OPEN</button>
@@ -151,11 +230,9 @@ details.tbl summary{margin-top:10px;font-size:12px;color:var(--ink-2);cursor:poi
   </section>
   <div id="app" hidden>
     <header class="top">
-      <div class="brandrow">
-        <div><div class="mono" id="updated">DINGUY Office</div><h1>DINGUY Office</h1></div>
-        <button class="iconbtn" id="refresh" aria-label="Refresh">↻ Refresh</button>
-      </div>
+      <div class="brand"><span class="logo" aria-hidden="true">D</span><b>DINGUY</b><small>Office</small></div>
       <nav class="tabs" id="tabs"></nav>
+      <div class="tools"><span class="upd" id="updated"></span><button class="iconbtn" id="refresh" aria-label="Refresh">↻<span class="rl"> Refresh</span></button></div>
     </header>
     <div id="warn" role="alert"></div>
     <main id="view"></main>
@@ -248,7 +325,7 @@ function stats(){
   const paid=S.orders.filter(o=>o.status==='paid');
   // Money = what telebirr receipts say was received. Hand-added registrations aren't counted;
   // removed records still count if a receipt shows real money came in.
-  const counted=S.orders.filter(o=>!o.manual&&(o.status==='paid'||(o.status==='removed'&&o.paidAmount!=null)));
+  const counted=S.orders.filter(o=>!o.manual&&(o.status==='paid'||(o.status==='removed'&&o.paidAmount!=null))&&!(byJami(o)&&o.jami&&o.jami.sandbox)); // Jami sandbox = test money
   // All-time money = the checked starting totals + what was paid after them (see BASELINE in api/admin.js).
   const B=S.baseline||{at:0,telebirr:0,jami:0},after=counted.filter(o=>(o.approvedAt||o.createdAt||0)>=B.at);
   const amt=o=>o.paidAmount!=null?o.paidAmount:o.price;
@@ -257,6 +334,10 @@ function stats(){
   const rev=B.telebirr+B.jami+sum(after);
   const revToday=sum(counted.filter(o=>dayKey(o.approvedAt||o.createdAt)===today));
   const rev7=sum(counted.filter(o=>(o.approvedAt||0)>=wk));
+  const paidAt=o=>o.approvedAt||o.createdAt||0,inR=(a,b)=>counted.filter(o=>paidAt(o)>=Date.now()-a*864e5&&paidAt(o)<Date.now()-b*864e5);
+  const yday=dayKey(Date.now()-864e5),revY=sum(counted.filter(o=>dayKey(paidAt(o))===yday));
+  const n7=inR(7,0).length,nP7=inR(14,7).length,revP7=sum(inR(14,7)),rev30=sum(inR(30,0)),revP30=sum(inR(60,30));
+  const sinceJ=sum(after.filter(byJami)),sinceT=sum(after.filter(o=>!byJami(o)));
   const noReceipt=after.filter(o=>o.paidAmount==null);
   const manual=S.orders.filter(o=>o.manual&&o.status==='paid');
   const missing=after.filter(o=>o.receiptMissing);
@@ -267,14 +348,14 @@ function stats(){
   const mins=realPaid.map(o=>((o.approvedAt||0)-(o.createdAt||0))/60000).filter(x=>x>0).sort((a,b)=>a-b);
   const med=mins.length?mins[Math.floor(mins.length/2)]:null;
   // last 14 days revenue
-  const days=[];for(let i=13;i>=0;i--){const t=Date.now()-i*864e5;days.push({k:dayKey(t),label:new Date(t).toLocaleDateString('en-GB',{timeZone:TZ,day:'numeric',month:'short'}),v:0,n:0});}
+  const days=[];for(let i=13;i>=0;i--){const t=Date.now()-i*864e5;days.push({k:dayKey(t),label:new Date(t).toLocaleDateString('en-GB',{timeZone:TZ,day:'numeric',month:'short'}),dn:new Date(t).toLocaleDateString('en-GB',{timeZone:TZ,day:'numeric'}),v:0,n:0,t:0,j:0});}
   const byDay=Object.fromEntries(days.map(d=>[d.k,d]));
-  for(const o of counted){const d=byDay[dayKey(o.approvedAt||o.createdAt)];if(d){d.v+=amt(o);d.n++;}}
+  for(const o of counted){const d=byDay[dayKey(o.approvedAt||o.createdAt)];if(d){d.v+=amt(o);d.n++;d[byJami(o)?'j':'t']+=amt(o);}}
   const byStone={};for(const o of paid){byStone[o.name]=(byStone[o.name]||0)+1;}
   const stones=Object.entries(byStone).sort((a,b)=>b[1]-a[1]);
   const fr=paid.filter(isFriend).length,lv=paid.length-fr;
   const am=paid.filter(o=>o.lang==='am').length;
-  return {B,rev,revToday,rev7,counted:after.length,missing,noReceipt,manual,byAcct,paid:paid.length,conv,med,real:real.length,coded:coded.length,realPaid:realPaid.length,days,stones,fr,lv,am};
+  return {B,revY,n7,nP7,revP7,rev30,revP30,sinceJ,sinceT,rev,revToday,rev7,counted:after.length,missing,noReceipt,manual,byAcct,paid:paid.length,conv,med,real:real.length,coded:coded.length,realPaid:realPaid.length,days,stones,fr,lv,am};
 }
 
 /* ---------- of the month ---------- */
@@ -314,14 +395,23 @@ function viewNewHits(){
   const h=S.newHits;if(!h)return '';
   const last7=h.days.slice(-7).reduce((a,d)=>a+d.n,0),today=h.days[h.days.length-1].n,max=Math.max(1,...h.days.map(d=>d.n));
   const bars=h.days.map(d=>`<i title="${esc(d.d)}: ${d.n}" style="height:${Math.max(4,d.n/max*100).toFixed(0)}%;${d.n?'':'opacity:.25'}"></i>`).join('');
-  return `<h2 class="sec"><span>Want new Dinguys? · “NEW” button</span></h2>
-  <div class="card newhits">
-    <div class="nh-top"><div><div class="v">${h.people}</div><div class="s">people tapped it</div></div>
-      <div class="nh-side"><div><b>${h.taps}</b> taps in total</div><div><b>${last7}</b> people this week · <b>${today}</b> today</div></div></div>
+  return card('Want new Dinguys?','Taps on the “NEW” button',`
+    <div class="newhits"><div class="nh-top"><div><div class="big">${h.people}</div><div class="sub">people tapped it</div></div>
+      <div class="nh-side"><div><b>${h.taps}</b> taps in total</div><div><b>${last7}</b> this week · <b>${today}</b> today</div></div></div>
     <div class="nh-bars" role="img" aria-label="People per day, last 14 days">${bars}</div>
-    <div class="readout" style="margin-top:6px">People per day, last 14 days. A person counts once per phone, however many times they tap.</div>
-  </div>`;
+    <div class="readout" style="margin-top:8px">People per day, last 14 days. One person counts once per phone.</div></div>`,'s4');
 }
+// A dashboard card: title, a line under it, an optional button on the right.
+const card=(t,sub,body,cls='',extra='')=>`<section class="card ${cls}"><div class="ch"><div><h3>${t}</h3>${sub?`<p>${sub}</p>`:''}</div>${extra}</div>${body}</section>`;
+// ↑ 12% / ↓ 5% against the period before; nothing when there's nothing to compare with.
+function delta(now,before){
+  if(!before)return now?'<span class="delta">new</span>':'<span class="delta flat">–</span>';
+  const p=Math.round((now-before)/before*100);
+  return `<span class="delta${p<0?' dn':p===0?' flat':''}">${p<0?'↓':p>0?'↑':''} ${Math.abs(p)}%</span>`;
+}
+const num=n=>Math.round(n).toLocaleString('en-US');
+const birr=n=>`${num(n)}<small>Birr</small>`;
+
 // Paid on Jami: orders JamiDev confirmed (Telebirr / M-Pesa / CBE Birr push on the buyer's phone).
 const GW={telebirr:'Telebirr',mpesa:'M-Pesa',cbe:'CBE Birr'};
 const byJami=o=>o.approvedBy==='jami'||o.paidTo==='jami';
@@ -335,106 +425,161 @@ function jamiStats(){
   const today=dayKey(Date.now()),wk=Date.now()-7*864e5;
   const open=tried.filter(o=>o.status==='awaiting'&&o.jami.state==='open'),expired=tried.filter(o=>o.status!=='paid'&&o.status!=='removed'&&o.jami.state==='expired');
   const gw={};for(const o of live){const k=(o.jami&&o.jami.gateway)||'telebirr';gw[k]=gw[k]||{n:0,v:0};gw[k].n++;gw[k].v+=amt(o);}
-  const days=[];for(let i=13;i>=0;i--){const t=Date.now()-i*864e5;days.push({k:dayKey(t),label:new Date(t).toLocaleDateString('en-GB',{timeZone:TZ,day:'numeric',month:'short'}),n:0,v:0});}
-  const byDay=Object.fromEntries(days.map(d=>[d.k,d]));for(const o of live){const d=byDay[dayKey(at(o))];if(d){d.n++;d.v+=amt(o);}}
   const triedPaid=tried.filter(o=>byJami(o)).length;
-  return {B,tried:tried.length,n:live.length,test,rev:B.jami+sum(since),revToday:sum(live.filter(o=>dayKey(at(o))===today)),n7:live.filter(o=>at(o)>=wk).length,rev7:sum(live.filter(o=>at(o)>=wk)),
-    rate:tried.length?Math.round(triedPaid/tried.length*100):null,open:open.length,expired:expired.length,gw:Object.entries(gw).sort((a,b)=>b[1].v-a[1].v),days};
+  return {B,tried:tried.length,triedPaid,n:live.length,test,rev:B.jami+sum(since),revToday:sum(live.filter(o=>dayKey(at(o))===today)),n7:live.filter(o=>at(o)>=wk).length,rev7:sum(live.filter(o=>at(o)>=wk)),
+    rate:tried.length?Math.round(triedPaid/tried.length*100):null,open:open.length,expired:expired.length,gw:Object.entries(gw).sort((a,b)=>b[1].v-a[1].v)};
 }
 function viewJami(){
-  const j=jamiStats(),all=stats().rev;
-  if(!j.tried&&!j.n&&!j.test)return `<h2 class="sec"><span>Paid on Jami</span></h2><div class="card empty">No Jami payments yet.</div>`;
-  const max=Math.max(1,...j.days.map(d=>d.n));const gMax=Math.max(1,...j.gw.map(g=>g[1].v));
-  const bars=j.days.map(d=>`<i title="${esc(d.label)}: ${d.n} · ${fmtBirr(d.v)}" style="height:${Math.max(4,d.n/max*100).toFixed(0)}%;${d.n?'':'opacity:.25'}"></i>`).join('');
-  return `<h2 class="sec"><span>Paid on Jami · ${j.n}</span><button data-tab="orders" data-jami>See orders</button></h2>
-  <div class="kpis">
-    <div class="card kpi"><div class="mono">Today</div><div class="v">${fmtBirr(j.revToday)}</div></div>
-    <div class="card kpi"><div class="mono">Last 7 days</div><div class="v">${fmtBirr(j.rev7)}</div><div class="s">${j.n7} paid</div></div>
-    <div class="card kpi"><div class="mono">All time on Jami</div><div class="v">${fmtBirr(j.rev)}</div><div class="s">${j.B.at?`${fmtBirr(j.B.jami)} up to ${esc(when(j.B.at))} + ${fmtBirr(j.rev-j.B.jami)} since · `:''}${j.n} paid${all?` · ${(j.rev/all*100).toFixed(j.rev/all<.1?1:0)}% of all money`:''}</div></div>
-    <div class="card kpi"><div class="mono">Jami success</div><div class="v">${j.rate==null?'—':j.rate+'%'}</div><div class="s">of ${j.tried} orders that tapped PAY NOW${j.expired?` · ${j.expired} expired unpaid`:''}${j.open?` · ${j.open} waiting now`:''}</div></div>
-  </div>
-  <div class="card newhits jami" style="margin-top:10px">
-    ${j.gw.map(([k,g])=>`<div class="hbar"><span class="lab">${esc(GW[k]||k)}</span><span class="tr"><i style="width:${(g.v/gMax*100).toFixed(1)}%"></i></span><span class="val">${g.n} · ${fmtBirr(g.v)}</span></div>`).join('')||'<div class="empty">No paid Jami orders yet.</div>'}
-    <div class="nh-bars" role="img" aria-label="Paid on Jami per day, last 14 days">${bars}</div>
-    <div class="readout" style="margin-top:6px">Paid on Jami per day, last 14 days.${j.test?` ${j.test} sandbox (test) payment${j.test===1?'':'s'} left out.`:''}</div>
-  </div>`;
-}
-function viewLeaders(){
-  const L=leaders(S.lb);
-  const tabs=Object.entries(LB_RANGES).map(([k,l])=>`<button class="chip${S.lb===k?' on':''}" data-lb="${k}" ${S.lb===k?'aria-pressed="true"':'aria-pressed="false"'}>${l}</button>`).join('');
-  const card=b=>`<div class="card lb"><div class="lb-h"><span class="ic" aria-hidden="true">${b.ic}</span><div><div class="tt">${esc(b.title)}</div><div class="ts">${esc(b.what)}</div></div></div>
-    ${b.rows.length?`<ol class="lb-l">${b.rows.map((x,i)=>`<li${i===0?' class="win"':''}><span class="pos">${i+1}</span><span class="nm">${esc(x.name)}${b.unit==='bought'&&x.phone?`<small>${esc(x.phone)}</small>`:''}</span><span class="ct">${x.n}<small> · ${fmtBirr(x.birr)}</small></span></li>`).join('')}</ol>
-    <button class="btn ghost" data-post="${esc(b.id)}">Copy for a post</button>`:'<div class="empty">Nobody yet.</div>'}</div>`;
-  return `<h2 class="sec"><span>Of the month · ${L.n} paid</span></h2>
-  <div class="chips" style="margin:0 0 10px">${tabs}</div>
-  <div class="lbs">${L.boards.map(card).join('')}</div>
-  <div class="readout" style="margin-top:8px">Paid orders only (hand-added ones left out). Same name = same receiver, so two different “Abel”s count together.</div>`;
+  const j=jamiStats(),gMax=Math.max(1,...j.gw.map(g=>g[1].v));
+  const body=`<div class="big">${birr(j.rev)}</div>
+    <div class="sub">${j.B.at?`${num(j.B.jami)} up to ${esc(when(j.B.at))} + ${num(j.rev-j.B.jami)} since`:`${j.n} paid`}</div>
+    <div class="prog" role="img" aria-label="Jami success ${j.rate??0}%"><i style="width:${j.rate??0}%"></i></div>
+    <div class="progl"><span><b>${j.rate==null?'—':j.rate+'%'}</b> of PAY NOW taps got paid</span><span>${j.triedPaid} of ${j.tried}</span></div>
+    <div class="sub" style="margin:4px 0 14px">${j.expired?`${j.expired} expired unpaid`:''}${j.expired&&j.open?' · ':''}${j.open?`${j.open} waiting now`:''}</div>
+    <div class="mrow"><span>Today</span><strong>${fmtBirr(j.revToday)}</strong></div>
+    <div class="mrow"><span>Last 7 days</span><strong>${fmtBirr(j.rev7)} · ${j.n7} paid</strong></div>
+    ${j.gw.length?'<div class="sub" style="margin-top:14px">All Jami payments, by app</div>':''}<div style="margin-top:10px">${j.gw.map(([k,g])=>`<div class="hbar j"><span class="lab">${esc(GW[k]||k)}</span><span class="tr"><i style="width:${(g.v/gMax*100).toFixed(1)}%"></i></span><span class="val">${g.n} · ${fmtBirr(g.v)}</span></div>`).join('')}</div>
+    ${j.test?`<div class="readout" style="margin-top:10px">${j.test} sandbox (test) payment${j.test===1?'':'s'} left out.</div>`:''}`;
+  return card('Paid on Jami','Telebirr · M-Pesa · CBE Birr push',body,'s4',`<button class="link" data-tab="orders" data-jami>Orders</button>`);
 }
 
-/* ---------- views ---------- */
+// When people buy: paid orders by the time they ordered, in Addis Ababa time (UTC+3, no daylight saving).
+const WD=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const addis=ms=>{const d=new Date(ms+3*3600e3);return{wd:d.getUTCDay(),h:d.getUTCHours()};};
+const hr=h=>`${String(h).padStart(2,'0')}:00–${String((h+1)%24).padStart(2,'0')}:00`;
+function timeStats(){
+  const paid=S.orders.filter(o=>!o.manual&&(o.status==='paid'||o.status==='removed')&&!(o.jami&&o.jami.sandbox&&byJami(o)));
+  const amt=o=>o.paidAmount!=null?o.paidAmount:o.price;
+  const grid=Array.from({length:7},()=>Array(24).fill(0)),wd=Array.from({length:7},()=>({n:0,v:0})),hours=Array.from({length:24},()=>({n:0,v:0})),dates={};
+  for(const o of paid){const {wd:w,h}=addis(o.createdAt||o.approvedAt);grid[w][h]++;wd[w].n++;wd[w].v+=amt(o);hours[h].n++;hours[h].v+=amt(o);
+    const k=dayKey(o.approvedAt||o.createdAt);dates[k]=dates[k]||{n:0,v:0};dates[k].n++;dates[k].v+=amt(o);}
+  const by=(l,f)=>l.map((x,i)=>({...x,i})).sort(f);
+  const wdS=by(wd,(a,b)=>b.n-a.n||b.v-a.v),day=by(hours.slice(8,23).map((x,i)=>({...x,h:i+8})),(a,b)=>a.n-b.n||a.v-b.v);
+  const hS=by(hours,(a,b)=>b.n-a.n||b.v-a.v);
+  const ds=Object.entries(dates).sort((a,b)=>b[1].v-a[1].v);
+  // slowest of the last 30 days, counting days with no sales
+  const last30=Array.from({length:30},(_,i)=>{const k=dayKey(Date.now()-i*864e5);return [k,dates[k]||{n:0,v:0}];}).sort((a,b)=>a[1].v-b[1].v);
+  return {n:paid.length,grid,wd,wdS,hS,day,ds,last30};
+}
+const dLabel=k=>new Date(k+'T12:00:00+03:00').toLocaleDateString('en-GB',{timeZone:TZ,weekday:'short',day:'numeric',month:'short'});
+function viewTimes(){
+  const t=timeStats();
+  if(!t.n)return card('When people buy','',`<div class="empty">No paid orders yet.</div>`,'s8');
+  const maxC=Math.max(1,...t.grid.flat()),maxW=Math.max(1,...t.wd.map(x=>x.n));
+  const order=[1,2,3,4,5,6,0];
+  const best=t.wdS[0],worst=t.wdS[t.wdS.length-1],peak=t.hS[0],quiet=t.day[0],top=t.ds[0],slow=t.last30[0];
+  const ins=[
+    ['Busiest day',WD[best.i],`${best.n} paid · ${fmtBirr(best.v)}`,1],
+    ['Slowest day',WD[worst.i],`${worst.n} paid · ${fmtBirr(worst.v)}`],
+    ['Peak hour',hr(peak.i),`${peak.n} paid · ${fmtBirr(peak.v)}`,1],
+    ['Quietest daytime hour',hr(quiet.h),`${quiet.n} paid · between 08:00 and 23:00`],
+    ['Best day ever',dLabel(top[0]),`${top[1].n} paid · ${fmtBirr(top[1].v)}`,1],
+    ['Slowest day, last 30',dLabel(slow[0]),`${slow[1].n} paid · ${fmtBirr(slow[1].v)}`],
+  ].map(([l,v,s2,up])=>`<div class="in${up?' up':''}"><div class="il">${l}</div><div class="iv">${esc(v)}</div><div class="is">${esc(s2)}</div></div>`).join('');
+  const wbars=order.map(i=>`<div class="${i===best.i?'top':''}"><i style="height:${Math.max(3,t.wd[i].n/maxW*100).toFixed(0)}%" title="${WD[i]}: ${t.wd[i].n} paid"></i>${WD[i].slice(0,3)}</div>`).join('');
+  const heat=order.map(w=>`<span>${WD[w].slice(0,3)}</span>`+t.grid[w].map((c,h)=>`<i title="${WD[w]} ${hr(h)}: ${c} paid" style="${c?`background:var(--accent);opacity:${(.18+.82*c/maxC).toFixed(2)}`:''}"></i>`).join('')).join('');
+  const body=`<div class="ins">${ins}</div>
+    <div class="dgrid" style="margin-top:14px;gap:12px">
+      <div class="plot s4"><div class="plot-h">By day of the week</div><div class="wbars">${wbars}</div></div>
+      <div class="plot s8"><div class="plot-h">Day × hour <span class="readout" style="font-weight:400">darker = more sales</span></div>
+        <div class="heat" role="img" aria-label="Paid orders by weekday and hour">${heat}<span></span>${[0,6,12,18].map(h=>`<span class="hx">${String(h).padStart(2,'0')}:00</span>`).join('')}</div></div>
+    </div>`;
+  return card('When people buy',`${t.n} paid orders, by the time they ordered (Addis Ababa time)`,body,'s8');
+}
+
+function viewLeaders(){
+  const L=leaders(S.lb);
+  const tabs=Object.entries(LB_RANGES).map(([k,l])=>`<button class="chip${S.lb===k?' on':''}" data-lb="${k}" aria-pressed="${S.lb===k}">${l}</button>`).join('');
+  const box=b=>`<div class="lb"><div class="lb-h"><span class="ic" aria-hidden="true">${b.ic}</span><div><div class="tt">${esc(b.title)}</div><div class="ts">${esc(b.what)}</div></div></div>
+    ${b.rows.length?`<ol class="lb-l">${b.rows.map((x,i)=>`<li${i===0?' class="win"':''}><span class="pos">${i+1}</span><span class="nm">${esc(x.name)}${b.unit==='bought'&&x.phone?`<small>${esc(x.phone)}</small>`:''}</span><span class="ct">${x.n}<small> · ${fmtBirr(x.birr)}</small></span></li>`).join('')}</ol>
+    <button class="btn ghost" data-post="${esc(b.id)}">Copy for a post</button>`:'<div class="empty">Nobody yet.</div>'}</div>`;
+  return card('Of the month',`${L.n} paid · hand-added ones left out · same name counts as the same person`,`<div class="lbs">${L.boards.map(box).join('')}</div>`,'s12',`<div class="chips" style="margin:0">${tabs}</div>`);
+}
 function renderTabs(){
   const n=tasks().length,inq=S.inquiries.filter(q=>q.status!=='done').length;
   const T=[['dash','Dashboard',0],['tasks','Tasks',n],['orders','Orders',0],['inq','Inquiries',inq]];
   $('#tabs').innerHTML=T.map(([k,l,c])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${l}${c?`<span class="badge">${c}</span>`:''}</button>`).join('');
   $('#updated').textContent='Updated '+new Date(S.loadedAt).toLocaleTimeString('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit'});
 }
+const greet=()=>{const h=addis(Date.now()).h;return h<12?'Good morning':h<17?'Good afternoon':'Good evening';};
+function recentTable(){
+  const list=S.orders.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,7);
+  if(!list.length)return '<div class="empty">No orders yet.</div>';
+  const label={paid:'Paid',review:'Check',awaiting:'Not paid',rejected:'Rejected',removed:'Removed'};
+  return `<div class="tw"><table class="act"><thead><tr><th>Order</th><th>Stone</th><th>For</th><th>Price</th><th>Paid via</th><th>Status</th><th>Date</th></tr></thead><tbody>
+    ${list.map(o=>`<tr data-open="${esc(o.id)}"><td class="oid" style="font-size:13px">${esc(o.id)}</td>
+      <td><span class="stn"><i aria-hidden="true">${o.price===89?'🪨':'💎'}</i>${esc(o.name)}</span></td><td>${esc(o.to)}</td><td class="num">${fmtBirr(o.price)}</td>
+      <td>${o.status==='paid'||o.status==='removed'?(byJami(o)?`<span class="via j">Jami${o.jami&&o.jami.gateway?' · '+esc(GW[o.jami.gateway]||''):''}</span>`:o.manual?'<span class="via">By hand</span>':'<span class="via">Telebirr</span>'):'—'}</td>
+      <td><span class="sdot c-${esc(o.status)}">${label[o.status]||esc(o.status)}</span></td><td>${when(o.createdAt)}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
 function viewDash(){
-  const st=stats(),ts=tasks();
+  const st=stats(),ts=tasks(),j=jamiStats();
   const max=Math.max(1,...st.days.map(d=>d.v));const top=Math.ceil(max/100)*100||100;
-  const cols=st.days.map((d,i)=>`<div class="col${d.v?'':' zero'}${S.sel===i?' sel':''}" data-col="${i}" role="img" aria-label="${esc(d.label)}: ${fmtBirr(d.v)}, ${d.n} paid"><i style="height:${(d.v/top*100).toFixed(1)}%"></i></div>`).join('');
+  const cols=st.days.map((d,i)=>`<div class="col${d.v?'':' zero'}${S.sel===i?' sel':''}" data-col="${i}" role="img" aria-label="${esc(d.label)}: ${fmtBirr(d.v)} (Telebirr ${d.t}, Jami ${d.j}), ${d.n} paid">${d.j?`<i class="j" style="height:${(d.j/top*100).toFixed(1)}%"></i>`:''}${d.t?`<i class="t" style="height:${(d.t/top*100).toFixed(1)}%"></i>`:''}</div>`).join('');
   const selD=S.sel!=null?st.days[S.sel]:null;
-  const funnel=[['Orders started',st.real],['Entered a code',st.coded],['Paid',st.realPaid]];
-  const fMax=Math.max(1,st.real);
-  const sMax=Math.max(1,...st.stones.map(s=>s[1]));
-  const tot=Math.max(1,st.fr+st.lv);
+  const engaged=S.orders.filter(o=>!o.manual&&(o.txn||(o.jami&&o.jami.startedAt))).length;
+  const funnel=[['Orders started',st.real],['Started paying',engaged],['Paid',st.realPaid]];
+  const fMax=Math.max(1,st.real),sMax=Math.max(1,...st.stones.map(s=>s[1])),tot=Math.max(1,st.fr+st.lv);
+  const today=new Date().toLocaleDateString('en-GB',{timeZone:TZ,weekday:'long',day:'numeric',month:'long'});
+  const tele=st.B.telebirr+st.sinceT,jami=st.B.jami+st.sinceJ,unchecked=st.noReceipt.reduce((a,o)=>a+o.price,0);
+  const wallet=(c,name,v,sub,stt,bad)=>`<div class="w"><div class="wn"><span class="dot" style="background:${c}"></span>${name}</div><div class="wv">${num(v)}<small style="font-size:11px;font-weight:500;color:var(--mut)"> Birr</small></div><div class="ws">${sub}</div><div class="st${bad?' bad':''}">${stt}</div></div>`;
   return `
-  ${ts.length?`<h2 class="sec"><span>Next up · ${ts.length}</span><button data-tab="tasks">See all</button></h2><div class="grid">${ts.slice(0,3).map(taskCard).join('')}</div>`:`<h2 class="sec"><span>Next up</span></h2><div class="card empty">✓ All caught up.</div>`}
-  ${viewJami()}
-  ${viewNewHits()}
-  ${viewLeaders()}
-  <h2 class="sec"><span>Money</span></h2>
-  <div class="kpis">
-    <div class="card kpi"><div class="mono">Today</div><div class="v">${fmtBirr(st.revToday)}</div></div>
-    <div class="card kpi"><div class="mono">Last 7 days</div><div class="v">${fmtBirr(st.rev7)}</div></div>
-    <div class="card kpi"><div class="mono">All time received</div><div class="v">${fmtBirr(st.rev)}</div><div class="s">${st.B.at?`${fmtBirr(st.B.telebirr+st.B.jami)} up to ${esc(when(st.B.at))} + ${st.counted} payments since`:`${st.counted} payments`} · ${st.paid} live registrations</div></div>
-    <div class="card kpi"><div class="mono">Pay rate</div><div class="v">${st.conv}%</div><div class="s">of started orders get paid${st.med!=null?` · ${Math.round(st.med)} min to pay (median)`:''}</div></div>
-  </div>
-  <h2 class="sec"><span>Money check</span></h2>
-  <div class="card">
-    ${st.B.at?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Starting total · telebirr, up to ${esc(when(st.B.at))}</span><strong>${fmtBirr(st.B.telebirr)}</strong></div><div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Starting total · Jami, up to ${esc(when(st.B.at))}</span><strong>${fmtBirr(st.B.jami)}</strong></div>`:''}
-    ${Object.entries(st.byAcct).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${k==='jami'?'JamiDev (Telebirr / M-Pesa / CBE Birr)':k==='7218'?'0996 567 218 (…7218)':k==='5467'?'Old number (…5467)':'Account …'+esc(k)}</span><strong>${fmtBirr(v)}</strong></div>`).join('')}
-    ${st.noReceipt.length?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Not checked against a receipt yet</span><strong>${fmtBirr(st.noReceipt.reduce((a,o)=>a+o.price,0))}</strong></div>`:''}
-    ${st.missing.length?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Marked paid, but telebirr has no such transaction</span><strong>${st.missing.length} · 0 Birr</strong></div>`:''}
-    <div class="row" style="padding:8px 0"><span>Added by hand (not counted)</span><strong>${st.manual.length}</strong></div>
-    <div class="readout" style="margin-top:6px">${st.B.at?`Accounts below the starting totals are payments since ${esc(when(st.B.at))}. `:''}Amounts come from the telebirr receipts the Mac helper reads, and from Jami.</div>
-    <details class="tbl"><summary>Restart the totals from checked amounts</summary><form class="f" id="baseform" style="margin-top:8px">
-      <div class="two"><label>Telebirr total (Birr)<input name="telebirr" inputmode="decimal" required value="${esc(st.B.telebirr)}"></label><label>Jami total (Birr)<input name="jami" inputmode="decimal" required value="${esc(st.B.jami)}"></label></div>
-      <button class="btn" type="submit">Save — count from now</button>
-      <div class="readout">Everything paid before now is replaced by these two amounts.</div></form></details>
-    ${st.noReceipt.length?`<details class="tbl"><summary>Show the ${st.noReceipt.length} without a receipt amount</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.noReceipt.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
-    ${st.missing.length?`<details class="tbl" open><summary>Show the ${st.missing.length} with no telebirr receipt</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.missing.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
-    ${st.manual.length?`<details class="tbl"><summary>Show the ${st.manual.length} added by hand</summary><table class="data"><thead><tr><th>Order</th><th>Note</th><th>Price</th></tr></thead><tbody>${st.manual.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
-  </div>
-  <h2 class="sec"><span>Money · last 14 days</span></h2>
-  <div class="card">
-    <div class="chart-h"><div class="t">Paid per day</div><div class="readout" aria-live="polite">${selD?`<strong>${esc(selD.label)}</strong> · ${fmtBirr(selD.v)} · ${selD.n} paid`:'Tap a bar'}</div></div>
-    <div class="cols" id="cols"><div class="gl" style="bottom:100%"><span>${fmtBirr(top)}</span></div><div class="gl" style="bottom:50%"><span>${fmtBirr(top/2)}</span></div>${cols}</div>
-    <div class="xlab"><span>${esc(st.days[0].label)}</span><span>${esc(st.days[7].label)}</span><span>Today</span></div>
-    <details class="tbl"><summary>Show as table</summary><table class="data"><thead><tr><th>Day</th><th>Paid</th><th>Birr</th></tr></thead><tbody>${st.days.slice().reverse().map(d=>`<tr><td>${esc(d.label)}</td><td>${d.n}</td><td>${d.v}</td></tr>`).join('')}</tbody></table></details>
-  </div>
-  <div class="two-col">
-    <div><h2 class="sec"><span>Where people drop off</span></h2>
-      <div class="card">${funnel.map(([l,v])=>`<div class="hbar"><span class="lab">${l}</span><span class="tr"><i style="width:${(v/fMax*100).toFixed(1)}%"></i></span><span class="val">${v}</span></div>`).join('')}
-        <div class="readout" style="margin-top:10px">${st.real?`${st.real-st.coded} never entered a code — send them the help SMS.`:'No orders yet.'}</div></div></div>
-    <div><h2 class="sec"><span>Friend vs loved one</span></h2>
-      <div class="card"><div class="split" role="img" aria-label="Friend ${st.fr}, Loved one ${st.lv}"><i style="flex:${st.fr||0.0001};background:var(--series-1)"></i><i style="flex:${st.lv||0.0001};background:var(--series-2)"></i></div>
-        <div class="legend"><span><b style="background:var(--series-1)"></b>Friend · ${st.fr} (${Math.round(st.fr/tot*100)}%)</span><span><b style="background:var(--series-2)"></b>Loved one · ${st.lv} (${Math.round(st.lv/tot*100)}%)</span></div>
-        <div class="readout" style="margin-top:10px">${st.paid?`${Math.round(st.am/st.paid*100)}% of buyers used Amharic.`:''}</div></div></div>
-  </div>
-  <h2 class="sec"><span>Best-selling stones</span></h2>
-  <div class="card">${st.stones.length?st.stones.map(([n,v])=>`<div class="hbar"><span class="lab" title="${esc(n)}">${esc(n)}</span><span class="tr"><i style="width:${(v/sMax*100).toFixed(1)}%"></i></span><span class="val">${v}</span></div>`).join(''):'<div class="empty">No paid registrations yet.</div>'}</div>
-  <h2 class="sec"><span>Add by hand</span></h2>
-  ${newForm()}`;
+  <div class="hello"><h1>${greet()} 👋</h1><p>Here’s how DINGUY is doing · ${esc(today)}</p></div>
+  <div class="dgrid">
+    <section class="card s4">
+      <div class="ch" style="margin-bottom:6px"><div><p style="margin:0;font-size:14px;color:var(--ink-2)">Total received</p></div><span class="via">ETB</span></div>
+      <div class="big">${birr(st.rev)}</div>
+      <div class="sub">${delta(st.rev30,st.revP30)} last 30 days vs the 30 before</div>
+      <div class="pillbtns"><button class="btn" data-tab="orders">Orders</button><button class="btn ghost" data-addhand>+ Add by hand</button></div>
+      <div class="wallets"><div class="wh">Where it came in <span>| starting totals + since ${st.B.at?esc(when(st.B.at).split(',')[0]):''}</span></div>
+        <div class="wl">${wallet('var(--tele)','Telebirr',tele,`${num(st.B.telebirr)} + ${num(st.sinceT)}`,'Active')}${wallet('var(--accent)','Jami',jami,`${num(st.B.jami)} + ${num(st.sinceJ)}`,'Active')}${wallet('var(--warn)','To check',unchecked,`${st.noReceipt.length} without receipt`,unchecked?'Check':'All clear',!!unchecked)}</div></div>
+    </section>
+    <section class="card s4"><div class="tiles">
+      <div class="tile hot"><div class="tl">Today<span class="ti">☀️</span></div><div><div class="tv">${fmtBirr(st.revToday)}</div><div class="sub">${delta(st.revToday,st.revY)} vs yesterday</div></div></div>
+      <div class="tile"><div class="tl">Last 7 days<span class="ti">📅</span></div><div><div class="tv">${fmtBirr(st.rev7)}</div><div class="sub">${delta(st.rev7,st.revP7)} vs week before</div></div></div>
+      <div class="tile"><div class="tl">Paid orders · 7 days<span class="ti">🪨</span></div><div><div class="tv">${st.n7}</div><div class="sub">${delta(st.n7,st.nP7)} vs week before</div></div></div>
+      <div class="tile"><div class="tl">Pay rate<span class="ti">✓</span></div><div><div class="tv">${st.conv}%</div><div class="sub">${st.med!=null?`${Math.round(st.med)} min to pay (median)`:'of started orders'}</div></div></div>
+    </div></section>
+    ${card('Money per day','Last 14 days, Telebirr and Jami',`<div class="plot">
+      <div class="plot-h"><span>${selD?`${esc(selD.label)} · ${fmtBirr(selD.v)}`:'Tap a bar'}</span><div class="legend"><span><b style="background:var(--tele)"></b>Telebirr</span><span><b class="hatch"></b>Jami</span></div></div>
+      <div class="readout" aria-live="polite" style="font-size:12px">${selD?`Telebirr ${fmtBirr(selD.t)} · Jami ${fmtBirr(selD.j)} · ${selD.n} paid`:'&nbsp;'}</div>
+      <div class="cols" id="cols"><div class="gl" style="bottom:100%"><span>${num(top)}</span></div><div class="gl" style="bottom:50%"><span>${num(top/2)}</span></div><div class="gl" style="bottom:0"><span>0</span></div>${cols}</div>
+      <div class="xlab">${st.days.map((d,i)=>`<span>${i%2?'':esc(d.dn)}</span>`).join('')}</div></div>
+      <details class="tbl"><summary>Show as table</summary><table class="data"><thead><tr><th>Day</th><th>Paid</th><th>Telebirr</th><th>Jami</th></tr></thead><tbody>${st.days.slice().reverse().map(d=>`<tr><td>${esc(d.label)}</td><td>${d.n}</td><td>${d.t}</td><td>${d.j}</td></tr>`).join('')}</tbody></table></details>`,'s4')}
+
+    ${card(`Next up${ts.length?' · '+ts.length:''}`,'',ts.length?`<div class="nextl">${ts.slice(0,3).map(taskCard).join('')}</div>`:'<div class="empty">✓ All caught up.</div>','s4',ts.length?'<button class="link" data-tab="tasks">See all</button>':'')}
+    ${card('Recent activity','Newest orders · tap a row to open it',recentTable(),'s8','<button class="link" data-tab="orders">All orders</button>')}
+
+    ${viewJami()}
+    ${viewTimes()}
+
+    ${viewLeaders()}
+
+    ${viewNewHits()}
+    ${card('Where people drop off','',`${funnel.map(([l,v])=>`<div class="hbar"><span class="lab" title="${esc(l)}">${l}</span><span class="tr"><i style="width:${Math.min(100,v/fMax*100).toFixed(1)}%"></i></span><span class="val">${v}</span></div>`).join('')}
+      <div class="readout" style="margin-top:12px">${st.real?`${Math.max(0,st.real-engaged)} never entered a code or tapped PAY NOW — the help SMS is for them.`:'No orders yet.'}</div>`,'s4')}
+    ${card('Friend vs loved one','',`<div class="split" role="img" aria-label="Friend ${st.fr}, Loved one ${st.lv}"><i style="flex:${st.fr||0.0001};background:var(--tele)"></i><i class="hatch" style="flex:${st.lv||0.0001}"></i></div>
+      <div class="legend" style="margin-top:12px"><span><b style="background:var(--tele)"></b>Friend · ${st.fr} (${Math.round(st.fr/tot*100)}%)</span><span><b class="hatch"></b>Loved one · ${st.lv} (${Math.round(st.lv/tot*100)}%)</span></div>
+      <div class="readout" style="margin-top:12px">${st.paid?`${Math.round(st.am/st.paid*100)}% of buyers used Amharic.`:''}</div>`,'s4')}
+
+    ${card('Best-selling stones','',st.stones.length?st.stones.map(([n,v],i)=>`<div class="hbar${i===0?' j':''}"><span class="lab" title="${esc(n)}">${esc(n)}</span><span class="tr"><i style="width:${(v/sMax*100).toFixed(1)}%"></i></span><span class="val">${v}</span></div>`).join(''):'<div class="empty">No paid registrations yet.</div>','s6')}
+    ${card('Money check','Starting totals, then each account since',`
+      ${st.B.at?`<div class="mrow"><span>Starting total · telebirr, up to ${esc(when(st.B.at))}</span><strong>${fmtBirr(st.B.telebirr)}</strong></div><div class="mrow"><span>Starting total · Jami, up to ${esc(when(st.B.at))}</span><strong>${fmtBirr(st.B.jami)}</strong></div>`:''}
+      ${Object.entries(st.byAcct).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="mrow"><span>${k==='jami'?'JamiDev (Telebirr / M-Pesa / CBE Birr)':k==='7218'?'0996 567 218 (…7218)':k==='5467'?'Old number (…5467)':'Account …'+esc(k)}</span><strong>${fmtBirr(v)}</strong></div>`).join('')}
+      ${st.noReceipt.length?`<div class="mrow"><span>Not checked against a receipt yet</span><strong>${fmtBirr(unchecked)}</strong></div>`:''}
+      ${st.missing.length?`<div class="mrow"><span>Marked paid, but telebirr has no such transaction</span><strong>${st.missing.length} · 0 Birr</strong></div>`:''}
+      <div class="mrow"><span>Added by hand (not counted)</span><strong>${st.manual.length}</strong></div>
+      <div class="readout" style="margin-top:8px">Amounts come from the telebirr receipts the Mac helper reads, and from Jami.</div>
+      ${st.noReceipt.length?`<details class="tbl"><summary>Show the ${st.noReceipt.length} without a receipt amount</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.noReceipt.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
+      ${st.missing.length?`<details class="tbl" open><summary>Show the ${st.missing.length} with no telebirr receipt</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.missing.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
+      ${st.manual.length?`<details class="tbl"><summary>Show the ${st.manual.length} added by hand</summary><table class="data"><thead><tr><th>Order</th><th>Note</th><th>Price</th></tr></thead><tbody>${st.manual.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
+      <details class="tbl"><summary>Restart the totals from checked amounts</summary><form class="f" id="baseform" style="margin-top:8px">
+        <div class="two"><label>Telebirr total (Birr)<input name="telebirr" inputmode="decimal" required value="${esc(st.B.telebirr)}"></label><label>Jami total (Birr)<input name="jami" inputmode="decimal" required value="${esc(st.B.jami)}"></label></div>
+        <button class="btn" type="submit">Save — count from now</button>
+        <div class="readout">Everything paid before now is replaced by these two amounts.</div></form></details>`,'s6')}
+    <div class="s12" id="addhand">${newForm()}</div>
+  </div>`;
 }
 function autoLine(){
   const a=S.auto||{},on=x=>x?'<strong>on</strong>':'off';
@@ -567,6 +712,8 @@ document.addEventListener('click',async e=>{
     if(what){const o=S.orders.find(x=>x.id===id);if(o)o.follow={...F(o),[what]:Date.now()};api('POST',{id,action:'mark',what}).catch(()=>{});render();toast('Copied — paste it into an SMS. Marked as sent.');}
     else toast('Copied — paste it into an SMS');return;}
   const ed=e.target.closest('[data-edit]');if(ed){S.edit=S.edit===ed.dataset.edit?null:ed.dataset.edit;render();return;}
+  if(e.target.closest('[data-addhand]')){const d=document.querySelector('#addhand details');if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});}return;}
+  const row=e.target.closest('tr[data-open]');if(row){S.q=row.dataset.open;S.filter='all';setTab('orders');return;}
   const lb=e.target.closest('[data-lb]');if(lb){S.lb=lb.dataset.lb;render();return;}
   const po=e.target.closest('[data-post]');if(po){const b=leaders(S.lb).boards.find(x=>x.id===po.dataset.post);const t=b&&postText(b,S.lb);
     if(t){try{await navigator.clipboard.writeText(t);toast('Copied — paste it into your post');}catch(err){prompt('Copy this:',t);}}return;}
