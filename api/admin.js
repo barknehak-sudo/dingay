@@ -7,10 +7,12 @@
 // POST /api/admin {id, action:'receipt', receipt:{amount,account,payer,paidAt}} → store what the telebirr receipt says
 // POST /api/admin {id, action:'restore'}  → put a removed record back (same number, same links)
 // POST /api/admin {create:{slug,to,by,…}} → add a registration by hand (paid another way / gift)
+// POST /api/admin {id, action:'edit', edit:{to,by,occasion,message,phone,toPhone,email,byEmail}} → fix certificate details
+// POST /api/admin {baseline:{telebirr, jami}} → restart the money totals from these amounts, counting from now
 // POST /api/admin {inquiry:id, action:'done'|'new'}
 // POST /api/admin {testEmail:'you@x.com'} → sends a sample certificate email through the Gmail setup
 // Orders come back with payLink, recordLink and msgs (the SMS/email texts); `auto` says what is sent automatically.
-import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO, ethPhone } from './_lib.js';
+import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, recordOf, publicRecord, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO, ethPhone } from './_lib.js';
 import { messages, links, followUp, sweep, autoOn, sendTestEmail } from './_notify.js';
 import { day as hitDay } from './hit.js';
 
@@ -18,6 +20,9 @@ const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim
 
 // What /office gets: no secret key, plus the customer's links and the ready-made texts.
 const view = (o, site) => { Object.assign(o, links(o, site), { msgs: messages(o, site) }); delete o.key; return o; };
+// Money totals start from a checked figure: everything paid before `at` is replaced by these amounts (Birr).
+// 15 Oct 2026: telebirr receipts weren't being read while the verifier was paused, so the totals were reset by hand.
+const BASELINE = { at: 1792055011000, telebirr: 36955, jami: 89 };
 const siteOf = (req) => 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
 
 export default async function handler(req, res) {
@@ -56,13 +61,20 @@ export default async function handler(req, res) {
       const days = Array.from({ length: 14 }, (_, i) => hitDay(Date.now() - (13 - i) * 864e5));
       const [taps, people, ...perDay] = await kv('MGET', 'hits:new:taps', 'hits:new:people', ...days.map((d) => 'hits:new:day:' + d));
       const newHits = { taps: Number(taps) || 0, people: Number(people) || 0, days: days.map((d, i) => ({ d, n: Number(perDay[i]) || 0 })) };
-      return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier'), newHits });
+      return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier'), newHits, baseline: (await getJSON('baseline')) || BASELINE });
     }
     if (req.method === 'POST' && (req.body || {}).testEmail) {
       const to = clean(req.body.testEmail, 120);
       if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(to)) return send(res, 400, { error: 'Email doesn’t look right.' });
       if (!autoOn().emailReady) return send(res, 400, { error: 'GMAIL_APP_PASSWORD is not set in Vercel (or the site wasn’t redeployed after adding it).' });
       try { return send(res, 200, await sendTestEmail(to)); } catch (e) { return send(res, 502, { error: 'Gmail refused: ' + e.message }); }
+    }
+    if (req.method === 'POST' && (req.body || {}).baseline) {
+      const b = req.body.baseline, tb = Number(b.telebirr), jm = Number(b.jami);
+      if (![tb, jm].every((n) => Number.isFinite(n) && n >= 0 && n < 1e8)) return send(res, 400, { error: 'Amounts don’t look right.' });
+      const baseline = { at: Date.now(), telebirr: Math.round(tb * 100) / 100, jami: Math.round(jm * 100) / 100 };
+      await setJSON('baseline', baseline);
+      return send(res, 200, { baseline });
     }
     if (req.method === 'POST' && (req.body || {}).inquiry) {
       const { inquiry, action } = req.body;
@@ -114,7 +126,21 @@ export default async function handler(req, res) {
         if (Number.isFinite(Number(rc.paidAt))) o.paidAt = Number(rc.paidAt);
         o.receiptMissing = rc.missing === true || undefined;
       }
-      if (action === 'receipt') {
+      if (action === 'edit') {
+        const e = req.body.edit || {};
+        const to = clean(e.to, 28), by = clean(e.by, 28);
+        if (!to || !by) return send(res, 400, { error: 'Fill in who it is for and who it is from.' });
+        const digits = String(e.phone || '').replace(/[^\d]/g, ''), pm = /^(?:251|0)?([79]\d{8})$/.exec(digits);
+        if (digits && !pm) return send(res, 400, { error: 'Buyer phone doesn’t look right.' });
+        const toPhone = ethPhone(e.toPhone);
+        if (String(e.toPhone || '').trim() && !toPhone) return send(res, 400, { error: 'Their phone number doesn’t look right.' });
+        const email = clean(e.email, 120), byEmail = clean(e.byEmail, 120);
+        if ([email, byEmail].some((x) => x && !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(x))) return send(res, 400, { error: 'Email doesn’t look right.' });
+        Object.assign(o, { to, by, occasion: OCCASIONS.includes(e.occasion) ? e.occasion : '', message: clean(e.message, 140),
+          phone: pm ? '0' + pm[1] : null, toPhone, email: email || null, byEmail: byEmail || null, editedAt: Date.now() });
+        // Paid records: update the public registry entry in place (same number, same date, same spot in "recent").
+        if (o.status === 'paid') await setJSON('reg:' + o.id, publicRecord(recordOf(o)));
+      } else if (action === 'receipt') {
         if (!rc) return send(res, 400, { error: 'No receipt.' });
       } else if (action === 'mark') {
         const FOLLOW = ['help_sms', 'congrats_sms', 'to_sms', 'email', 'buyer_email', 'help_email', 'call', 'help_skip', 'congrats_skip', 'to_skip', 'email_skip'];

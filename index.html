@@ -6,6 +6,7 @@
 <script src="./compat.js"></script>
 <script src="./i18n.js"></script>
 <script src="./support.js"></script>
+<script src="./ga.js"></script>
 </head>
 <body>
 <x-dc>
@@ -1169,11 +1170,14 @@ class Component extends DCLogic {
     const el=document.getElementById('dg-txn');if(el)el.focus();this.toastMsg('Press and hold the box, then tap Paste.');};
   savedPhone(){try{return localStorage.getItem('dingay.phone')||''}catch(e){return''}}
   rememberOrder(id,key){try{const k='dingay.orders.v1';const m=JSON.parse(localStorage.getItem(k)||'{}');m[id]=key;localStorage.setItem(k,JSON.stringify(m));}catch(e){}}
+  // Google Analytics (ga.js): price/name come from the catalog so the event works before the server answers.
+  gaItem(ev,slug){const pr=P.find(p=>p.slug===slug);if(pr)window.track(ev,{currency:'ETB',value:pr.price,items:[{item_id:pr.slug,item_name:pr.name,price:pr.price}]});}
   createOrder=async()=>{const d=this.state.draft;if(this.state.busy)return;this.setState({busy:true,regErr:''});
-    try{const j=await this.post('order',{slug:d.slug,to:d.to,by:d.by,occasion:d.occasion,message:d.message,phone:d.phone,toPhone:d.toPhone.trim(),email:(d.email||'').trim(),byEmail:(d.byEmail||'').trim(),lang:LANG});this.rememberOrder(j.id,j.key);try{localStorage.setItem('dingay.phone',d.phone)}catch(e){}this.setState({busy:false});this.go('pay/'+j.id+'/'+j.key);}
+    try{const j=await this.post('order',{slug:d.slug,to:d.to,by:d.by,occasion:d.occasion,message:d.message,phone:d.phone,toPhone:d.toPhone.trim(),email:(d.email||'').trim(),byEmail:(d.byEmail||'').trim(),lang:LANG});this.rememberOrder(j.id,j.key);this.gaItem('begin_checkout',d.slug);try{localStorage.setItem('dingay.phone',d.phone)}catch(e){}this.setState({busy:false});this.go('pay/'+j.id+'/'+j.key);}
     catch(e){this.setState({busy:false,regErr:e.message});}};
   // JamiDev: push a payment request to the buyer's phone, then poll until Jami confirms it.
   payJami=async()=>{const p=this.state.pay;if(p.jamiBusy)return;this.setState(s=>({pay:{...s.pay,jamiBusy:true,error:''}}));
+    window.track('add_payment_info',{payment_type:'jami_'+(p.gw||'telebirr'),currency:'ETB',value:p.order&&p.order.price});
     try{const j=await this.post('pay-jami',{id:p.id,key:p.key,gateway:p.gw||'telebirr'});
       if(j.order&&j.order.status==='paid'){this.finishPaid(j.order);return;}
       if(j.mode==='redirect'&&j.checkoutUrl){location.href=j.checkoutUrl;return;}
@@ -1197,7 +1201,7 @@ class Component extends DCLogic {
   waitLeft(){const o=this.state.pay.order;if(!o)return 0;const t0=Math.min(Date.now(),o.submittedAt||Date.now());return Math.max(0,30-Math.floor((Date.now()-t0)/1000));}
   refreshPay(){const p=this.state.pay;if(this.state.route.a!=='pay'){clearInterval(this.poll);return;}
     this.api('status?id='+encodeURIComponent(p.id)+'&key='+encodeURIComponent(p.key)).then(o=>{if(o.status==='paid'){clearInterval(this.poll);this.finishPaid(o);}else if(o.status!=='review'){clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,order:o}}));}},()=>{});}
-  finishPaid(o){const reg={...o.reg,key:this.state.pay.key};const regs={...this.state.regs,[reg.no]:reg};this.save(regs);
+  finishPaid(o){window.track('purchase',{transaction_id:o.id,currency:'ETB',value:o.price,items:[{item_id:o.slug,item_name:o.name,price:o.price}]});const reg={...o.reg,key:this.state.pay.key};const regs={...this.state.regs,[reg.no]:reg};this.save(regs);
     this.setState({regs,lastNo:reg.no,draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),toPhone:'',email:'',byEmail:''}},()=>this.go('success'));}
   verifyPay=async e=>{e&&e.preventDefault&&e.preventDefault();const p=this.state.pay;const txn=p.txn.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
     if(txn.length<8){this.setState({pay:{...p,error:'Enter the transaction number from your telebirr SMS.'}});return;}

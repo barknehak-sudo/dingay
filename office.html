@@ -81,6 +81,7 @@ dl.kv dt{color:var(--mut)}dl.kv dd{margin:0;overflow-wrap:anywhere}
 .newhits .nh-side{font-size:14px;color:var(--ink-2);text-align:right;line-height:1.6}
 .newhits .nh-bars{margin-top:14px;height:56px;display:flex;align-items:flex-end;gap:4px}
 .newhits .nh-bars i{flex:1;background:linear-gradient(180deg,#c86bff,#5f8bff);border-radius:4px 4px 0 0;min-height:3px}
+.newhits.jami .nh-bars i{background:#1f8a55}.newhits.jami .hbar .tr i{background:#1f8a55}
 button.chip{border:1px solid var(--line);cursor:pointer;font:inherit;font-size:13px;padding:6px 12px;min-height:34px}
 button.chip.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
 .lbs{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))}
@@ -175,7 +176,7 @@ async function api(method,body,query=''){
 }
 async function load(){
   $('#err').textContent='';
-  try{const j=await api('GET');S.orders=j.orders;S.inquiries=j.inquiries||[];S.auto=j.auto||{};S.verifier=j.verifier||null;S.newHits=j.newHits||null;if(S.auto.from)SW_MAIL=S.auto.from;S.loadedAt=Date.now();
+  try{const j=await api('GET');S.orders=j.orders;S.inquiries=j.inquiries||[];S.auto=j.auto||{};S.verifier=j.verifier||null;S.newHits=j.newHits||null;S.baseline=j.baseline||null;if(S.auto.from)SW_MAIL=S.auto.from;S.loadedAt=Date.now();
     try{sessionStorage.setItem('dg-admin',pw)}catch(e){}
     $('#login').hidden=true;$('#app').hidden=false;render();}
   catch(e){$('#err').textContent=e.message;$('#login').hidden=false;$('#app').hidden=true;}
@@ -198,7 +199,10 @@ const tgHref=phone=>'https://t.me/+251'+String(phone||'').replace(/^0/,'');
 const TG_ICON='<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" style="flex:none;fill:currentColor"><path d="M21.9 4.6 18.8 19.3c-.2 1-.8 1.3-1.7.8l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.8 8.8-7.9c.4-.3-.1-.5-.6-.2L6.8 13.2l-4.7-1.5c-1-.3-1-1 .2-1.5L20.6 3c.8-.3 1.6.2 1.3 1.6z"/></svg>';
 // Main "send" button (Telegram) + a small SMS fallback for when the phone's SMS works again.
 const sendBtns=(o,what,phone,text,label)=>`<a class="btn tg" href="${esc(tgHref(phone))}" target="_blank" rel="noopener" data-tgcopy="${esc(text)}" data-mark="${what}" data-id="${esc(o.id)}">${TG_ICON}${label}</a>`
-  +`<a class="btn ghost" href="${esc(smsHref(phone,text))}" data-mark="${what}" data-id="${esc(o.id)}">SMS</a>`;
+  +`<a class="btn ghost" href="${esc(smsHref(phone,text))}" data-mark="${what}" data-id="${esc(o.id)}">SMS</a>`
+  +copyBtn(o,what,text);
+// Copies the ready-made text, so it can be pasted into any SMS app; also records it as sent.
+const copyBtn=(o,what,text,label='Copy message')=>text?`<button class="btn ghost" data-copytext="${esc(text)}" data-cmark="${esc(what||'')}" data-id="${esc(o.id)}">${label}</button>`:'';
 const mailHref=(o,m)=>`mailto:${o.email}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
 // Opens Gmail's compose window signed in as the SIDEWAYS address, everything filled in.
 const gmailHref=(o,m)=>`https://mail.google.com/mail/?authuser=${encodeURIComponent(SW_MAIL)}&view=cm&fs=1&to=${encodeURIComponent(o.email)}&su=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
@@ -245,16 +249,18 @@ function stats(){
   // Money = what telebirr receipts say was received. Hand-added registrations aren't counted;
   // removed records still count if a receipt shows real money came in.
   const counted=S.orders.filter(o=>!o.manual&&(o.status==='paid'||(o.status==='removed'&&o.paidAmount!=null)));
+  // All-time money = the checked starting totals + what was paid after them (see BASELINE in api/admin.js).
+  const B=S.baseline||{at:0,telebirr:0,jami:0},after=counted.filter(o=>(o.approvedAt||o.createdAt||0)>=B.at);
   const amt=o=>o.paidAmount!=null?o.paidAmount:o.price;
   const sum=l=>l.reduce((a,o)=>a+amt(o),0);
   const today=dayKey(Date.now()),wk=Date.now()-7*864e5;
-  const rev=sum(counted);
+  const rev=B.telebirr+B.jami+sum(after);
   const revToday=sum(counted.filter(o=>dayKey(o.approvedAt||o.createdAt)===today));
   const rev7=sum(counted.filter(o=>(o.approvedAt||0)>=wk));
-  const noReceipt=counted.filter(o=>o.paidAmount==null);
+  const noReceipt=after.filter(o=>o.paidAmount==null);
   const manual=S.orders.filter(o=>o.manual&&o.status==='paid');
-  const missing=counted.filter(o=>o.receiptMissing);
-  const byAcct={};for(const o of counted)if(o.paidAmount!=null&&!o.receiptMissing){const k=o.paidTo||'?';byAcct[k]=(byAcct[k]||0)+o.paidAmount;}
+  const missing=after.filter(o=>o.receiptMissing);
+  const byAcct={};for(const o of after)if(o.paidAmount!=null&&!o.receiptMissing){const k=o.paidTo||'?';byAcct[k]=(byAcct[k]||0)+o.paidAmount;}
   const realPaid=real.filter(o=>o.status==='paid'||o.status==='removed');
   const coded=real.filter(o=>o.txn);
   const conv=real.length?Math.round(realPaid.length/real.length*100):0;
@@ -268,7 +274,7 @@ function stats(){
   const stones=Object.entries(byStone).sort((a,b)=>b[1]-a[1]);
   const fr=paid.filter(isFriend).length,lv=paid.length-fr;
   const am=paid.filter(o=>o.lang==='am').length;
-  return {rev,revToday,rev7,counted:counted.length,missing,noReceipt,manual,byAcct,paid:paid.length,conv,med,real:real.length,coded:coded.length,realPaid:realPaid.length,days,stones,fr,lv,am};
+  return {B,rev,revToday,rev7,counted:after.length,missing,noReceipt,manual,byAcct,paid:paid.length,conv,med,real:real.length,coded:coded.length,realPaid:realPaid.length,days,stones,fr,lv,am};
 }
 
 /* ---------- of the month ---------- */
@@ -316,6 +322,43 @@ function viewNewHits(){
     <div class="readout" style="margin-top:6px">People per day, last 14 days. A person counts once per phone, however many times they tap.</div>
   </div>`;
 }
+// Paid on Jami: orders JamiDev confirmed (Telebirr / M-Pesa / CBE Birr push on the buyer's phone).
+const GW={telebirr:'Telebirr',mpesa:'M-Pesa',cbe:'CBE Birr'};
+const byJami=o=>o.approvedBy==='jami'||o.paidTo==='jami';
+function jamiStats(){
+  const tried=S.orders.filter(o=>!o.manual&&o.jami&&o.jami.startedAt&&!o.jami.sandbox);
+  const paid=S.orders.filter(o=>byJami(o)&&(o.status==='paid'||o.status==='removed'));
+  const live=paid.filter(o=>!(o.jami&&o.jami.sandbox)),test=paid.length-live.length;
+  const B=S.baseline||{at:0,jami:0},since=live.filter(o=>((o.jami&&o.jami.paidAt)||o.approvedAt||0)>=B.at);
+  const amt=o=>o.paidAmount!=null?o.paidAmount:o.price,sum=l=>l.reduce((a,o)=>a+amt(o),0);
+  const at=o=>(o.jami&&o.jami.paidAt)||o.approvedAt||0;
+  const today=dayKey(Date.now()),wk=Date.now()-7*864e5;
+  const open=tried.filter(o=>o.status==='awaiting'&&o.jami.state==='open'),expired=tried.filter(o=>o.status!=='paid'&&o.status!=='removed'&&o.jami.state==='expired');
+  const gw={};for(const o of live){const k=(o.jami&&o.jami.gateway)||'telebirr';gw[k]=gw[k]||{n:0,v:0};gw[k].n++;gw[k].v+=amt(o);}
+  const days=[];for(let i=13;i>=0;i--){const t=Date.now()-i*864e5;days.push({k:dayKey(t),label:new Date(t).toLocaleDateString('en-GB',{timeZone:TZ,day:'numeric',month:'short'}),n:0,v:0});}
+  const byDay=Object.fromEntries(days.map(d=>[d.k,d]));for(const o of live){const d=byDay[dayKey(at(o))];if(d){d.n++;d.v+=amt(o);}}
+  const triedPaid=tried.filter(o=>byJami(o)).length;
+  return {B,tried:tried.length,n:live.length,test,rev:B.jami+sum(since),revToday:sum(live.filter(o=>dayKey(at(o))===today)),n7:live.filter(o=>at(o)>=wk).length,rev7:sum(live.filter(o=>at(o)>=wk)),
+    rate:tried.length?Math.round(triedPaid/tried.length*100):null,open:open.length,expired:expired.length,gw:Object.entries(gw).sort((a,b)=>b[1].v-a[1].v),days};
+}
+function viewJami(){
+  const j=jamiStats(),all=stats().rev;
+  if(!j.tried&&!j.n&&!j.test)return `<h2 class="sec"><span>Paid on Jami</span></h2><div class="card empty">No Jami payments yet.</div>`;
+  const max=Math.max(1,...j.days.map(d=>d.n));const gMax=Math.max(1,...j.gw.map(g=>g[1].v));
+  const bars=j.days.map(d=>`<i title="${esc(d.label)}: ${d.n} · ${fmtBirr(d.v)}" style="height:${Math.max(4,d.n/max*100).toFixed(0)}%;${d.n?'':'opacity:.25'}"></i>`).join('');
+  return `<h2 class="sec"><span>Paid on Jami · ${j.n}</span><button data-tab="orders" data-jami>See orders</button></h2>
+  <div class="kpis">
+    <div class="card kpi"><div class="mono">Today</div><div class="v">${fmtBirr(j.revToday)}</div></div>
+    <div class="card kpi"><div class="mono">Last 7 days</div><div class="v">${fmtBirr(j.rev7)}</div><div class="s">${j.n7} paid</div></div>
+    <div class="card kpi"><div class="mono">All time on Jami</div><div class="v">${fmtBirr(j.rev)}</div><div class="s">${j.B.at?`${fmtBirr(j.B.jami)} up to ${esc(when(j.B.at))} + ${fmtBirr(j.rev-j.B.jami)} since · `:''}${j.n} paid${all?` · ${(j.rev/all*100).toFixed(j.rev/all<.1?1:0)}% of all money`:''}</div></div>
+    <div class="card kpi"><div class="mono">Jami success</div><div class="v">${j.rate==null?'—':j.rate+'%'}</div><div class="s">of ${j.tried} orders that tapped PAY NOW${j.expired?` · ${j.expired} expired unpaid`:''}${j.open?` · ${j.open} waiting now`:''}</div></div>
+  </div>
+  <div class="card newhits jami" style="margin-top:10px">
+    ${j.gw.map(([k,g])=>`<div class="hbar"><span class="lab">${esc(GW[k]||k)}</span><span class="tr"><i style="width:${(g.v/gMax*100).toFixed(1)}%"></i></span><span class="val">${g.n} · ${fmtBirr(g.v)}</span></div>`).join('')||'<div class="empty">No paid Jami orders yet.</div>'}
+    <div class="nh-bars" role="img" aria-label="Paid on Jami per day, last 14 days">${bars}</div>
+    <div class="readout" style="margin-top:6px">Paid on Jami per day, last 14 days.${j.test?` ${j.test} sandbox (test) payment${j.test===1?'':'s'} left out.`:''}</div>
+  </div>`;
+}
 function viewLeaders(){
   const L=leaders(S.lb);
   const tabs=Object.entries(LB_RANGES).map(([k,l])=>`<button class="chip${S.lb===k?' on':''}" data-lb="${k}" ${S.lb===k?'aria-pressed="true"':'aria-pressed="false"'}>${l}</button>`).join('');
@@ -346,22 +389,28 @@ function viewDash(){
   const tot=Math.max(1,st.fr+st.lv);
   return `
   ${ts.length?`<h2 class="sec"><span>Next up · ${ts.length}</span><button data-tab="tasks">See all</button></h2><div class="grid">${ts.slice(0,3).map(taskCard).join('')}</div>`:`<h2 class="sec"><span>Next up</span></h2><div class="card empty">✓ All caught up.</div>`}
+  ${viewJami()}
   ${viewNewHits()}
   ${viewLeaders()}
   <h2 class="sec"><span>Money</span></h2>
   <div class="kpis">
     <div class="card kpi"><div class="mono">Today</div><div class="v">${fmtBirr(st.revToday)}</div></div>
     <div class="card kpi"><div class="mono">Last 7 days</div><div class="v">${fmtBirr(st.rev7)}</div></div>
-    <div class="card kpi"><div class="mono">All time received</div><div class="v">${fmtBirr(st.rev)}</div><div class="s">${st.counted} payments · ${st.paid} live registrations</div></div>
+    <div class="card kpi"><div class="mono">All time received</div><div class="v">${fmtBirr(st.rev)}</div><div class="s">${st.B.at?`${fmtBirr(st.B.telebirr+st.B.jami)} up to ${esc(when(st.B.at))} + ${st.counted} payments since`:`${st.counted} payments`} · ${st.paid} live registrations</div></div>
     <div class="card kpi"><div class="mono">Pay rate</div><div class="v">${st.conv}%</div><div class="s">of started orders get paid${st.med!=null?` · ${Math.round(st.med)} min to pay (median)`:''}</div></div>
   </div>
   <h2 class="sec"><span>Money check</span></h2>
   <div class="card">
+    ${st.B.at?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Starting total · telebirr, up to ${esc(when(st.B.at))}</span><strong>${fmtBirr(st.B.telebirr)}</strong></div><div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Starting total · Jami, up to ${esc(when(st.B.at))}</span><strong>${fmtBirr(st.B.jami)}</strong></div>`:''}
     ${Object.entries(st.byAcct).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${k==='jami'?'JamiDev (Telebirr / M-Pesa / CBE Birr)':k==='7218'?'0996 567 218 (…7218)':k==='5467'?'Old number (…5467)':'Account …'+esc(k)}</span><strong>${fmtBirr(v)}</strong></div>`).join('')}
     ${st.noReceipt.length?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Not checked against a receipt yet</span><strong>${fmtBirr(st.noReceipt.reduce((a,o)=>a+o.price,0))}</strong></div>`:''}
     ${st.missing.length?`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>Marked paid, but telebirr has no such transaction</span><strong>${st.missing.length} · 0 Birr</strong></div>`:''}
     <div class="row" style="padding:8px 0"><span>Added by hand (not counted)</span><strong>${st.manual.length}</strong></div>
-    <div class="readout" style="margin-top:6px">Amounts come from the telebirr receipts the Mac helper reads.</div>
+    <div class="readout" style="margin-top:6px">${st.B.at?`Accounts below the starting totals are payments since ${esc(when(st.B.at))}. `:''}Amounts come from the telebirr receipts the Mac helper reads, and from Jami.</div>
+    <details class="tbl"><summary>Restart the totals from checked amounts</summary><form class="f" id="baseform" style="margin-top:8px">
+      <div class="two"><label>Telebirr total (Birr)<input name="telebirr" inputmode="decimal" required value="${esc(st.B.telebirr)}"></label><label>Jami total (Birr)<input name="jami" inputmode="decimal" required value="${esc(st.B.jami)}"></label></div>
+      <button class="btn" type="submit">Save — count from now</button>
+      <div class="readout">Everything paid before now is replaced by these two amounts.</div></form></details>
     ${st.noReceipt.length?`<details class="tbl"><summary>Show the ${st.noReceipt.length} without a receipt amount</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.noReceipt.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
     ${st.missing.length?`<details class="tbl" open><summary>Show the ${st.missing.length} with no telebirr receipt</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.missing.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
     ${st.manual.length?`<details class="tbl"><summary>Show the ${st.manual.length} added by hand</summary><table class="data"><thead><tr><th>Order</th><th>Note</th><th>Price</th></tr></thead><tbody>${st.manual.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
@@ -409,6 +458,9 @@ function orderCard(o){
     if(o.status==='paid')a.push(sendBtns(o,'congrats_sms',o.phone,m.congrats,'Congrats'));
     else if(o.status!=='removed')a.push(sendBtns(o,'help_sms',o.phone,m.help,'Help'));}
   if(o.toPhone&&o.status==='paid')a.push(sendBtns(o,'to_sms',o.toPhone,m.gift,'Text '+esc(o.to)));
+  else if(o.status==='paid')a.push(copyBtn(o,'',m.gift,'Copy message for '+esc(o.to)));
+  if(!o.phone&&o.status==='paid')a.push(copyBtn(o,'',m.congrats,'Copy congrats for '+esc(o.by)));
+  if(o.status!=='removed')a.push(`<button class="btn ghost" data-edit="${esc(o.id)}">Edit details</button>`);
   if(o.email&&o.status==='paid')a.push(emailLinks(o,m,'Email '+esc(o.to)));
   if(o.status==='review'||o.status==='awaiting'||o.status==='rejected')a.push(`<button class="btn ok" data-a="approve" data-id="${esc(o.id)}">Approve</button>`);
   if(o.status==='review'||o.status==='awaiting')a.push(`<button class="btn bad" data-a="reject" data-id="${esc(o.id)}">Reject</button>`);
@@ -427,19 +479,33 @@ function orderCard(o){
       ${o.byEmail?`<dt>Buyer email</dt><dd>${esc(o.byEmail)}</dd>`:''}
       ${o.txn?`<dt>Transaction</dt><dd>${o.manual?esc(o.txn):`<a href="https://transactioninfo.ethiotelecom.et/receipt/${encodeURIComponent(o.txn)}" target="_blank" rel="noopener noreferrer">${esc(o.txn)} ↗</a>`}</dd>`:''}
       ${o.paidAmount!=null?`<dt>Received</dt><dd>${esc(o.paidAmount)} Birr${o.paidTo?' → …'+esc(o.paidTo):''}${o.payer?' · from '+esc(o.payer):''}</dd>`:''}
+      ${o.jami?`<dt>Jami</dt><dd>${byJami(o)?'Paid':o.jami.state==='expired'?'Expired, not paid':'Started'} · ${esc(GW[o.jami.gateway]||o.jami.gateway||'')}${o.jami.sandbox?' · TEST':''} · ${when((o.jami.paidAt||o.jami.startedAt))}</dd>`:''}
       ${o.approvedBy?`<dt>Approved</dt><dd>${esc(o.approvedBy)} · ${when(o.approvedAt)}</dd>`:''}
       ${o.message?`<dt>Message</dt><dd>“${esc(o.message)}”</dd>`:''}
     </dl>
     ${o.reason&&o.status==='review'?`<div class="reason">${esc(o.reason)}</div>`:''}
     ${followChips(o)}
     <div class="acts">${a.join('')}</div>
+    ${S.edit===o.id?editForm(o):''}
   </div>`;
 }
+// Fix names and other certificate details. Paid records update on the public registry and certificate right away.
+function editForm(o){
+  const occ=['Birthday','Anniversary','Graduation','Farewell','Apology','Just because'];
+  return `<form class="f" data-editform="${esc(o.id)}" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+    <div class="two"><label>For (recipient)<input name="to" required maxlength="28" value="${esc(o.to)}"></label><label>From (buyer)<input name="by" required maxlength="28" value="${esc(o.by)}"></label></div>
+    <label>Occasion<select name="occasion"><option value="">—</option>${occ.map(x=>`<option${o.occasion===x?' selected':''}>${x}</option>`).join('')}</select></label>
+    <label>Message<textarea name="message" maxlength="140">${esc(o.message||'')}</textarea></label>
+    <div class="two"><label>Buyer phone<input name="phone" type="tel" value="${esc(o.phone||'')}"></label><label>Recipient phone<input name="toPhone" type="tel" value="${esc(o.toPhone||'')}"></label></div>
+    <div class="two"><label>Buyer email<input name="byEmail" type="email" value="${esc(o.byEmail||'')}"></label><label>Recipient email<input name="email" type="email" value="${esc(o.email||'')}"></label></div>
+    <div class="acts" style="margin-top:0"><button class="btn" type="submit">Save changes</button><button class="btn ghost" type="button" data-edit="${esc(o.id)}">Cancel</button></div>
+  </form>`;
+}
 function viewOrders(){
-  const FIL=[['all','All'],['review','Check'],['awaiting','Not paid'],['paid','Paid'],['rejected','Rejected'],['removed','Removed']];
+  const FIL=[['all','All'],['review','Check'],['awaiting','Not paid'],['paid','Paid'],['jami','Paid on Jami'],['rejected','Rejected'],['removed','Removed']];
   const q=S.q.trim().toLowerCase();
-  const list=S.orders.filter(o=>(S.filter==='all'||o.status===S.filter)&&(!q||[o.id,o.to,o.by,o.phone,o.toPhone,o.txn,o.email,o.byEmail].some(v=>String(v||'').toLowerCase().includes(q))));
-  const cnt=k=>k==='all'?S.orders.length:S.orders.filter(o=>o.status===k).length;
+  const list=S.orders.filter(o=>(S.filter==='all'||(S.filter==='jami'?byJami(o)&&o.status==='paid':o.status===S.filter))&&(!q||[o.id,o.to,o.by,o.phone,o.toPhone,o.txn,o.email,o.byEmail].some(v=>String(v||'').toLowerCase().includes(q))));
+  const cnt=k=>k==='all'?S.orders.length:k==='jami'?S.orders.filter(o=>byJami(o)&&o.status==='paid').length:S.orders.filter(o=>o.status===k).length;
   return `<div style="margin-top:14px"><input class="search" id="q" type="search" placeholder="Search name, phone, DG-…, transaction" value="${esc(S.q)}">
     <div class="filters">${FIL.map(([k,l])=>`<button data-filter="${k}" aria-pressed="${S.filter===k}">${l} · ${cnt(k)}</button>`).join('')}</div></div>
     <div class="grid" style="margin-top:12px">${list.slice(0,80).map(orderCard).join('')||'<div class="card empty">Nothing here.</div>'}</div>
@@ -492,10 +558,15 @@ function replaceOrder(o){S.orders=S.orders.map(x=>x.id===o.id?{...x,...o}:x);}
 $('#loginForm').onsubmit=e=>{e.preventDefault();pw=$('#pw').value;load();};
 $('#refresh').onclick=()=>load().then(()=>toast('Updated'));
 document.addEventListener('click',async e=>{
-  const tab=e.target.closest('[data-tab]');if(tab){setTab(tab.dataset.tab);return;}
+  const tab=e.target.closest('[data-tab]');if(tab){if(tab.hasAttribute('data-jami'))S.filter='jami';setTab(tab.dataset.tab);return;}
   const fil=e.target.closest('[data-filter]');if(fil){S.filter=fil.dataset.filter;render();return;}
   const tm=e.target.closest('[data-testmail]');if(tm){const to=prompt('Send a test certificate email to:');if(!to)return;tm.disabled=true;
     try{const j=await api('POST',{testEmail:to.trim()});toast('Sent from '+j.from+' — check '+j.to);}catch(err){alert(err.message);}tm.disabled=false;return;}
+  const cp=e.target.closest('[data-copytext]');if(cp){const t=cp.dataset.copytext,id=cp.dataset.id,what=cp.dataset.cmark;
+    try{await navigator.clipboard.writeText(t);}catch(err){prompt('Copy this:',t);}
+    if(what){const o=S.orders.find(x=>x.id===id);if(o)o.follow={...F(o),[what]:Date.now()};api('POST',{id,action:'mark',what}).catch(()=>{});render();toast('Copied — paste it into an SMS. Marked as sent.');}
+    else toast('Copied — paste it into an SMS');return;}
+  const ed=e.target.closest('[data-edit]');if(ed){S.edit=S.edit===ed.dataset.edit?null:ed.dataset.edit;render();return;}
   const lb=e.target.closest('[data-lb]');if(lb){S.lb=lb.dataset.lb;render();return;}
   const po=e.target.closest('[data-post]');if(po){const b=leaders(S.lb).boards.find(x=>x.id===po.dataset.post);const t=b&&postText(b,S.lb);
     if(t){try{await navigator.clipboard.writeText(t);toast('Copied — paste it into your post');}catch(err){prompt('Copy this:',t);}}return;}
@@ -524,6 +595,13 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('#q');if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(_){}}}});
 document.addEventListener('submit',async e=>{
+  const ef=e.target.closest('[data-editform]');
+  if(ef){e.preventDefault();const id=ef.dataset.editform,btn=ef.querySelector('button[type=submit]');btn.disabled=true;
+    try{const j=await api('POST',{id,action:'edit',edit:Object.fromEntries(new FormData(ef).entries())});replaceOrder(j.order);S.edit=null;render();toast('Saved — certificate updated');}
+    catch(err){alert(err.message);btn.disabled=false;}return;}
+  if(e.target.id==='baseform'){e.preventDefault();const b=Object.fromEntries(new FormData(e.target).entries());
+    if(!confirm(`Restart the money totals at ${b.telebirr} Birr telebirr + ${b.jami} Birr Jami, counting from now?`))return;
+    try{const j=await api('POST',{baseline:b});S.baseline=j.baseline;render();toast('Totals restarted');}catch(err){alert(err.message);}return;}
   if(e.target.id!=='newform')return;e.preventDefault();
   const f=e.target,btn=f.querySelector('button[type=submit]');const create=Object.fromEntries(new FormData(f).entries());
   if(!confirm(`Register ${create.to} (from ${create.by}) as PAID and publish it?`))return;
@@ -534,7 +612,7 @@ document.addEventListener('submit',async e=>{
   catch(err){out.innerHTML=`<div class="err">${esc(err.message)}</div>`;btn.disabled=false;}
 });
 if(pw)load();
-setInterval(()=>{if(!$('#app').hidden&&document.visibilityState==='visible'&&!document.querySelector('details.new[open]')&&!(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))load();},60000);
+setInterval(()=>{if(!$('#app').hidden&&document.visibilityState==='visible'&&!S.edit&&!document.querySelector('details.new[open]')&&!(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))load();},60000);
 </script>
 </body>
 </html>
