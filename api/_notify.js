@@ -9,6 +9,8 @@ import { kv, loadOrder, saveOrder, PAY_TO } from './_lib.js';
 
 export const SITE = (process.env.SITE_URL || 'https://dinguy.xyz').replace(/\/$/, '');
 export const SW_MAIL = process.env.GMAIL_USER || 'offscriptet@gmail.com';
+// TELEGRAM_LINK — invite link of the DINGUY Telegram group/channel (t.me/+…); shown in emails and after paying.
+export const TG = () => (/^https:\/\/t\.me\//.test(process.env.TELEGRAM_LINK || '') ? process.env.TELEGRAM_LINK : '');
 const SW_CONTACT = 'infosideways7@gmail.com'; // SIDEWAYS contact in the email footer
 const SW_LINK = 'https://dinguy.xyz/#/sideways';
 export const autoOn = () => ({ sms: !!process.env.SMSETHIOPIA_KEY, email: AUTO_EMAIL && !!process.env.GMAIL_APP_PASSWORD, emailReady: !!process.env.GMAIL_APP_PASSWORD, from: SW_MAIL });
@@ -40,9 +42,10 @@ export function messages(o, site = SITE) {
   const body = am
     ? `ሰላም ${o.to}፣\n\n${o.by} በDINGUY መዝገብ ውስጥ ${o.name}ን በስምዎ አስመዝግበዋል።\n\n${o.message ? `“${o.message}”\n\n` : ''}የምዝገባ ቁ. ${o.id}\nመዝገብዎና ሰርተፊኬትዎ፦ ${recordLink}\n\nDINGUY® — ከልክ በላይ ትርጉም ላላቸው አጋጣሚዎች የተመዘገቡ ድንጋዮች።\nዲጂታል ምዝገባ። አካላዊ ድንጋይ አይካተትም።\n\n—\nDINGUY የSIDEWAYS ስራ ነው።\nSIDEWAYS ሰዎች ቆም ብለው፣ ደግመው አይተው እንዲያስታውሱ የሚያደርጉ ድረ-ገጾችን፣ ዘመቻዎችንና ሀሳቦችን ይሰራል።\nየእርስዎን ሀሳብ እንስራው፦ ${SW_LINK}\n${SW_CONTACT} · 0996 567 218`
     : `Hi ${o.to},\n\n${o.by} has registered ${o.name} in your name with the DINGUY Registry.\n\n${o.message ? `“${o.message}”\n\n` : ''}Registration No. ${o.id}\nYour record and certificate: ${recordLink}\n\nDINGUY® — Registered stones for unreasonably meaningful occasions.\nDigital registration. No physical stone included.\n\n—\nDINGUY is a SIDEWAYS project.\nSIDEWAYS makes websites, campaigns and ideas that make people stop, look twice and remember.\nGot an idea? Let’s make people talk: ${SW_LINK}\n${SW_CONTACT} · 0996 567 218`;
-  const foot = am
+  const tg = TG(), tgLine = tg ? (am ? `\n\nየDINGUY ቴሌግራም ቡድናችንን ይቀላቀሉ፦ ${tg}` : `\n\nJoin the DINGUY Telegram group: ${tg}`) : '';
+  const foot = tgLine + (am
     ? `\n\n—\nDINGUY የSIDEWAYS ስራ ነው። ጥያቄ ካለዎት ይህን ኢሜይል ይመልሱ ወይም ይደውሉ፦ ${num}`
-    : `\n\n—\nDINGUY is a SIDEWAYS project. Questions? Just reply to this email or call ${num}.`;
+    : `\n\n—\nDINGUY is a SIDEWAYS project. Questions? Just reply to this email or call ${num}.`);
   // to the buyer, once paid: receipt + the private link to send to the recipient
   const buyerSubject = am ? `ደረሰኝ፦ ${o.name} ለ${o.to} ተመዝግቧል · ${o.id}` : `Receipt: ${o.name} is registered to ${o.to} · ${o.id}`;
   const buyerBody = am
@@ -177,7 +180,7 @@ export async function followUp(id, opts = {}) {
   return o;
 }
 
-// Look over recent orders for anything due. Runs at most every 10 seconds, however often it's called
+// Look over orders that may still need a message. Runs at most once a minute, however often it's called
 // (customer status checks, /office, the verifier, /api/sweep from an outside cron).
 export async function sweep() {
   try {

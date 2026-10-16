@@ -43,7 +43,14 @@ export const setJSON = (k, v) => kv('SET', k, JSON.stringify(v));
 // left to send — and (2) bumps 'ver', so /office can skip downloading all orders when nothing changed.
 // Both keep Upstash bandwidth low: the free plan allows 10 GB a month.
 export const touch = () => kv('INCR', 'ver');
-export const saveOrder = async (o) => { await setJSON('order:' + o.id, o); await kv('SADD', 'fu', o.id); await touch(); };
+// (3) 'upd' (id → time of the last change) lets the Google Sheet sync fetch only what changed.
+export const saveOrder = async (o) => {
+  o.updatedAt = Date.now();
+  await setJSON('order:' + o.id, o);
+  await kv('SADD', 'fu', o.id);
+  await kv('ZADD', 'upd', o.updatedAt, o.id);
+  await touch();
+};
 export const loadOrder = (id) => (/^DG-\d{6}$/.test(id || '') ? getJSON('order:' + id) : null);
 
 /* ---------- http ---------- */

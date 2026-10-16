@@ -250,7 +250,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const TZ='Africa/Addis_Ababa';
 let SW_MAIL='offscriptet@gmail.com'; // the sending address; the server's setting wins (see load())
 let pw='';try{pw=sessionStorage.getItem('dg-admin')||''}catch(e){}
-const S={role:'admin',orders:[],inquiries:[],auto:{},lb:'30d',tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
+const S={bcForm:{channel:'sms',who:'paid',subject:'',text:''},bcCount:{},role:'admin',orders:[],inquiries:[],auto:{},lb:'30d',tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
 try{const t=sessionStorage.getItem('dg-tab');if(t)S.tab=t;}catch(e){}
 // Partner password: read-only, Dashboard only, no customer details (the server leaves them out too).
 const P=()=>S.role==='partner';
@@ -263,7 +263,7 @@ async function load(){
   $('#err').textContent='';
   try{const j=await api('GET',null,S.ver&&!$('#app').hidden?'?v='+encodeURIComponent(S.ver):'');
     if(j.same){S.verifier=j.verifier||S.verifier;S.loadedAt=Date.now();render();return;} // nothing changed since the last load
-    S.ver=j.ver;S.role=j.role==='partner'?'partner':'admin';if(P())S.tab='dash';S.orders=j.orders;S.inquiries=j.inquiries||[];S.auto=j.auto||{};S.verifier=j.verifier||null;S.newHits=j.newHits||null;S.baseline=j.baseline||null;if(S.auto.from)SW_MAIL=S.auto.from;S.loadedAt=Date.now();
+    S.ver=j.ver;S.role=j.role==='partner'?'partner':'admin';if(P())S.tab='dash';S.orders=j.orders;S.inquiries=j.inquiries||[];S.auto=j.auto||{};S.verifier=j.verifier||null;S.newHits=j.newHits||null;S.baseline=j.baseline||null;S.bc=j.bc||null;S.optouts=j.optouts||[];S.audiences=j.audiences||{};if(S.auto.from)SW_MAIL=S.auto.from;S.loadedAt=Date.now();
     try{sessionStorage.setItem('dg-admin',pw)}catch(e){}
     $('#login').hidden=true;$('#app').hidden=false;render();loadGA();}
   catch(e){$('#err').textContent=e.message;$('#login').hidden=false;$('#app').hidden=true;}
@@ -557,7 +557,7 @@ function viewLeaders(){
 }
 function renderTabs(){
   const n=P()?0:tasks().length,inq=S.inquiries.filter(q=>q.status!=='done').length;
-  const T=P()?[['dash','Dashboard',0]]:[['dash','Dashboard',0],['tasks','Tasks',n],['orders','Orders',0],['inq','Inquiries',inq]];
+  const T=P()?[['dash','Dashboard',0]]:[['dash','Dashboard',0],['tasks','Tasks',n],['orders','Orders',0],['inq','Inquiries',inq],['send','Send',S.bc&&S.bc.state==='sending'?'…':0]];
   $('#role').textContent=P()?'Partner view':'Office';
   $('#tabs').innerHTML=T.map(([k,l,c])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${l}${c?`<span class="badge">${c}</span>`:''}</button>`).join('');
   $('#updated').textContent='Updated '+new Date(S.loadedAt).toLocaleTimeString('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit'});
@@ -720,6 +720,66 @@ function viewOrders(){
     ${list.length>80?`<div class="empty">Showing 80 of ${list.length}. Search to narrow down.</div>`:''}
     <h2 class="sec"><span>Add by hand</span></h2>${newForm()}`;
 }
+/* ---------- send: SMS / email to many customers (api/_broadcast.js) ---------- */
+const BC_TPL={
+  telegram:{t:'Telegram invite',sms:'Hi {name}! DINGUY now has a Telegram group: new stones, monthly winners and offers first. Join here: https://t.me/+XXXX',subject:'Join DINGUY on Telegram',email:'Hi {name},\n\nThank you for being part of DINGUY.\n\nWe now have a Telegram group where new stones, the monthly winners and offers show up first. Join here:\nhttps://t.me/+XXXX\n\nSee you there!\nDINGUY'},
+  newstone:{t:'New stones',sms:'Hi {name}! New DINGUY stones just landed. Register one for someone special: dinguy.xyz',subject:'New DINGUY stones are here',email:'Hi {name},\n\nNew stones just landed in the DINGUY Registry.\n\nRegister one for someone who deserves it: https://dinguy.xyz\n\nDINGUY'},
+};
+// SMS cost: 160 letters per SMS (70 if it has Amharic or emoji — avoid emoji in SMS); long messages are split into parts.
+function smsParts(t){const uni=/[^\x00-\x7F£¥èéùìòÇØøÅå_ÆæßÉ¤¡ÄÖÑÜ§¿äöñüà€]/.test(t),one=uni?70:160,many=uni?67:153;return t.length<=one?1:Math.ceil(t.length/many);}
+function bcInfo(){const f=S.bcForm,t=f.text||'';if(f.channel!=='sms')return `${t.length} characters`;const n=S.bcCount[f.channel+':'+f.who],p=smsParts(t);return `${t.length} characters · ${p} SMS part${p>1?'s':''} per person${n!=null?` · about ${n*p} SMS in total`:''}`;}
+function bcProgress(){
+  const b=S.bc;if(!b)return '';
+  const pct=b.total?Math.round(b.done/b.total*100):0,st={sending:'Sending…',done:'Finished',stopped:'Stopped'}[b.state]||b.state;
+  return card(`${st} · ${b.channel==='sms'?'SMS':'Email'}`,`To ${esc((S.audiences||{})[b.who]||b.who)} · started ${esc(when(b.startedAt))}`,`
+    <div class="prog"><i style="width:${pct}%"></i></div>
+    <div class="progl"><span><b>${b.sent}</b> sent${b.failed?` · <b style="color:var(--bad)">${b.failed}</b> failed`:''}</span><span>${b.done} of ${b.total}</span></div>
+    ${b.state==='sending'?`<div class="readout" style="margin-top:10px">Keep this page open while it sends${b.channel==='email'?' — emails go one every 15 seconds, up to 200 a day'+(b.waitUntil?', <b>today’s 200 are used: it continues tomorrow</b>':''):''}. If you close it, it carries on from here when you open it again.</div>`:''}
+    ${b.failures&&b.failures.length?`<details class="tbl"><summary>Last failures</summary><table class="data"><tbody>${b.failures.map(x=>`<tr><td>${esc(x.to)}</td><td>${esc(x.msg)}</td></tr>`).join('')}</tbody></table></details>`:''}
+    <div class="readout" style="margin-top:10px;white-space:pre-wrap;max-height:90px;overflow:auto">${b.subject?`<b>${esc(b.subject)}</b>\n`:''}${esc(b.text)}</div>`,'',b.state==='sending'?'<button class="btn bad" data-bc="stop">Stop</button>':'');
+}
+function viewSend(){
+  const f=S.bcForm,sending=S.bc&&S.bc.state==='sending',n=S.bcCount[f.channel+':'+f.who];
+  const ready=f.channel==='sms'?!!S.auto.sms:!!S.auto.emailReady;
+  const ch=(k,l)=>`<button type="button" class="chip${f.channel===k?' on':''}" data-bcf-ch="${k}" aria-pressed="${f.channel===k}">${l}</button>`;
+  return `<div class="hello"><h1>Send a message</h1><p>SMS or email to a group of customers — updates, new stones, the Telegram group.</p></div>
+  <div class="dgrid">
+    <div class="s8" style="display:grid;gap:14px">
+      <div id="bcprog">${bcProgress()}</div>
+      ${card('New message','Write <b>{name}</b> to put in each person’s first name.',`
+      <form class="f" id="bcform" style="padding-bottom:0">
+        <div class="chips" style="margin:0">${ch('sms','SMS')}${ch('email','Email')}</div>
+        ${ready?'':`<div class="reason">${f.channel==='sms'?'SMS isn’t set up (SMSETHIOPIA_KEY in Vercel).':'Email isn’t set up (GMAIL_APP_PASSWORD in Vercel).'}</div>`}
+        <label>Who gets it<select name="who" data-bcf>${Object.entries(S.audiences||{}).map(([k,l])=>`<option value="${k}"${f.who===k?' selected':''}>${esc(l)}</option>`).join('')}</select></label>
+        ${f.channel==='email'?`<label>Subject<input name="subject" data-bcf maxlength="140" value="${esc(f.subject)}"></label>`:''}
+        <label>Message<textarea name="text" data-bcf maxlength="2000" style="min-height:140px">${esc(f.text)}</textarea></label>
+        <div class="readout" id="bcinfo">${bcInfo()}</div>
+        <div class="chips" style="margin:0">Start from: ${Object.entries(BC_TPL).map(([k,t])=>`<button type="button" class="chip" data-bctpl="${k}">${t.t}</button>`).join('')}</div>
+        <div class="two" style="align-items:end"><label>Send a test to yourself first<input name="test" id="bctest" placeholder="${f.channel==='sms'?'09XX XXX XXX':'you@gmail.com'}"></label><button type="button" class="btn ghost" data-bc="test" style="min-height:48px">Send test</button></div>
+        <button type="button" class="btn accent" data-bc="start" style="min-height:52px" ${sending||!ready?'disabled':''}>Send to ${n==null?'…':n} ${n===1?'person':'people'}</button>
+        ${sending?'<div class="readout">One message at a time — stop or finish the one that’s sending first.</div>':''}
+      </form>`)}
+    </div>
+    ${card('Don’t message','People who asked to stop. They’re skipped in every send.',`
+      <form class="f" id="optform" style="padding-bottom:0"><div class="two" style="align-items:end"><label>Phone or email<input name="value" required></label><button class="btn ghost" style="min-height:48px">Add</button></div></form>
+      ${(S.optouts||[]).length?(S.optouts||[]).map(v=>`<div class="mrow"><span>${esc(v)}</span><button class="link" data-optundo="${esc(v)}">Remove</button></div>`).join(''):'<div class="readout">Nobody yet.</div>'}`,'s4')}
+  </div>`;
+}
+async function bcCount(){
+  const f=S.bcForm,k=f.channel+':'+f.who;if(S.bcCount[k]!=null||bcCount.busy===k)return;bcCount.busy=k;
+  try{const j=await api('POST',{bc:{do:'count',channel:f.channel,who:f.who}});S.bcCount[k]=j.count;}catch(e){}
+  bcCount.busy=null;if(S.tab==='send'&&!(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))render();
+  else{const b=document.querySelector('[data-bc="start"]');if(b)b.textContent=`Send to ${S.bcCount[k]} people`;}
+}
+// While a message is sending and this page is open, send the next batch every few seconds.
+function bcLoop(){
+  if(bcLoop.t||!S.bc||S.bc.state!=='sending'||P())return;
+  bcLoop.t=setTimeout(async()=>{
+    try{if(document.visibilityState==='visible'){const j=await api('POST',{bc:{do:'tick'}});S.bc=j.bc;const p=$('#bcprog');if(p)p.innerHTML=bcProgress();
+      if(S.bc&&S.bc.state!=='sending'){toast(S.bc.state==='done'?'Message sent to everyone':'Stopped');render();}}}catch(e){}
+    bcLoop.t=null;bcLoop();
+  },S.bc.channel==='sms'?2500:8000);
+}
 function viewInq(){
   if(!S.inquiries.length)return `<div class="card empty" style="margin-top:16px">No SIDEWAYS inquiries yet.</div>`;
   return `<div class="grid" style="margin-top:14px">${S.inquiries.map(q=>{const h=reachLink(q.reach);return `<div class="card" style="${q.status==='done'?'opacity:.6':''}">
@@ -756,8 +816,10 @@ function verifierWarning(){
 function render(){
   renderTabs();
   const w=P()?'':verifierWarning();$('#warn').innerHTML=w?`<div class="warnbar">⚠️ <span>${w}</span></div>`:'';
-  const v=P()?viewDash:{dash:viewDash,tasks:viewTasks,orders:viewOrders,inq:viewInq}[S.tab]||viewDash;
+  const v=P()?viewDash:{dash:viewDash,tasks:viewTasks,orders:viewOrders,inq:viewInq,send:viewSend}[S.tab]||viewDash;
   $('#view').innerHTML=v();
+  if(S.tab==='send')bcCount();
+  bcLoop();
 }
 function setTab(t){S.tab=t;S.sel=null;try{sessionStorage.setItem('dg-tab',t)}catch(e){}render();window.scrollTo(0,0);}
 function replaceOrder(o){S.orders=S.orders.map(x=>x.id===o.id?{...x,...o}:x);}
@@ -777,6 +839,17 @@ document.addEventListener('click',async e=>{
   const ed=e.target.closest('[data-edit]');if(ed){S.edit=S.edit===ed.dataset.edit?null:ed.dataset.edit;render();return;}
   if(e.target.closest('[data-addhand]')){const d=document.querySelector('#addhand details');if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});}return;}
   const row=e.target.closest('tr[data-open]');if(row){S.q=row.dataset.open;S.filter='all';setTab('orders');return;}
+  const bch=e.target.closest('[data-bcf-ch]');if(bch){S.bcForm.channel=bch.dataset.bcfCh;render();return;}
+  const tpl=e.target.closest('[data-bctpl]');if(tpl){const t=BC_TPL[tpl.dataset.bctpl],f=S.bcForm;f.text=f.channel==='sms'?t.sms:t.email;if(f.channel==='email')f.subject=t.subject;render();return;}
+  const ou=e.target.closest('[data-optundo]');if(ou){try{const j=await api('POST',{bc:{do:'optout',value:ou.dataset.optundo,undo:true}});S.optouts=j.optouts;render();}catch(err){alert(err.message);}return;}
+  const bca=e.target.closest('[data-bc]');if(bca){const f=S.bcForm,d=bca.dataset.bc;
+    if(d==='test'){const to=($('#bctest')||{}).value||'';if(!to.trim())return alert('Type your own phone or email for the test.');bca.disabled=true;
+      try{const j=await api('POST',{bc:{do:'test',channel:f.channel,subject:f.subject,text:f.text,to}});toast('Test sent to '+j.to);}catch(err){alert(err.message);}bca.disabled=false;return;}
+    if(d==='start'){const n=S.bcCount[f.channel+':'+f.who];
+      if(!confirm(`Send this ${f.channel==='sms'?'SMS':'email'} to ${n} ${n===1?'person':'people'} (${S.audiences[f.who]})?${f.channel==='sms'?`\n\nAbout ${n*smsParts(f.text||'')} SMS will be used.`:''}`))return;bca.disabled=true;
+      try{const j=await api('POST',{bc:{do:'start',channel:f.channel,who:f.who,subject:f.subject,text:f.text}});S.bc=j.bc;S.bcForm={...f,text:'',subject:''};render();toast('Sending…');}catch(err){alert(err.message);bca.disabled=false;}return;}
+    if(d==='stop'){if(!confirm('Stop sending? The people not reached yet won’t get it.'))return;try{const j=await api('POST',{bc:{do:'stop'}});S.bc=j.bc;render();}catch(err){alert(err.message);}return;}
+    return;}
   const lb=e.target.closest('[data-lb]');if(lb){S.lb=lb.dataset.lb;render();return;}
   const po=e.target.closest('[data-post]');if(po){const b=leaders(S.lb).boards.find(x=>x.id===po.dataset.post);const t=b&&postText(b,S.lb);
     if(t){try{await navigator.clipboard.writeText(t);toast('Copied — paste it into your post');}catch(err){prompt('Copy this:',t);}}return;}
@@ -803,8 +876,11 @@ document.addEventListener('click',async e=>{
   try{const j=await api('POST',{id,action:a,note});replaceOrder(j.order);render();toast({approve:'Approved',reject:'Rejected',remove:'Removed',restore:'Restored'}[a]||'Done');}
   catch(err){alert(err.message);b.disabled=false;}
 });
-document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('#q');if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(_){}}}});
+document.addEventListener('input',e=>{if(e.target.matches('[data-bcf]')){S.bcForm[e.target.name]=e.target.value;if(e.target.name==='who')render();else{const i=$('#bcinfo');if(i)i.textContent=bcInfo();}return;}
+  if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('#q');if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(_){}}}});
 document.addEventListener('submit',async e=>{
+  if(e.target.id==='optform'){e.preventDefault();const v=e.target.querySelector('[name=value]').value;try{const j=await api('POST',{bc:{do:'optout',value:v}});S.optouts=j.optouts;S.bcCount={};render();toast('Added');}catch(err){alert(err.message);}return;}
+  if(e.target.id==='bcform'){e.preventDefault();return;}
   const ef=e.target.closest('[data-editform]');
   if(ef){e.preventDefault();const id=ef.dataset.editform,btn=ef.querySelector('button[type=submit]');btn.disabled=true;
     try{const j=await api('POST',{id,action:'edit',edit:Object.fromEntries(new FormData(ef).entries())});replaceOrder(j.order);S.edit=null;render();toast('Saved — certificate updated');}

@@ -16,6 +16,7 @@
 import { kv, getJSON, setJSON, loadOrder, saveOrder, touch, publish, recordOf, publicRecord, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO, ethPhone } from './_lib.js';
 import { messages, links, followUp, sweep, autoOn, sendTestEmail } from './_notify.js';
 import { day as hitDay } from './hit.js';
+import { AUDIENCES, audience, startJob, tick, stopJob, getJob, jobView, testSend, optout, optouts, exportRows } from './_broadcast.js';
 import crypto from 'node:crypto';
 
 const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
@@ -47,6 +48,11 @@ export default async function handler(req, res) {
     if (!partner && !sameSecret(given, process.env.ADMIN_PASSWORD)) {
       if (await limited('adminfail:' + ip(req), 20, 600)) return send(res, 429, { error: 'Too many wrong passwords. Wait 10 minutes.' });
       return send(res, 401, { error: 'Wrong password.' });
+    }
+    // GET /api/admin?export=1&since=<ms> → order rows for the Google Sheet sync (admin only; see tools/google-sheet-sync.gs)
+    if (req.method === 'GET' && req.query.export) {
+      if (partner) return send(res, 403, { error: 'Export is for the admin password only.' });
+      return send(res, 200, await exportRows(Number(req.query.since) || 0, siteOf(req)));
     }
     if (req.method === 'GET' && !partner) await sweep();
     // /office sends back the 'ver' it last saw; if no order or inquiry changed since, skip re-sending all of them.
@@ -89,13 +95,26 @@ export default async function handler(req, res) {
       const days = Array.from({ length: 14 }, (_, i) => hitDay(Date.now() - (13 - i) * 864e5));
       const [taps, people, ...perDay] = await kv('MGET', 'hits:new:taps', 'hits:new:people', ...days.map((d) => 'hits:new:day:' + d));
       const newHits = { taps: Number(taps) || 0, people: Number(people) || 0, days: days.map((d, i) => ({ d, n: Number(perDay[i]) || 0 })) };
-      return send(res, 200, { role: 'admin', ver, orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier'), newHits, baseline: (await getJSON('baseline')) || BASELINE });
+      return send(res, 200, { role: 'admin', ver, bc: jobView(await getJob()), optouts: await optouts(), audiences: AUDIENCES, orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier'), newHits, baseline: (await getJSON('baseline')) || BASELINE });
     }
     if (req.method === 'POST' && (req.body || {}).testEmail) {
       const to = clean(req.body.testEmail, 120);
       if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(to)) return send(res, 400, { error: 'Email doesn’t look right.' });
       if (!autoOn().emailReady) return send(res, 400, { error: 'GMAIL_APP_PASSWORD is not set in Vercel (or the site wasn’t redeployed after adding it).' });
       try { return send(res, 200, await sendTestEmail(to)); } catch (e) { return send(res, 502, { error: 'Gmail refused: ' + e.message }); }
+    }
+    // Messages to many customers: {bc:{do:'count'|'test'|'start'|'tick'|'stop'|'optout', …}} — see api/_broadcast.js
+    if (req.method === 'POST' && (req.body || {}).bc) {
+      const b = req.body.bc;
+      try {
+        if (b.do === 'count') return send(res, 200, { count: (await audience(b.channel, b.who)).length });
+        if (b.do === 'test') return send(res, 200, { to: await testSend(b) });
+        if (b.do === 'start') return send(res, 200, { bc: jobView(await startJob(b)) });
+        if (b.do === 'tick') return send(res, 200, { bc: jobView(await tick()) });
+        if (b.do === 'stop') return send(res, 200, { bc: jobView(await stopJob()) });
+        if (b.do === 'optout') return send(res, 200, { optouts: await optout(b.value, b.undo) });
+      } catch (e) { return send(res, 400, { error: e.message }); }
+      return send(res, 400, { error: 'Unknown.' });
     }
     if (req.method === 'POST' && (req.body || {}).baseline) {
       const b = req.body.baseline, tb = Number(b.telebirr), jm = Number(b.jami);
