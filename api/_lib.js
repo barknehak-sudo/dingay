@@ -39,7 +39,11 @@ export async function kv(...cmd) {
 }
 export const getJSON = async (k) => { const v = await kv('GET', k); return v ? JSON.parse(v) : null; };
 export const setJSON = (k, v) => kv('SET', k, JSON.stringify(v));
-export const saveOrder = (o) => setJSON('order:' + o.id, o);
+// Every save also (1) puts the order on the 'fu' list the follow-up sweep reads — it drops orders with nothing
+// left to send — and (2) bumps 'ver', so /office can skip downloading all orders when nothing changed.
+// Both keep Upstash bandwidth low: the free plan allows 10 GB a month.
+export const touch = () => kv('INCR', 'ver');
+export const saveOrder = async (o) => { await setJSON('order:' + o.id, o); await kv('SADD', 'fu', o.id); await touch(); };
 export const loadOrder = (id) => (/^DG-\d{6}$/.test(id || '') ? getJSON('order:' + id) : null);
 
 /* ---------- http ---------- */

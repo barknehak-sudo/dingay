@@ -69,7 +69,7 @@ export async function checkJami(o) {
   try {
     const st = await jamiSession(s);
     if (st.status !== 'open') console.log('jami session', o.id, s, JSON.stringify(st).slice(0, 600));
-    o.jami = { ...o.jami, last: { status: st.status, at: Date.now(), raw: JSON.stringify(st).slice(0, 300) } };
+    o.jami = { ...o.jami, last: { status: st.status, at: Date.now() } }; // full answer is in the log above
     if (st.status === 'completed' && st.orderId) return (await markPaidByJami(o.id, { sessionId: s, amount: Number(st.amount), jamiOrderId: st.orderId })) || o;
     if (st.status === 'expired' && o.jami.state !== 'expired') { o.jami = { ...o.jami, state: 'expired' }; await saveOrder(o); }
   } catch (e) { console.error('jami status', o.id, e.message); }

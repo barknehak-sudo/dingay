@@ -1,4 +1,5 @@
 // Admin API. Header x-admin-password must match the ADMIN_PASSWORD env var.
+// PARTNER_PASSWORD (optional) opens a read-only view: GET /api/admin only, with customers' private details left out.
 // GET  /api/admin                         → latest orders
 // POST /api/admin {id, action:'approve'|'reject', note?}
 // GET  /api/admin?pending=1               → only orders waiting for review (cheap; used by the verifier)
@@ -12,9 +13,10 @@
 // POST /api/admin {inquiry:id, action:'done'|'new'}
 // POST /api/admin {testEmail:'you@x.com'} → sends a sample certificate email through the Gmail setup
 // Orders come back with payLink, recordLink and msgs (the SMS/email texts); `auto` says what is sent automatically.
-import { kv, getJSON, setJSON, loadOrder, saveOrder, publish, recordOf, publicRecord, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO, ethPhone } from './_lib.js';
+import { kv, getJSON, setJSON, loadOrder, saveOrder, touch, publish, recordOf, publicRecord, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO, ethPhone } from './_lib.js';
 import { messages, links, followUp, sweep, autoOn, sendTestEmail } from './_notify.js';
 import { day as hitDay } from './hit.js';
+import crypto from 'node:crypto';
 
 const clean = (s, max) => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, max);
 
@@ -23,18 +25,44 @@ const view = (o, site) => { Object.assign(o, links(o, site), { msgs: messages(o,
 // Money totals start from a checked figure: everything paid before `at` is replaced by these amounts (Birr).
 // 15 Oct 2026: telebirr receipts weren't being read while the verifier was paused, so the totals were reset by hand.
 const BASELINE = { at: 1792055011000, telebirr: 36955, jami: 89 };
+// Partner view: only what the dashboard charts need. No phones, emails, messages, keys, links, SMS texts,
+// transaction numbers or payer names; names are first names; buyers are matched by an opaque id instead of the phone.
+const first = (s) => String(s || '').trim().split(/\s+/)[0] || '';
+const buyerId = (o) => o.phone ? crypto.createHash('sha256').update('dg-partner:' + o.phone + (process.env.PARTNER_PASSWORD || '')).digest('hex').slice(0, 12) : null;
+const partnerView = (o) => ({
+  id: o.id, slug: o.slug, name: o.name, kind: o.kind, price: o.price, status: o.status, manual: o.manual || undefined, lang: o.lang,
+  occasion: o.occasion, to: first(o.to), by: first(o.by), buyer: buyerId(o), txn: o.txn ? '✓' : null,
+  createdAt: o.createdAt, submittedAt: o.submittedAt, approvedAt: o.approvedAt, approvedBy: o.approvedBy, paidAt: o.paidAt,
+  paidAmount: o.paidAmount, paidTo: o.paidTo, receiptMissing: o.receiptMissing,
+  jami: o.jami ? { state: o.jami.state, gateway: o.jami.gateway, mode: o.jami.mode, startedAt: o.jami.startedAt, paidAt: o.jami.paidAt, sandbox: o.jami.sandbox } : undefined,
+});
 const siteOf = (req) => 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');
 
 export default async function handler(req, res) {
   try {
     if (!process.env.ADMIN_PASSWORD) return send(res, 503, { error: 'ADMIN_PASSWORD is not set in Vercel.' });
     // Only wrong passwords count toward the lockout, so the verifier can poll freely.
-    if (!sameSecret(req.headers['x-admin-password'], process.env.ADMIN_PASSWORD)) {
+    const given = req.headers['x-admin-password'];
+    const partner = !sameSecret(given, process.env.ADMIN_PASSWORD) && !!process.env.PARTNER_PASSWORD && sameSecret(given, process.env.PARTNER_PASSWORD);
+    if (!partner && !sameSecret(given, process.env.ADMIN_PASSWORD)) {
       if (await limited('adminfail:' + ip(req), 20, 600)) return send(res, 429, { error: 'Too many wrong passwords. Wait 10 minutes.' });
       return send(res, 401, { error: 'Wrong password.' });
     }
+    if (req.method === 'GET' && !partner) await sweep();
+    // /office sends back the 'ver' it last saw; if no order or inquiry changed since, skip re-sending all of them.
+    const ver = req.method === 'GET' && !req.query.pending ? String((await kv('GET', 'ver')) || 0) : null;
+    if (ver && req.query.v === ver) return send(res, 200, { same: true, ver, verifier: partner ? undefined : await getJSON('verifier') });
+    if (partner) {
+      if (req.method !== 'GET') return send(res, 403, { error: 'Partner view is read-only.' });
+      const ids = await kv('LRANGE', 'orders', 0, 499);
+      const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
+      const orders = raw.filter(Boolean).map((r) => partnerView(JSON.parse(r)));
+      const days = Array.from({ length: 14 }, (_, i) => hitDay(Date.now() - (13 - i) * 864e5));
+      const [taps, people, ...perDay] = await kv('MGET', 'hits:new:taps', 'hits:new:people', ...days.map((d) => 'hits:new:day:' + d));
+      const newHits = { taps: Number(taps) || 0, people: Number(people) || 0, days: days.map((d, i) => ({ d, n: Number(perDay[i]) || 0 })) };
+      return send(res, 200, { role: 'partner', ver, orders, newHits, baseline: (await getJSON('baseline')) || BASELINE });
+    }
 
-    if (req.method === 'GET') await sweep();
     // The verifier (Mac) reports its health about once a minute; /office shows a banner when it's off or stuck.
     if (req.method === 'GET' && req.headers['x-verifier']) {
       let h = {}; try { h = JSON.parse(req.headers['x-verifier']); } catch {}
@@ -61,7 +89,7 @@ export default async function handler(req, res) {
       const days = Array.from({ length: 14 }, (_, i) => hitDay(Date.now() - (13 - i) * 864e5));
       const [taps, people, ...perDay] = await kv('MGET', 'hits:new:taps', 'hits:new:people', ...days.map((d) => 'hits:new:day:' + d));
       const newHits = { taps: Number(taps) || 0, people: Number(people) || 0, days: days.map((d, i) => ({ d, n: Number(perDay[i]) || 0 })) };
-      return send(res, 200, { orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier'), newHits, baseline: (await getJSON('baseline')) || BASELINE });
+      return send(res, 200, { role: 'admin', ver, orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier'), newHits, baseline: (await getJSON('baseline')) || BASELINE });
     }
     if (req.method === 'POST' && (req.body || {}).testEmail) {
       const to = clean(req.body.testEmail, 120);
@@ -83,6 +111,7 @@ export default async function handler(req, res) {
       if (action !== 'done' && action !== 'new') return send(res, 400, { error: 'Unknown action.' });
       q.status = action;
       await setJSON('inq:' + q.id, q);
+      await touch();
       return send(res, 200, { inquiry: q });
     }
     if (req.method === 'POST' && (req.body || {}).create) {

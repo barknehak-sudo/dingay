@@ -1,6 +1,6 @@
 // POST /api/contact — SIDEWAYS "start a project" inquiries, read on the /office page.
 import crypto from 'node:crypto';
-import { kv, setJSON, send, ip, limited } from './_lib.js';
+import { kv, setJSON, send, ip, limited, touch } from './_lib.js';
 
 const clean = (s, max) => String(s || '').replace(/[\u0000-\u0008\u000b-\u001f<>]/g, '').trim().slice(0, max);
 const NEEDS = ['Website', 'Guerrilla marketing', 'Something unusual'];
@@ -16,6 +16,7 @@ export default async function handler(req, res) {
     const id = 'IQ-' + Date.now().toString(36).toUpperCase() + crypto.randomBytes(2).toString('hex').toUpperCase();
     await setJSON('inq:' + id, { id, name, reach, need, msg, status: 'new', createdAt: Date.now() });
     await kv('LPUSH', 'inquiries', id);
+    await touch();
     await kv('LTRIM', 'inquiries', 0, 499);
     send(res, 200, { ok: true });
   } catch (e) {

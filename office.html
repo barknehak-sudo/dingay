@@ -215,6 +215,12 @@ table.data{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
 table.data th,table.data td{text-align:left;padding:7px 4px;border-bottom:1px solid var(--line)}
 table.data td:last-child,table.data th:last-child{text-align:right;font-variant-numeric:tabular-nums}
 details.tbl summary{margin-top:12px;font-size:12.5px;color:var(--ink-2);cursor:pointer}
+/* visitors (Google Analytics) */
+@media (min-width:900px){.ins.four{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.nh-bars i.now{background:var(--accent)}
+.vx{display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;color:var(--mut)}
+ol.setup{margin:0;padding-left:20px;font-size:14px;line-height:1.55;color:var(--ink-2)}ol.setup li{margin-top:6px}ol.setup b{color:var(--ink)}
+ol.setup code{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12.5px;background:var(--card-2);padding:1px 6px;border-radius:6px;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -230,7 +236,7 @@ details.tbl summary{margin-top:12px;font-size:12.5px;color:var(--ink-2);cursor:p
   </section>
   <div id="app" hidden>
     <header class="top">
-      <div class="brand"><span class="logo" aria-hidden="true">D</span><b>DINGUY</b><small>Office</small></div>
+      <div class="brand"><span class="logo" aria-hidden="true">D</span><b>DINGUY</b><small id="role">Office</small></div>
       <nav class="tabs" id="tabs"></nav>
       <div class="tools"><span class="upd" id="updated"></span><button class="iconbtn" id="refresh" aria-label="Refresh">↻<span class="rl"> Refresh</span></button></div>
     </header>
@@ -244,8 +250,10 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const TZ='Africa/Addis_Ababa';
 let SW_MAIL='offscriptet@gmail.com'; // the sending address; the server's setting wins (see load())
 let pw='';try{pw=sessionStorage.getItem('dg-admin')||''}catch(e){}
-const S={orders:[],inquiries:[],auto:{},lb:'30d',tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
+const S={role:'admin',orders:[],inquiries:[],auto:{},lb:'30d',tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
 try{const t=sessionStorage.getItem('dg-tab');if(t)S.tab=t;}catch(e){}
+// Partner password: read-only, Dashboard only, no customer details (the server leaves them out too).
+const P=()=>S.role==='partner';
 
 async function api(method,body,query=''){
   const r=await fetch('/api/admin'+query,{method,headers:{'x-admin-password':pw,'content-type':'application/json'},body:body?JSON.stringify(body):undefined,keepalive:method==='POST'});
@@ -253,9 +261,11 @@ async function api(method,body,query=''){
 }
 async function load(){
   $('#err').textContent='';
-  try{const j=await api('GET');S.orders=j.orders;S.inquiries=j.inquiries||[];S.auto=j.auto||{};S.verifier=j.verifier||null;S.newHits=j.newHits||null;S.baseline=j.baseline||null;if(S.auto.from)SW_MAIL=S.auto.from;S.loadedAt=Date.now();
+  try{const j=await api('GET',null,S.ver&&!$('#app').hidden?'?v='+encodeURIComponent(S.ver):'');
+    if(j.same){S.verifier=j.verifier||S.verifier;S.loadedAt=Date.now();render();return;} // nothing changed since the last load
+    S.ver=j.ver;S.role=j.role==='partner'?'partner':'admin';if(P())S.tab='dash';S.orders=j.orders;S.inquiries=j.inquiries||[];S.auto=j.auto||{};S.verifier=j.verifier||null;S.newHits=j.newHits||null;S.baseline=j.baseline||null;if(S.auto.from)SW_MAIL=S.auto.from;S.loadedAt=Date.now();
     try{sessionStorage.setItem('dg-admin',pw)}catch(e){}
-    $('#login').hidden=true;$('#app').hidden=false;render();}
+    $('#login').hidden=true;$('#app').hidden=false;render();loadGA();}
   catch(e){$('#err').textContent=e.message;$('#login').hidden=false;$('#app').hidden=true;}
 }
 function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200);}
@@ -379,7 +389,7 @@ function leaders(r){
   const w=lbWindow(r);
   const paid=S.orders.filter(o=>o.status==='paid'&&!o.manual&&(o.approvedAt||o.createdAt)>=w.from&&(o.approvedAt||o.createdAt)<w.to);
   const fr=paid.filter(isFriend),lv=paid.filter(o=>!isFriend(o));
-  const buyer=o=>o.phone||'n:'+normName(o.by),to=o=>normName(o.to)||null;
+  const buyer=o=>o.phone||o.buyer||'n:'+normName(o.by),to=o=>normName(o.to)||null;
   return {n:paid.length,boards:[
     {id:'player',ic:'🏆',title:'Player of the month',what:'Bought the most Dinguys',unit:'bought',rows:rank(paid,buyer,o=>o.by)},
     {id:'friend',ic:'🤝',title:'Friend of the month',what:'Bought the most for friends',unit:'bought',rows:rank(fr,buyer,o=>o.by)},
@@ -400,6 +410,56 @@ function viewNewHits(){
       <div class="nh-side"><div><b>${h.taps}</b> taps in total</div><div><b>${last7}</b> this week · <b>${today}</b> today</div></div></div>
     <div class="nh-bars" role="img" aria-label="People per day, last 14 days">${bars}</div>
     <div class="readout" style="margin-top:8px">People per day, last 14 days. One person counts once per phone.</div></div>`,'s4');
+}
+// Visitors from Google Analytics (api/analytics.js). Fetched after the orders; the server keeps it for 10 minutes.
+async function loadGA(){
+  if(S.ga&&!S.ga.error&&Date.now()-S.gaAt<5*60e3)return;
+  S.gaAt=Date.now();
+  try{const r=await fetch('/api/analytics',{headers:{'x-admin-password':pw}});const j=await r.json().catch(()=>({error:'Bad response'}));S.ga=r.ok?j:{error:j.error||r.status};}
+  catch(e){S.ga={error:e.message};}
+  // don't redraw under someone who is typing; the next refresh shows it
+  if(S.tab==='dash'&&!$('#app').hidden&&!S.edit&&!document.querySelector('details.new[open]')&&!(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))render();
+}
+const pageName=p=>p==='/'?'Home':p==='/pay'?'Pay page':decodeURIComponent(p).replace(/^\//,'').replace(/^./,c=>c.toUpperCase());
+function gaSetup(g){
+  return `<ol class="setup">
+    <li>In <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud</a>, pick or create a project, then <b>APIs &amp; Services → Library</b> → turn on <b>Google Analytics Data API</b>.</li>
+    <li><b>IAM &amp; Admin → Service accounts → Create service account</b> (any name, no roles). Open it → <b>Keys → Add key → JSON</b>. A .json file downloads.</li>
+    <li>In Google Analytics: <b>Admin → Property access management → +</b> and add ${g.email?`<code>${esc(g.email)}</code>`:'the service account’s email (<code>client_email</code> in the file)'} as <b>Viewer</b>.</li>
+    <li>Still in Admin: <b>Property details</b> → copy the <b>Property ID</b> (a number, not G-85R6XY6WBN).</li>
+    <li>In Vercel → Settings → Environment Variables add <code>GA_PROPERTY_ID</code> (that number) and <code>GA_SERVICE_ACCOUNT_JSON</code> (paste the whole .json file), then redeploy.</li>
+  </ol>${g.missing&&g.missing.length?`<div class="readout" style="margin-top:12px">Missing now: ${g.missing.map(esc).join(', ')}</div>`:''}`;
+}
+function viewVisitors(st){
+  const g=S.ga,T='Visitors';
+  if(!g)return card(T,'From Google Analytics','<div class="empty">Loading visitors…</div>','s12');
+  if(g.setup)return card(T,'Connect Google Analytics to see visitors here',P()?'<div class="empty">Not connected yet.</div>':gaSetup(g),'s12');
+  if(g.error)return card(T,'From Google Analytics',`<div class="warnbar"><span>⚠️</span><span><b>Couldn’t read Google Analytics.</b> ${esc(g.error)}${g.denied?' — the service account probably isn’t added to the property yet (step 3), or the Property ID is wrong.':''}</span></div>${g.denied&&!P()?gaSetup(g):''}`,'s12');
+  const w=g.week,ev=g.events||{},E=k=>(ev[k]||{}).users||0;
+  const conv=w.users?st.n7/w.users*100:null,pct=x=>x==null?'—':(x<10?x.toFixed(1):Math.round(x))+'%';
+  const tiles=[
+    ['Visitors today',num(g.today.users),`${num(g.today.views)} page views`],
+    ['Visitors · 7 days',num(w.users),`${delta(w.users,g.prev.users)} vs week before`],
+    ['Visits · 7 days',num(w.sessions),`${num(w.views)} page views`],
+    ['Visitors → paid',pct(conv),`${st.n7} paid orders · 7 days`,1],
+  ].map(([l,v,s2,up])=>`<div class="in${up?' up':''}"><div class="il">${l}</div><div class="iv">${v}</div><div class="is">${s2}</div></div>`).join('');
+  const dMax=Math.max(1,...g.days.map(d=>d.n)),dl=k=>new Date(k+'T12:00:00+03:00').toLocaleDateString('en-GB',{timeZone:TZ,day:'numeric',month:'short'});
+  const bars=g.days.map((d,i)=>`<i class="${i===g.days.length-1?'now':''}" title="${esc(dl(d.d))}: ${d.n}" style="height:${Math.max(4,d.n/dMax*100).toFixed(0)}%;${d.n?'':'opacity:.25'}"></i>`).join('');
+  const hb=(rows,max,lab,val,tip='')=>rows.map((r,i)=>`<div class="hbar${i===0?' j':''}"><span class="lab" title="${esc(tip&&tip(r)||lab(r))}">${esc(lab(r))}</span><span class="tr"><i style="width:${(val(r)/max*100).toFixed(1)}%"></i></span><span class="val">${num(val(r))}</span></div>`).join('');
+  const src=g.sources||[],sMax=Math.max(1,...src.map(s=>s.users));
+  const pages=g.pages||[],pMax=Math.max(1,...pages.map(p=>p.views));
+  const funnel=[['Visitors',w.users],['Began checkout',E('begin_checkout')],['Tapped pay',E('add_payment_info')],['Paid orders',st.n7]],fMax=Math.max(1,w.users);
+  const plot=(h,body)=>`<div class="plot s6"><div class="plot-h">${h}</div>${body}</div>`;
+  const body=`<div class="ins four">${tiles}</div>
+    <div class="dgrid" style="margin-top:14px;gap:12px">
+      ${plot('Visitors per day <span class="readout" style="font-weight:400">last 14 days</span>',`<div class="nh-bars" style="height:120px" role="img" aria-label="Visitors per day, last 14 days">${bars}</div><div class="vx"><span>${esc(dl(g.days[0].d))}</span><span>Today</span></div>`)}
+      ${plot('Where they came from <span class="readout" style="font-weight:400">7 days</span>',(src.length?hb(src,sMax,s=>s.name,s=>s.users,s=>s.name==='Other'&&g.otherSources&&g.otherSources.length?'Other: '+g.otherSources.join(', '):s.name):'<div class="empty">No visits yet.</div>')
+        +'<div class="readout" style="margin-top:10px;font-size:12px">Telegram’s in-app browser often hides where people came from, so some of it shows as Direct. Links with <b>?utm_source=telegram</b> are counted right.</div>')}
+      ${plot('Top pages <span class="readout" style="font-weight:400">page views · 7 days</span>',pages.length?hb(pages,pMax,p=>pageName(p.path),p=>p.views,p=>`${p.path} · ${p.users} visitors`):'<div class="empty">No page views yet.</div>')}
+      ${plot('Visitors → paid <span class="readout" style="font-weight:400">7 days</span>',hb(funnel,fMax,f=>f[0],f=>f[1])
+        +`<div class="readout" style="margin-top:10px;font-size:12px">${pct(conv)} of visitors paid. Paid orders come from the Office’s own records${E('purchase')?`; Google counted ${num((ev.purchase||{}).count)} purchases`:''}.</div>`)}
+    </div>`;
+  return card(T,'From Google Analytics · this week vs the week before',body,'s12',`<span class="via">${g.cached?'Updated '+ago(g.at):'Just updated'}</span>`);
 }
 // A dashboard card: title, a line under it, an optional button on the right.
 const card=(t,sub,body,cls='',extra='')=>`<section class="card ${cls}"><div class="ch"><div><h3>${t}</h3>${sub?`<p>${sub}</p>`:''}</div>${extra}</div>${body}</section>`;
@@ -440,7 +500,7 @@ function viewJami(){
     <div class="mrow"><span>Last 7 days</span><strong>${fmtBirr(j.rev7)} · ${j.n7} paid</strong></div>
     ${j.gw.length?'<div class="sub" style="margin-top:14px">All Jami payments, by app</div>':''}<div style="margin-top:10px">${j.gw.map(([k,g])=>`<div class="hbar j"><span class="lab">${esc(GW[k]||k)}</span><span class="tr"><i style="width:${(g.v/gMax*100).toFixed(1)}%"></i></span><span class="val">${g.n} · ${fmtBirr(g.v)}</span></div>`).join('')}</div>
     ${j.test?`<div class="readout" style="margin-top:10px">${j.test} sandbox (test) payment${j.test===1?'':'s'} left out.</div>`:''}`;
-  return card('Paid on Jami','Telebirr · M-Pesa · CBE Birr push',body,'s4',`<button class="link" data-tab="orders" data-jami>Orders</button>`);
+  return card('Paid on Jami','Telebirr · M-Pesa · CBE Birr push',body,'s4',P()?'':`<button class="link" data-tab="orders" data-jami>Orders</button>`);
 }
 
 // When people buy: paid orders by the time they ordered, in Addis Ababa time (UTC+3, no daylight saving).
@@ -496,8 +556,9 @@ function viewLeaders(){
   return card('Of the month',`${L.n} paid · hand-added ones left out · same name counts as the same person`,`<div class="lbs">${L.boards.map(box).join('')}</div>`,'s12',`<div class="chips" style="margin:0">${tabs}</div>`);
 }
 function renderTabs(){
-  const n=tasks().length,inq=S.inquiries.filter(q=>q.status!=='done').length;
-  const T=[['dash','Dashboard',0],['tasks','Tasks',n],['orders','Orders',0],['inq','Inquiries',inq]];
+  const n=P()?0:tasks().length,inq=S.inquiries.filter(q=>q.status!=='done').length;
+  const T=P()?[['dash','Dashboard',0]]:[['dash','Dashboard',0],['tasks','Tasks',n],['orders','Orders',0],['inq','Inquiries',inq]];
+  $('#role').textContent=P()?'Partner view':'Office';
   $('#tabs').innerHTML=T.map(([k,l,c])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${l}${c?`<span class="badge">${c}</span>`:''}</button>`).join('');
   $('#updated').textContent='Updated '+new Date(S.loadedAt).toLocaleTimeString('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit'});
 }
@@ -507,14 +568,14 @@ function recentTable(){
   if(!list.length)return '<div class="empty">No orders yet.</div>';
   const label={paid:'Paid',review:'Check',awaiting:'Not paid',rejected:'Rejected',removed:'Removed'};
   return `<div class="tw"><table class="act"><thead><tr><th>Order</th><th>Stone</th><th>For</th><th>Price</th><th>Paid via</th><th>Status</th><th>Date</th></tr></thead><tbody>
-    ${list.map(o=>`<tr data-open="${esc(o.id)}"><td class="oid" style="font-size:13px">${esc(o.id)}</td>
+    ${list.map(o=>`<tr${P()?'':` data-open="${esc(o.id)}"`}><td class="oid" style="font-size:13px">${esc(o.id)}</td>
       <td><span class="stn"><i aria-hidden="true">${o.price===89?'🪨':'💎'}</i>${esc(o.name)}</span></td><td>${esc(o.to)}</td><td class="num">${fmtBirr(o.price)}</td>
       <td>${o.status==='paid'||o.status==='removed'?(byJami(o)?`<span class="via j">Jami${o.jami&&o.jami.gateway?' · '+esc(GW[o.jami.gateway]||''):''}</span>`:o.manual?'<span class="via">By hand</span>':'<span class="via">Telebirr</span>'):'—'}</td>
       <td><span class="sdot c-${esc(o.status)}">${label[o.status]||esc(o.status)}</span></td><td>${when(o.createdAt)}</td></tr>`).join('')}
   </tbody></table></div>`;
 }
 function viewDash(){
-  const st=stats(),ts=tasks(),j=jamiStats();
+  const st=stats(),ts=P()?[]:tasks(),j=jamiStats();
   const max=Math.max(1,...st.days.map(d=>d.v));const top=Math.ceil(max/100)*100||100;
   const cols=st.days.map((d,i)=>`<div class="col${d.v?'':' zero'}${S.sel===i?' sel':''}" data-col="${i}" role="img" aria-label="${esc(d.label)}: ${fmtBirr(d.v)} (Telebirr ${d.t}, Jami ${d.j}), ${d.n} paid">${d.j?`<i class="j" style="height:${(d.j/top*100).toFixed(1)}%"></i>`:''}${d.t?`<i class="t" style="height:${(d.t/top*100).toFixed(1)}%"></i>`:''}</div>`).join('');
   const selD=S.sel!=null?st.days[S.sel]:null;
@@ -531,7 +592,7 @@ function viewDash(){
       <div class="ch" style="margin-bottom:6px"><div><p style="margin:0;font-size:14px;color:var(--ink-2)">Total received</p></div><span class="via">ETB</span></div>
       <div class="big">${birr(st.rev)}</div>
       <div class="sub">${delta(st.rev30,st.revP30)} last 30 days vs the 30 before</div>
-      <div class="pillbtns"><button class="btn" data-tab="orders">Orders</button><button class="btn ghost" data-addhand>+ Add by hand</button></div>
+      ${P()?'':`<div class="pillbtns"><button class="btn" data-tab="orders">Orders</button><button class="btn ghost" data-addhand>+ Add by hand</button></div>`}
       <div class="wallets"><div class="wh">Where it came in <span>| starting totals + since ${st.B.at?esc(when(st.B.at).split(',')[0]):''}</span></div>
         <div class="wl">${wallet('var(--tele)','Telebirr',tele,`${num(st.B.telebirr)} + ${num(st.sinceT)}`,'Active')}${wallet('var(--accent)','Jami',jami,`${num(st.B.jami)} + ${num(st.sinceJ)}`,'Active')}${wallet('var(--warn)','To check',unchecked,`${st.noReceipt.length} without receipt`,unchecked?'Check':'All clear',!!unchecked)}</div></div>
     </section>
@@ -548,8 +609,10 @@ function viewDash(){
       <div class="xlab">${st.days.map((d,i)=>`<span>${i%2?'':esc(d.dn)}</span>`).join('')}</div></div>
       <details class="tbl"><summary>Show as table</summary><table class="data"><thead><tr><th>Day</th><th>Paid</th><th>Telebirr</th><th>Jami</th></tr></thead><tbody>${st.days.slice().reverse().map(d=>`<tr><td>${esc(d.label)}</td><td>${d.n}</td><td>${d.t}</td><td>${d.j}</td></tr>`).join('')}</tbody></table></details>`,'s4')}
 
-    ${card(`Next up${ts.length?' · '+ts.length:''}`,'',ts.length?`<div class="nextl">${ts.slice(0,3).map(taskCard).join('')}</div>`:'<div class="empty">✓ All caught up.</div>','s4',ts.length?'<button class="link" data-tab="tasks">See all</button>':'')}
-    ${card('Recent activity','Newest orders · tap a row to open it',recentTable(),'s8','<button class="link" data-tab="orders">All orders</button>')}
+    ${P()?'':card(`Next up${ts.length?' · '+ts.length:''}`,'',ts.length?`<div class="nextl">${ts.slice(0,3).map(taskCard).join('')}</div>`:'<div class="empty">✓ All caught up.</div>','s4',ts.length?'<button class="link" data-tab="tasks">See all</button>':'')}
+    ${card('Recent activity',P()?'Newest orders':'Newest orders · tap a row to open it',recentTable(),P()?'s12':'s8',P()?'':'<button class="link" data-tab="orders">All orders</button>')}
+
+    ${viewVisitors(st)}
 
     ${viewJami()}
     ${viewTimes()}
@@ -571,14 +634,14 @@ function viewDash(){
       ${st.missing.length?`<div class="mrow"><span>Marked paid, but telebirr has no such transaction</span><strong>${st.missing.length} · 0 Birr</strong></div>`:''}
       <div class="mrow"><span>Added by hand (not counted)</span><strong>${st.manual.length}</strong></div>
       <div class="readout" style="margin-top:8px">Amounts come from the telebirr receipts the Mac helper reads, and from Jami.</div>
-      ${st.noReceipt.length?`<details class="tbl"><summary>Show the ${st.noReceipt.length} without a receipt amount</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.noReceipt.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
+      ${P()?'':`${st.noReceipt.length?`<details class="tbl"><summary>Show the ${st.noReceipt.length} without a receipt amount</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.noReceipt.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
       ${st.missing.length?`<details class="tbl" open><summary>Show the ${st.missing.length} with no telebirr receipt</summary><table class="data"><thead><tr><th>Order</th><th>Transaction</th><th>Price</th></tr></thead><tbody>${st.missing.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
       ${st.manual.length?`<details class="tbl"><summary>Show the ${st.manual.length} added by hand</summary><table class="data"><thead><tr><th>Order</th><th>Note</th><th>Price</th></tr></thead><tbody>${st.manual.map(o=>`<tr><td>${esc(o.id)} · ${esc(o.to)}</td><td>${esc(o.txn||'—')}</td><td>${o.price}</td></tr>`).join('')}</tbody></table></details>`:''}
       <details class="tbl"><summary>Restart the totals from checked amounts</summary><form class="f" id="baseform" style="margin-top:8px">
         <div class="two"><label>Telebirr total (Birr)<input name="telebirr" inputmode="decimal" required value="${esc(st.B.telebirr)}"></label><label>Jami total (Birr)<input name="jami" inputmode="decimal" required value="${esc(st.B.jami)}"></label></div>
         <button class="btn" type="submit">Save — count from now</button>
-        <div class="readout">Everything paid before now is replaced by these two amounts.</div></form></details>`,'s6')}
-    <div class="s12" id="addhand">${newForm()}</div>
+        <div class="readout">Everything paid before now is replaced by these two amounts.</div></form></details>`}`,'s6')}
+    ${P()?'':`<div class="s12" id="addhand">${newForm()}</div>`}
   </div>`;
 }
 function autoLine(){
@@ -692,8 +755,8 @@ function verifierWarning(){
 }
 function render(){
   renderTabs();
-  const w=verifierWarning();$('#warn').innerHTML=w?`<div class="warnbar">⚠️ <span>${w}</span></div>`:'';
-  const v={dash:viewDash,tasks:viewTasks,orders:viewOrders,inq:viewInq}[S.tab]||viewDash;
+  const w=P()?'':verifierWarning();$('#warn').innerHTML=w?`<div class="warnbar">⚠️ <span>${w}</span></div>`:'';
+  const v=P()?viewDash:{dash:viewDash,tasks:viewTasks,orders:viewOrders,inq:viewInq}[S.tab]||viewDash;
   $('#view').innerHTML=v();
 }
 function setTab(t){S.tab=t;S.sel=null;try{sessionStorage.setItem('dg-tab',t)}catch(e){}render();window.scrollTo(0,0);}
@@ -703,7 +766,7 @@ function replaceOrder(o){S.orders=S.orders.map(x=>x.id===o.id?{...x,...o}:x);}
 $('#loginForm').onsubmit=e=>{e.preventDefault();pw=$('#pw').value;load();};
 $('#refresh').onclick=()=>load().then(()=>toast('Updated'));
 document.addEventListener('click',async e=>{
-  const tab=e.target.closest('[data-tab]');if(tab){if(tab.hasAttribute('data-jami'))S.filter='jami';setTab(tab.dataset.tab);return;}
+  const tab=e.target.closest('[data-tab]');if(tab){if(P())return;if(tab.hasAttribute('data-jami'))S.filter='jami';setTab(tab.dataset.tab);return;}
   const fil=e.target.closest('[data-filter]');if(fil){S.filter=fil.dataset.filter;render();return;}
   const tm=e.target.closest('[data-testmail]');if(tm){const to=prompt('Send a test certificate email to:');if(!to)return;tm.disabled=true;
     try{const j=await api('POST',{testEmail:to.trim()});toast('Sent from '+j.from+' — check '+j.to);}catch(err){alert(err.message);}tm.disabled=false;return;}
@@ -759,7 +822,7 @@ document.addEventListener('submit',async e=>{
   catch(err){out.innerHTML=`<div class="err">${esc(err.message)}</div>`;btn.disabled=false;}
 });
 if(pw)load();
-setInterval(()=>{if(!$('#app').hidden&&document.visibilityState==='visible'&&!S.edit&&!document.querySelector('details.new[open]')&&!(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))load();},60000);
+setInterval(()=>{if(!$('#app').hidden&&document.visibilityState==='visible'&&!S.edit&&!document.querySelector('details.new[open]')&&!(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))load();},120000);
 </script>
 </body>
 </html>

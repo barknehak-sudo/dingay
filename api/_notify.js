@@ -183,19 +183,25 @@ export async function sweep() {
   try {
     const on = autoOn();
     if (!on.sms && !on.email) return;
-    if (!(await kv('SET', 'sweep', '1', 'NX', 'EX', 10))) return;
-    const ids = await kv('LRANGE', 'orders', 0, 499);
+    if (!(await kv('SET', 'sweep', '1', 'NX', 'EX', 60))) return; // at most once a minute
+    // Only orders that may still need a message are read (the 'fu' set, filled by saveOrder), not all of them.
+    // The first run after this change fills it once from the order list.
+    if (await kv('SET', 'fu:init', '1', 'NX')) { const all = await kv('LRANGE', 'orders', 0, 499); if (all.length) await kv('SADD', 'fu', ...all); }
+    const ids = await kv('SMEMBERS', 'fu');
     const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
-    const now = Date.now();
+    const now = Date.now(), list = [], settled = [];
+    raw.forEach((r, i) => { if (r) list.push(JSON.parse(r)); else settled.push(ids[i]); });
+    list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); // newest first, so new customers go before the backlog
     let noMail = false; // once one email has to wait, the rest wait too — skip them this round
-    for (const r of raw) { // newest first, so new customers go before the backlog
-      if (!r) continue;
-      const o = JSON.parse(r);
+    for (const o of list) {
+      // Nothing due and past the first 15 minutes: nothing new can come up until the order changes (and is saved again).
+      if (!due(o, now).length) { if (now - (o.createdAt || 0) > 15 * MIN) settled.push(o.id); continue; }
       const d = due(o, now).filter((w) => !(MAIL_KINDS.includes(w) && noMail));
       if (!d.length) continue;
       followUp.mailWaiting = false;
       await followUp(o.id, { noMail });
       if (followUp.mailWaiting) noMail = true;
     }
+    if (settled.length) await kv('SREM', 'fu', ...settled);
   } catch (e) { console.error('sweep', e.message); }
 }
