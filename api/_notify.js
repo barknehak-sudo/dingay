@@ -77,6 +77,9 @@ export async function sendSMS(phone, text) {
   let j = null; try { j = JSON.parse(raw); } catch {}
   if (!r.ok || (j && (j.success === false || j.status === 'error' || j.error))) {
     console.error('smsethiopia reply', r.status, raw.slice(0, 1500));
+    // Account problems (sender name not approved, no balance…) fail every SMS the same way: pause automatic SMS
+    // for 6 hours instead of retrying every order every 30 minutes (each retry rewrites the order in Upstash).
+    if (/sender ?id|10006|balance|insufficient|credit|unauthori|api key|suspend/i.test(raw)) { smsDownUntil = Date.now() + 6 * 3600e3; await kv('SET', 'sms:paused', String((j && j.error_message) || raw).slice(0, 160), 'EX', 6 * 3600); }
     throw new Error(`smsethiopia ${r.status}: ${(j && (j.message || j.error || j.error_message)) || raw.slice(0, 160)}`);
   }
   return j || raw;
@@ -124,6 +127,10 @@ async function mailSlot(addr, kind) {
 
 /* ---------- what's due ---------- */
 const MIN = 60e3, HOUR = 60 * MIN;
+const SMS_KINDS = ['help_sms', 'congrats_sms', 'to_sms'];
+let smsDownUntil = 0; // set the moment SMS Ethiopia refuses the account, so the rest of this run skips SMS too
+const smsDown = () => Date.now() < smsDownUntil;
+export const smsPaused = () => kv('GET', 'sms:paused');
 // SMS only for recent orders, so turning it on never texts old customers.
 // Certificate emails have no age limit — every paid recipient should get theirs (paced, see above).
 function due(o, now = Date.now()) {
@@ -147,10 +154,12 @@ function due(o, now = Date.now()) {
 export async function followUp(id, opts = {}) {
   let o = await loadOrder(id);
   if (!o) return null;
-  const todo = due(o).filter((w) => !(MAIL_KINDS.includes(w) && opts.noMail));
+  const paused = opts.smsPaused !== undefined ? opts.smsPaused : await smsPaused();
+  const todo = due(o).filter((w) => !(MAIL_KINDS.includes(w) && opts.noMail) && !((paused || smsDown()) && SMS_KINDS.includes(w)));
   if (!todo.length) return o;
   const m = messages(o), sent = {}, failed = {};
   for (const what of todo) {
+    if (smsDown() && SMS_KINDS.includes(what)) continue;
     // One send per order per kind, even if two requests race. A failure retries after 30 minutes.
     if (await kv('GET', `auto:${o.id}:${what}`)) continue;
     if (MAIL_KINDS.includes(what)) { const slot = await mailSlot(what === 'email' ? o.email : o.byEmail, what); if (slot !== 'ok') { if (slot === 'wait') followUp.mailWaiting = true; continue; } }
@@ -192,17 +201,19 @@ export async function sweep() {
     if (await kv('SET', 'fu:init', '1', 'NX')) { const all = await kv('LRANGE', 'orders', 0, 499); if (all.length) await kv('SADD', 'fu', ...all); }
     const ids = await kv('SMEMBERS', 'fu');
     const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
-    const now = Date.now(), list = [], settled = [];
+    const now = Date.now(), list = [], settled = [], paused = await smsPaused();
+    // While SMS is paused, SMS doesn't count as due — those orders settle instead of being re-read every minute.
+    const dueNow = (o) => due(o, now).filter((w) => !(paused && SMS_KINDS.includes(w)));
     raw.forEach((r, i) => { if (r) list.push(JSON.parse(r)); else settled.push(ids[i]); });
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); // newest first, so new customers go before the backlog
     let noMail = false; // once one email has to wait, the rest wait too — skip them this round
     for (const o of list) {
       // Nothing due and past the first 15 minutes: nothing new can come up until the order changes (and is saved again).
-      if (!due(o, now).length) { if (now - (o.createdAt || 0) > 15 * MIN) settled.push(o.id); continue; }
-      const d = due(o, now).filter((w) => !(MAIL_KINDS.includes(w) && noMail));
+      if (!dueNow(o).length) { if (now - (o.createdAt || 0) > 15 * MIN) settled.push(o.id); continue; }
+      const d = dueNow(o).filter((w) => !(MAIL_KINDS.includes(w) && noMail));
       if (!d.length) continue;
       followUp.mailWaiting = false;
-      await followUp(o.id, { noMail });
+      await followUp(o.id, { noMail, smsPaused: paused });
       if (followUp.mailWaiting) noMail = true;
     }
     if (settled.length) await kv('SREM', 'fu', ...settled);

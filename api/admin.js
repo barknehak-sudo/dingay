@@ -14,7 +14,7 @@
 // POST /api/admin {testEmail:'you@x.com'} → sends a sample certificate email through the Gmail setup
 // Orders come back with payLink, recordLink and msgs (the SMS/email texts); `auto` says what is sent automatically.
 import { kv, getJSON, setJSON, loadOrder, saveOrder, touch, publish, recordOf, publicRecord, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO, ethPhone } from './_lib.js';
-import { messages, links, followUp, sweep, autoOn, sendTestEmail } from './_notify.js';
+import { messages, links, followUp, sweep, autoOn, sendTestEmail, smsPaused } from './_notify.js';
 import { day as hitDay } from './hit.js';
 import { AUDIENCES, audience, startJob, tick, stopJob, getJob, jobView, testSend, optout, optouts, exportRows } from './_broadcast.js';
 import crypto from 'node:crypto';
@@ -82,7 +82,9 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'GET') {
-      const ids = await kv('LRANGE', 'orders', 0, 499);
+      // ?since=<ms>: /office already has the orders — send only the ones changed since then ('upd', kept by saveOrder).
+      const now = Date.now(), since = Number(req.query.since) || 0;
+      const ids = since ? await kv('ZRANGEBYSCORE', 'upd', String(since), '+inf') : await kv('LRANGE', 'orders', 0, 499);
       const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
       // payLink = the customer's private order link, so you can text it to them.
       const orders = raw.filter(Boolean).map((r) => view(JSON.parse(r), siteOf(req)));
@@ -95,7 +97,7 @@ export default async function handler(req, res) {
       const days = Array.from({ length: 14 }, (_, i) => hitDay(Date.now() - (13 - i) * 864e5));
       const [taps, people, ...perDay] = await kv('MGET', 'hits:new:taps', 'hits:new:people', ...days.map((d) => 'hits:new:day:' + d));
       const newHits = { taps: Number(taps) || 0, people: Number(people) || 0, days: days.map((d, i) => ({ d, n: Number(perDay[i]) || 0 })) };
-      return send(res, 200, { role: 'admin', ver, bc: jobView(await getJob()), optouts: await optouts(), audiences: AUDIENCES, orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier'), newHits, baseline: (await getJSON('baseline')) || BASELINE });
+      return send(res, 200, { role: 'admin', ver, now, partial: !!since, smsPaused: await smsPaused(), bc: jobView(await getJob()), optouts: await optouts(), audiences: AUDIENCES, orders, inquiries, receivers: RECEIVERS, payTo: PAY_TO, auto: autoOn(), verifier: await getJSON('verifier'), newHits, baseline: (await getJSON('baseline')) || BASELINE });
     }
     if (req.method === 'POST' && (req.body || {}).testEmail) {
       const to = clean(req.body.testEmail, 120);
