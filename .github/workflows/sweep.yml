@@ -1,0 +1,13 @@
+# Every 5 minutes, ask the site to send any automatic SMS/email that is due (help SMS for unpaid orders,
+# congrats that failed and need a retry), so nothing waits for a customer or /office to be open.
+name: SMS sweep
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: curl -fsS -m 60 https://dinguy.xyz/api/sweep

@@ -3,6 +3,7 @@
 //   GMAIL_APP_PASSWORD  — Gmail app password for GMAIL_USER (no password = no automatic email)
 //   GMAIL_USER          — sender address, default offscriptet@gmail.com
 //   SITE_URL            — links inside messages, default https://dinguy.xyz
+//   ALERT_EMAIL         — gets an email when SMS stops going through, default GMAIL_USER
 // Whatever isn't sent automatically (not configured, or the send failed) stays a task in /office.
 import nodemailer from 'nodemailer';
 import { kv, loadOrder, saveOrder, PAY_TO } from './_lib.js';
@@ -67,23 +68,44 @@ export function messages(o, site = SITE) {
 export async function sendSMS(phone, text) {
   const m = /^0?([79]\d{8})$/.exec(String(phone || ''));
   if (!m) throw new Error('bad phone ' + phone);
-  const r = await fetch('https://smsethiopia.com/api/sms/send', {
-    method: 'POST',
-    headers: { KEY: process.env.SMSETHIOPIA_KEY, 'content-type': 'application/json', accept: 'application/json' },
-    body: JSON.stringify({ msisdn: '251' + m[1], text }),
-    signal: AbortSignal.timeout(10000),
-  });
+  let r;
+  try {
+    r = await fetch('https://smsethiopia.com/api/sms/send', {
+      method: 'POST',
+      headers: { KEY: process.env.SMSETHIOPIA_KEY, 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ msisdn: '251' + m[1], text }),
+      signal: AbortSignal.timeout(10000),
+    });
+  } catch (e) {
+    await smsAlert('SMS Ethiopia is not answering', `A text to ${phone} could not reach SMS Ethiopia (${e.message}). It is retried in 30 minutes.`);
+    throw e;
+  }
   const raw = await r.text();
   let j = null; try { j = JSON.parse(raw); } catch {}
   if (!r.ok || (j && (j.success === false || j.status === 'error' || j.error))) {
     console.error('smsethiopia reply', r.status, raw.slice(0, 1500));
     // Account problems (sender name not approved, no balance…) fail every SMS the same way: pause automatic SMS
     // for 6 hours instead of retrying every order every 30 minutes (each retry rewrites the order in Upstash).
-    if (/sender ?id|10006|balance|insufficient|credit|unauthori|api key|suspend/i.test(raw)) { smsDownUntil = Date.now() + 6 * 3600e3; await kv('SET', PAUSE_KEY(), String((j && j.error_message) || raw).slice(0, 160), 'EX', 6 * 3600); }
+    const why = String((j && (j.error_message || j.message || j.error)) || raw).slice(0, 160);
+    if (/sender ?id|10006|balance|insufficient|credit|unauthori|api key|suspend/i.test(raw)) {
+      smsDownUntil = Date.now() + 6 * 3600e3; await kv('SET', PAUSE_KEY(), why, 'EX', 6 * 3600);
+      await smsAlert('Automatic SMS is PAUSED', `SMS Ethiopia refused the account: "${why}"\n\nNo help or congrats SMS will go out for the next 6 hours. Fix it on smsethiopia.com (balance, campaign, sender ID or API key), then send the waiting texts from /office.`, true);
+    } else await smsAlert('An SMS did not go through', `SMS Ethiopia refused a text to ${phone}: "${why}"\n\nIt stays as a task in /office and is retried in 30 minutes.`);
     throw new Error(`smsethiopia ${r.status}: ${(j && (j.message || j.error || j.error_message)) || raw.slice(0, 160)}`);
   }
   console.log('smsethiopia ok', r.status, raw.slice(0, 300)); // shows in Vercel logs, so "accepted but never arrived" can be traced
   return j || raw;
+}
+
+// ALERT_EMAIL — who hears about SMS problems (default: the sending Gmail). At most one alert an hour,
+// except a pause, which always alerts (it happens at most once every 6 hours).
+const ALERT_TO = () => process.env.ALERT_EMAIL || SW_MAIL;
+async function smsAlert(subject, text, always) {
+  try {
+    if (!process.env.GMAIL_APP_PASSWORD) return;
+    if (!always && !(await kv('SET', 'sms:alerted', '1', 'NX', 'EX', 3600))) return;
+    await sendEmail(ALERT_TO(), '⚠️ DINGUY: ' + subject, `${text}\n\n${SITE}/office`);
+  } catch (e) { console.error('smsAlert', e.message); }
 }
 
 let mailer;
