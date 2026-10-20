@@ -82,6 +82,7 @@ export async function sendSMS(phone, text) {
     if (/sender ?id|10006|balance|insufficient|credit|unauthori|api key|suspend/i.test(raw)) { smsDownUntil = Date.now() + 6 * 3600e3; await kv('SET', PAUSE_KEY(), String((j && j.error_message) || raw).slice(0, 160), 'EX', 6 * 3600); }
     throw new Error(`smsethiopia ${r.status}: ${(j && (j.message || j.error || j.error_message)) || raw.slice(0, 160)}`);
   }
+  console.log('smsethiopia ok', r.status, raw.slice(0, 300)); // shows in Vercel logs, so "accepted but never arrived" can be traced
   return j || raw;
 }
 
