@@ -105,6 +105,7 @@ export const getJob = () => getJSON(JOB);
 export async function testSend({ channel, subject, text, to }) {
   const p = { to: channel === 'sms' ? normPhone(to) : normMail(to), name: 'Test' };
   if (!p.to) throw new Error(channel === 'sms' ? 'Test phone number doesn’t look right.' : 'Test email doesn’t look right.');
+  if (!String(text || '').trim()) throw new Error('Write the message first.');
   await deliver({ channel, subject: '[TEST] ' + String(subject || ''), text: String(text || '') }, p);
   return p.to;
 }

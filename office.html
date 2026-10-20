@@ -850,7 +850,7 @@ document.addEventListener('click',async e=>{
   const tpl=e.target.closest('[data-bctpl]');if(tpl){const t=BC_TPL[tpl.dataset.bctpl],f=S.bcForm;f.text=f.channel==='sms'?t.sms:t.email;if(f.channel==='email')f.subject=t.subject;render();return;}
   const ou=e.target.closest('[data-optundo]');if(ou){try{const j=await api('POST',{bc:{do:'optout',value:ou.dataset.optundo,undo:true}});S.optouts=j.optouts;render();}catch(err){alert(err.message);}return;}
   const bca=e.target.closest('[data-bc]');if(bca){const f=S.bcForm,d=bca.dataset.bc;
-    if(d==='test'){const to=($('#bctest')||{}).value||'';if(!to.trim())return alert('Type your own phone or email for the test.');bca.disabled=true;
+    if(d==='test'){const to=($('#bctest')||{}).value||'';if(!to.trim())return alert('Type your own phone or email for the test.');if(!String(f.text||'').trim())return alert('Write the message first (or pick a template).');bca.disabled=true;
       try{const j=await api('POST',{bc:{do:'test',channel:f.channel,subject:f.subject,text:f.text,to}});toast('Test sent to '+j.to);}catch(err){alert(err.message);}bca.disabled=false;return;}
     if(d==='start'){const n=S.bcCount[f.channel+':'+f.who];
       if(!confirm(`Send this ${f.channel==='sms'?'SMS':'email'} to ${n} ${n===1?'person':'people'} (${S.audiences[f.who]})?${f.channel==='sms'?`\n\nAbout ${n*smsParts(f.text||'')} SMS will be used.`:''}`))return;bca.disabled=true;
