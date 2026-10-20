@@ -79,7 +79,7 @@ export async function sendSMS(phone, text) {
     console.error('smsethiopia reply', r.status, raw.slice(0, 1500));
     // Account problems (sender name not approved, no balance…) fail every SMS the same way: pause automatic SMS
     // for 6 hours instead of retrying every order every 30 minutes (each retry rewrites the order in Upstash).
-    if (/sender ?id|10006|balance|insufficient|credit|unauthori|api key|suspend/i.test(raw)) { smsDownUntil = Date.now() + 6 * 3600e3; await kv('SET', 'sms:paused', String((j && j.error_message) || raw).slice(0, 160), 'EX', 6 * 3600); }
+    if (/sender ?id|10006|balance|insufficient|credit|unauthori|api key|suspend/i.test(raw)) { smsDownUntil = Date.now() + 6 * 3600e3; await kv('SET', PAUSE_KEY(), String((j && j.error_message) || raw).slice(0, 160), 'EX', 6 * 3600); }
     throw new Error(`smsethiopia ${r.status}: ${(j && (j.message || j.error || j.error_message)) || raw.slice(0, 160)}`);
   }
   return j || raw;
@@ -130,7 +130,9 @@ const MIN = 60e3, HOUR = 60 * MIN;
 const SMS_KINDS = ['help_sms', 'congrats_sms', 'to_sms'];
 let smsDownUntil = 0; // set the moment SMS Ethiopia refuses the account, so the rest of this run skips SMS too
 const smsDown = () => Date.now() < smsDownUntil;
-export const smsPaused = () => kv('GET', 'sms:paused');
+// The pause belongs to the key that failed: putting a new SMSETHIOPIA_KEY in Vercel resumes SMS at once.
+const PAUSE_KEY = () => 'sms:paused:' + String(process.env.SMSETHIOPIA_KEY || '').slice(-6);
+export const smsPaused = () => kv('GET', PAUSE_KEY());
 // SMS only for recent orders, so turning it on never texts old customers.
 // Certificate emails have no age limit — every paid recipient should get theirs (paced, see above).
 function due(o, now = Date.now()) {
