@@ -162,16 +162,29 @@ function due(o, now = Date.now()) {
   const f = o.follow || {}, out = [], on = autoOn();
   const age = now - o.createdAt, sincePaid = now - (o.approvedAt || o.createdAt);
   if (on.sms && o.phone && (o.status === 'awaiting' || o.status === 'rejected') && !f.help_sms && !f.help_skip && age > 30e3 && age < 24 * HOUR) out.push('help_sms');
-  if (on.sms && o.phone && o.status === 'paid' && !f.congrats_sms && !f.congrats_skip && sincePaid < 24 * HOUR) out.push('congrats_sms');
-  if (on.sms && o.toPhone && o.status === 'paid' && !f.to_sms && !f.to_skip && sincePaid < 48 * HOUR) out.push('to_sms');
   // Emails from offscriptet@gmail.com (paced, see mailSlot). An address that failed 3 times is left for a human.
   const tries = (k) => (((o.autoErr || {})[k] || {}).n || 0) < MAIL_MAX_TRIES;
+  // Congrats/receiver SMS have no age limit: older paid orders that missed theirs catch up, 20 per 5 minutes
+  // (see catchUp). A number that failed 3 times is left for a human.
+  if (on.sms && o.phone && o.status === 'paid' && !f.congrats_sms && !f.congrats_skip && tries('congrats_sms')) out.push('congrats_sms');
+  if (on.sms && o.toPhone && o.status === 'paid' && !f.to_sms && !f.to_skip && tries('to_sms')) out.push('to_sms');
   if (AUTO_EMAIL && on.email) {
     if (o.email && o.status === 'paid' && !f.email && !f.email_skip && tries('email')) out.push('email');
     if (o.byEmail && o.status === 'paid' && !f.buyer_email && sincePaid < 7 * 24 * HOUR && tries('buyer_email')) out.push('buyer_email');
     if (o.byEmail && (o.status === 'awaiting' || o.status === 'rejected') && !f.help_email && !f.help_skip && age > 10 * MIN && age < 24 * HOUR && tries('help_email')) out.push('help_email');
   }
   return out;
+}
+
+// Catch-up: congrats/receiver SMS for orders paid more than a day ago. Fresh ones always go at once;
+// catch-up ones share 20 sends per 5-minute window.
+const CATCHUP_PER_5MIN = 20;
+const isCatchUp = (o, what, now = Date.now()) => (what === 'congrats_sms' || what === 'to_sms') && now - (o.approvedAt || o.createdAt) > 24 * HOUR;
+const catchUpKey = () => 'sms:catchup:' + Math.floor(Date.now() / 300e3);
+async function catchUpSlot() {
+  const k = catchUpKey(), n = await kv('INCR', k);
+  if (n === 1) await kv('EXPIRE', k, 600);
+  return n <= CATCHUP_PER_5MIN;
 }
 
 // Send whatever is due for this order. Safe to call any number of times, from anywhere.
@@ -187,6 +200,7 @@ export async function followUp(id, opts = {}) {
     if (smsDown() && SMS_KINDS.includes(what)) continue;
     // One send per order per kind, even if two requests race. A failure retries after 30 minutes.
     if (await kv('GET', `auto:${o.id}:${what}`)) continue;
+    if (isCatchUp(o, what) && !(await catchUpSlot())) continue;
     if (MAIL_KINDS.includes(what)) { const slot = await mailSlot(what === 'email' ? o.email : o.byEmail, what); if (slot !== 'ok') { if (slot === 'wait') followUp.mailWaiting = true; continue; } }
     if (!(await kv('SET', `auto:${o.id}:${what}`, '1', 'NX', 'EX', 172800))) continue;
     try {
@@ -224,22 +238,28 @@ export async function sweep() {
     // Only orders that may still need a message are read (the 'fu' set, filled by saveOrder), not all of them.
     // The first run after this change fills it once from the order list.
     if (await kv('SET', 'fu:init', '1', 'NX')) { const all = await kv('LRANGE', 'orders', 0, 499); if (all.length) await kv('SADD', 'fu', ...all); }
+    // Once: put every order back on the list, so paid orders that missed their congrats SMS catch up.
+    if (on.sms && (await kv('SET', 'fu:catchup1', '1', 'NX'))) { const all = await kv('LRANGE', 'orders', 0, -1); if (all.length) await kv('SADD', 'fu', ...all); }
     const ids = await kv('SMEMBERS', 'fu');
     const raw = ids.length ? await kv('MGET', ...ids.map((i) => 'order:' + i)) : [];
     const now = Date.now(), list = [], settled = [], paused = await smsPaused();
     // While SMS is paused, SMS doesn't count as due — those orders settle instead of being re-read every minute.
     const dueNow = (o) => due(o, now).filter((w) => !(paused && SMS_KINDS.includes(w)));
+    // When this window's catch-up sends are used up, those orders wait (they stay on the list) without being re-read.
+    const used = async () => (+(await kv('GET', catchUpKey())) || 0) >= CATCHUP_PER_5MIN;
+    let full = await used();
     raw.forEach((r, i) => { if (r) list.push(JSON.parse(r)); else settled.push(ids[i]); });
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); // newest first, so new customers go before the backlog
     let noMail = false; // once one email has to wait, the rest wait too — skip them this round
     for (const o of list) {
       // Nothing due and past the first 15 minutes: nothing new can come up until the order changes (and is saved again).
       if (!dueNow(o).length) { if (now - (o.createdAt || 0) > 15 * MIN) settled.push(o.id); continue; }
-      const d = dueNow(o).filter((w) => !(MAIL_KINDS.includes(w) && noMail));
+      const d = dueNow(o).filter((w) => !(MAIL_KINDS.includes(w) && noMail) && !(full && isCatchUp(o, w, now)));
       if (!d.length) continue;
       followUp.mailWaiting = false;
       await followUp(o.id, { noMail, smsPaused: paused });
       if (followUp.mailWaiting) noMail = true;
+      if (!full && d.some((w) => isCatchUp(o, w, now))) full = await used();
     }
     if (settled.length) await kv('SREM', 'fu', ...settled);
   } catch (e) { console.error('sweep', e.message); }
