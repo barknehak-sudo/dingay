@@ -70,7 +70,7 @@ export async function sendSMS(phone, text) {
   if (!m) throw new Error('bad phone ' + phone);
   let r;
   try {
-    r = await fetch('https://smsethiopia.com/api/sms/send', {
+    r = await fetch('https://smsethiopia.com/api/v2/sms/send', {
       method: 'POST',
       headers: { KEY: process.env.SMSETHIOPIA_KEY, 'content-type': 'application/json', accept: 'application/json' },
       body: JSON.stringify({ msisdn: '251' + m[1], text }),
@@ -195,7 +195,7 @@ export async function followUp(id, opts = {}) {
   const paused = opts.smsPaused !== undefined ? opts.smsPaused : await smsPaused();
   const todo = due(o).filter((w) => !(MAIL_KINDS.includes(w) && opts.noMail) && !((paused || smsDown()) && SMS_KINDS.includes(w)));
   if (!todo.length) return o;
-  const m = messages(o), sent = {}, failed = {};
+  const m = messages(o), sent = {}, failed = {}, ids = {};
   for (const what of todo) {
     if (smsDown() && SMS_KINDS.includes(what)) continue;
     // One send per order per kind, even if two requests race. A failure retries after 30 minutes.
@@ -204,9 +204,7 @@ export async function followUp(id, opts = {}) {
     if (MAIL_KINDS.includes(what)) { const slot = await mailSlot(what === 'email' ? o.email : o.byEmail, what); if (slot !== 'ok') { if (slot === 'wait') followUp.mailWaiting = true; continue; } }
     if (!(await kv('SET', `auto:${o.id}:${what}`, '1', 'NX', 'EX', 172800))) continue;
     try {
-      if (what === 'help_sms') await sendSMS(o.phone, m.help);
-      if (what === 'congrats_sms') await sendSMS(o.phone, m.congrats);
-      if (what === 'to_sms') await sendSMS(o.toPhone, m.gift);
+      if (SMS_KINDS.includes(what)) ids[what] = smsRecord(await sendSMS(...smsOf(o, what, m)));
       if (what === 'email') await sendEmail(o.email, m.subject, m.body);
       if (what === 'buyer_email') await sendEmail(o.byEmail, m.buyerSubject, m.buyerBody);
       if (what === 'help_email') await sendEmail(o.byEmail, m.helpSubject, m.helpBody);
@@ -224,6 +222,51 @@ export async function followUp(id, opts = {}) {
   o.auto = { ...(o.auto || {}), ...Object.fromEntries(Object.keys(sent).map((k) => [k, true])) };
   o.autoErr = { ...(o.autoErr || {}), ...failed };
   for (const k of Object.keys(sent)) delete o.autoErr[k];
+  o.sms = { ...(o.sms || {}), ...ids };
+  await saveOrder(o);
+  return o;
+}
+
+/* ---------- delivery ---------- */
+// Every SMS keeps SMS Ethiopia's message id in o.sms[kind] = { id, at, st, late }. The sweep asks SMS Ethiopia
+// how it went; one not confirmed DELIVERED after 30 minutes is marked `late` and shows in /office with Retry.
+const LATE = 30 * MIN, WATCH = 24 * HOUR;
+const smsOf = (o, what, m = messages(o)) => what === 'help_sms' ? [o.phone, m.help] : what === 'congrats_sms' ? [o.phone, m.congrats] : [o.toPhone, m.gift];
+const smsRecord = (j) => ({ id: j && typeof j.id === 'string' ? j.id : null, at: Date.now(), st: (j && j.status) || 'ACCEPTED' });
+const watching = (o, now = Date.now()) => Object.values(o.sms || {}).some((x) => x && x.id && x.st !== 'DELIVERED' && now - x.at < WATCH);
+async function checkDelivery(o, now = Date.now()) {
+  let changed = false;
+  for (const [k, x] of Object.entries(o.sms || {})) {
+    if (!x || !x.id || x.st === 'DELIVERED' || now - x.at > WATCH || now - x.at < 3 * MIN) continue;
+    try {
+      const r = await fetch('https://smsethiopia.com/api/v2/sms/' + encodeURIComponent(x.id), { headers: { KEY: process.env.SMSETHIOPIA_KEY, accept: 'application/json' }, signal: AbortSignal.timeout(8000) });
+      const j = r.ok ? await r.json() : null;
+      const st = j && j.status ? String(j.status) : x.st;
+      const late = st !== 'DELIVERED' && now - x.at > LATE;
+      if (st !== x.st || late !== !!x.late) { o.sms[k] = { ...x, st, late }; changed = true; }
+    } catch (e) { console.error('sms status', o.id, k, e.message); }
+  }
+  return changed;
+}
+
+// Send one SMS again now, from /office (Retry). Throws SMS Ethiopia's reason if it is refused.
+export async function resendSMS(id, what) {
+  if (!SMS_KINDS.includes(what)) throw new Error('Unknown SMS.');
+  const o = await loadOrder(id);
+  if (!o) throw new Error('Order not found.');
+  const [phone, text] = smsOf(o, what);
+  if (!phone) throw new Error('This order has no phone number for that SMS.');
+  let rec;
+  try { rec = smsRecord(await sendSMS(phone, text)); }
+  catch (e) {
+    o.autoErr = { ...(o.autoErr || {}), [what]: { at: Date.now(), msg: String(e.message).slice(0, 200), n: (((o.autoErr || {})[what] || {}).n || 0) + 1 } };
+    await saveOrder(o);
+    throw e;
+  }
+  o.follow = { ...(o.follow || {}), [what]: Date.now() };
+  o.auto = { ...(o.auto || {}), [what]: true };
+  if (o.autoErr) delete o.autoErr[what];
+  o.sms = { ...(o.sms || {}), [what]: rec };
   await saveOrder(o);
   return o;
 }
@@ -253,6 +296,14 @@ export async function sweep() {
     let noMail = false; // once one email has to wait, the rest wait too — skip them this round
     for (const o of list) {
       // Nothing due and past the first 15 minutes: nothing new can come up until the order changes (and is saved again).
+      // Delivery check for SMS sent in the last day, at most every 5 minutes per order.
+      if (watching(o, now)) {
+        if (await kv('SET', 'dlr:' + o.id, '1', 'NX', 'EX', 280)) {
+          const fresh = await loadOrder(o.id);
+          if (fresh && (await checkDelivery(fresh, now))) await saveOrder(fresh);
+        }
+        if (!dueNow(o).length) continue; // stays on the list until delivered or a day old
+      }
       if (!dueNow(o).length) { if (now - (o.createdAt || 0) > 15 * MIN) settled.push(o.id); continue; }
       const d = dueNow(o).filter((w) => !(MAIL_KINDS.includes(w) && noMail) && !(full && isCatchUp(o, w, now)));
       if (!d.length) continue;

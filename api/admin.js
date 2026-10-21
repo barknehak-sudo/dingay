@@ -6,6 +6,7 @@
 // POST /api/admin {id, action:'remove'}   → take a paid record off the public registry
 // POST /api/admin {id, action:'mark', what}  → record a follow-up (help_sms, congrats_sms, email, call, *_skip)
 // POST /api/admin {id, action:'receipt', receipt:{amount,account,payer,paidAt}} → store what the telebirr receipt says
+// POST /api/admin {id, action:'resend', what}  → send help_sms / congrats_sms / to_sms again now
 // POST /api/admin {id, action:'restore'}  → put a removed record back (same number, same links)
 // POST /api/admin {create:{slug,to,by,…}} → add a registration by hand (paid another way / gift)
 // POST /api/admin {id, action:'edit', edit:{to,by,occasion,message,phone,toPhone,email,byEmail}} → fix certificate details
@@ -14,7 +15,7 @@
 // POST /api/admin {testEmail:'you@x.com'} → sends a sample certificate email through the Gmail setup
 // Orders come back with payLink, recordLink and msgs (the SMS/email texts); `auto` says what is sent automatically.
 import { kv, getJSON, setJSON, loadOrder, saveOrder, touch, publish, recordOf, publicRecord, send, sameSecret, limited, ip, newKey, PRODUCTS, OCCASIONS, RECEIVERS, PAY_TO, ethPhone } from './_lib.js';
-import { messages, links, followUp, sweep, autoOn, sendTestEmail, smsPaused } from './_notify.js';
+import { messages, links, followUp, sweep, autoOn, sendTestEmail, smsPaused, resendSMS } from './_notify.js';
 import { day as hitDay } from './hit.js';
 import { AUDIENCES, audience, startJob, tick, stopJob, getJob, jobView, testSend, optout, optouts, exportRows } from './_broadcast.js';
 import crypto from 'node:crypto';
@@ -164,6 +165,11 @@ export default async function handler(req, res) {
     }
     if (req.method === 'POST') {
       const { id, action, note } = req.body || {};
+      // Retry one SMS now (help_sms, congrats_sms or to_sms) — from a "didn't go through" task.
+      if (action === 'resend') {
+        try { return send(res, 200, { order: view(await resendSMS(id, req.body.what), siteOf(req)) }); }
+        catch (e) { return send(res, 502, { error: 'SMS Ethiopia refused it: ' + e.message }); }
+      }
       const o = await loadOrder(id);
       if (!o) return send(res, 404, { error: 'Order not found.' });
       // Receipt facts (from the verifier, which can read telebirr from Ethiopia). Approve may carry them too.

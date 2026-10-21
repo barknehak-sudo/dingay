@@ -302,17 +302,32 @@ const emailLinks=(o,m,label)=>`<a class="btn" href="${esc(gmailHref(o,m))}" targ
 const markLink=(o,what,href,label,cls='btn')=>`<a class="${cls}" href="${esc(href)}" data-mark="${what}" data-id="${esc(o.id)}">${label}</a>`;
 
 /* ---------- tasks ---------- */
+// With automatic SMS on, an SMS task only shows when that SMS failed or wasn't confirmed delivered (see smsIssue);
+// everything else is sent by the server, so old "send it by hand" tasks don't pile up.
+const SMS_TASK={help:'help_sms',congrats:'congrats_sms',to:'to_sms'};
+function smsIssue(o,k){const e=(o.autoErr||{})[k],x=(o.sms||{})[k],f=F(o);
+  if(e&&!f[k])return `Didn’t go through: ${e.msg}`;
+  if(x&&x.late&&x.st!=='DELIVERED')return `Not delivered yet (SMS Ethiopia: ${String(x.st||'').toLowerCase()||'no answer'}) · sent ${ago(x.at)}`;
+  return '';}
 function tasks(){
-  const now=Date.now(),out=[];
+  const now=Date.now(),out=[],autoSms=!!(S.auto||{}).sms;
   for(const o of S.orders){
     const f=F(o);
+    if(autoSms){
+      for(const [k,what] of Object.entries(SMS_TASK)){
+        if(f[k+'_skip']||(k==='help'&&o.status==='paid')||now-o.createdAt>7*864e5)continue;
+        const why=smsIssue(o,what);if(!why)continue;
+        const who=k==='to'?o.to:o.by;
+        out.push({p:1,k,o,ic:'⚠️',retry:what,t:`${{help:'Help',congrats:'Congrats',to:'Record'}[k]} SMS to ${who} didn’t arrive`,s:`${k==='to'?o.toPhone:o.phone} · ${why}`,at:o.createdAt});
+      }
+    }
     if(o.status==='review')out.push({p:1,k:'review',o,ic:'🔎',t:`Check payment ${o.txn||''}`,s:`${o.name} for ${o.to} · ${o.price} Birr · ${o.reason||'waiting for you'}`,at:o.submittedAt||o.createdAt});
-    if((o.status==='awaiting'||o.status==='rejected')&&o.phone&&!f.help_sms&&!f.help_skip&&now-o.createdAt>10*60e3&&now-o.createdAt<7*864e5)
+    if(!autoSms&&(o.status==='awaiting'||o.status==='rejected')&&o.phone&&!f.help_sms&&!f.help_skip&&now-o.createdAt>10*60e3&&now-o.createdAt<7*864e5)
       out.push({p:3,k:'help',o,ic:'💬',t:`Help ${o.by} pay`,s:`${o.status==='rejected'?'Code was rejected':'Didn’t pay yet'} · ${o.name} · ordered ${ago(o.createdAt)}`,at:o.createdAt});
     const recent=now-(o.approvedAt||o.createdAt)<7*864e5; // older paid orders don't flood the list
-    if(o.status==='paid'&&recent&&o.phone&&!f.congrats_sms&&!f.congrats_skip)
+    if(!autoSms&&o.status==='paid'&&recent&&o.phone&&!f.congrats_sms&&!f.congrats_skip)
       out.push({p:2,k:'congrats',o,ic:'🎉',t:`Text congrats to ${o.by}`,s:`${o.to} · ${o.name} · paid ${ago(o.approvedAt)}`,at:o.approvedAt});
-    if(o.status==='paid'&&recent&&o.toPhone&&!f.to_sms&&!f.to_skip)
+    if(!autoSms&&o.status==='paid'&&recent&&o.toPhone&&!f.to_sms&&!f.to_skip)
       out.push({p:2,k:'to',o,ic:'🎁',t:`Text ${o.to} their record`,s:`${o.toPhone} · from ${o.by} · ${o.name}`,at:o.approvedAt});
     if(o.status==='paid'&&recent&&o.email&&!o.toPhone&&!f.email&&!f.email_skip)
       out.push({p:2,k:'email',o,ic:'✉️',t:`Email the certificate to ${o.to}`,s:`${o.email} · from ${o.by} · sends from ${SW_MAIL}`,at:o.approvedAt});
@@ -324,9 +339,10 @@ function reachLink(r){const t=String(r||'').trim();if(/^[^@\s]+@[^@\s]+\.[^@\s]+
 function taskCard(t){
   const o=t.o;let acts='';
   if(t.k==='review')acts=`<a class="btn ghost" href="https://transactioninfo.ethiotelecom.et/receipt/${encodeURIComponent(o.txn||'')}" target="_blank" rel="noopener noreferrer">Open receipt ↗</a><button class="btn ok" data-a="approve" data-id="${esc(o.id)}">Approve</button><button class="btn bad" data-a="reject" data-id="${esc(o.id)}">Reject</button>`;
-  if(t.k==='help')acts=sendBtns(o,'help_sms',o.phone,msgs(o).help,'Send help on Telegram')+`<a class="btn ghost" href="tel:${esc(o.phone)}" data-mark="call" data-id="${esc(o.id)}">Call</a><button class="btn ghost" data-skip="help_skip" data-id="${esc(o.id)}">Skip</button>`;
-  if(t.k==='to')acts=sendBtns(o,'to_sms',o.toPhone,msgs(o).gift,'Send to '+esc(o.to)+' on Telegram')+`<button class="btn ghost" data-skip="to_skip" data-id="${esc(o.id)}">Skip</button>`;
-  if(t.k==='congrats')acts=sendBtns(o,'congrats_sms',o.phone,msgs(o).congrats,'Send congrats on Telegram')+`<button class="btn ghost" data-skip="congrats_skip" data-id="${esc(o.id)}">Skip</button>`;
+  const retry=t.retry?`<button class="btn" data-resend="${esc(t.retry)}" data-id="${esc(o.id)}">Retry SMS</button>`:'';
+  if(t.k==='help')acts=retry+sendBtns(o,'help_sms',o.phone,msgs(o).help,'Send help on Telegram')+`<a class="btn ghost" href="tel:${esc(o.phone)}" data-mark="call" data-id="${esc(o.id)}">Call</a><button class="btn ghost" data-skip="help_skip" data-id="${esc(o.id)}">Skip</button>`;
+  if(t.k==='to')acts=retry+sendBtns(o,'to_sms',o.toPhone,msgs(o).gift,'Send to '+esc(o.to)+' on Telegram')+`<button class="btn ghost" data-skip="to_skip" data-id="${esc(o.id)}">Skip</button>`;
+  if(t.k==='congrats')acts=retry+sendBtns(o,'congrats_sms',o.phone,msgs(o).congrats,'Send congrats on Telegram')+`<button class="btn ghost" data-skip="congrats_skip" data-id="${esc(o.id)}">Skip</button>`;
   if(t.k==='email')acts=emailLinks(o,msgs(o),'Send from Gmail')+`<button class="btn ghost" data-skip="email_skip" data-id="${esc(o.id)}">Skip</button>`;
   if(t.k==='inq'){const q=t.q,h=reachLink(q.reach);acts=(h?`<a class="btn" href="${esc(h)}">${h.startsWith('mailto')?'Email':'Call'} ${esc(q.name)}</a>`:'')+`<button class="btn ghost" data-q="${esc(q.id)}" data-qa="done">Mark done</button>`;}
   const sub=t.k==='inq'&&t.q.msg?`${esc(t.s)}<br>“${esc(t.q.msg.slice(0,140))}”`:esc(t.s);
@@ -654,7 +670,7 @@ function autoLine(){
   return autoLine.base(a);
 }
 autoLine.base=a=>{const on=x=>x?'<strong>on</strong>':'off';
-  return `<div class="readout" style="margin-top:14px">Automatic SMS ${on(a.sms)}. ${a.sms?'Help texts go out 30 s after an unpaid order; the buyer’s congrats and the recipient’s record link as soon as it’s paid. Anything that fails stays here.':'Set SMSETHIOPIA_KEY in Vercel to turn it on.'} ${a.email?`Automatic email <strong>on</strong> from ${esc(a.from)}: the recipient’s certificate, the buyer’s receipt, and a help email 10 min after an unpaid order (paced, max 60 a day).`:'Automatic email is off — set GMAIL_APP_PASSWORD in Vercel.'}${a.emailReady?` <button class="btn ghost" data-testmail style="margin-left:6px;min-height:30px;padding:0 10px">Send test email</button>`:''}</div>`;};
+  return `<div class="readout" style="margin-top:14px">Automatic SMS ${on(a.sms)}. ${a.sms?'Help texts go out 30 s after an unpaid order; the buyer’s congrats and the recipient’s record link as soon as it’s paid. Only texts that fail or aren’t delivered within 30 min show up here, with Retry.':'Set SMSETHIOPIA_KEY in Vercel to turn it on.'} ${a.email?`Automatic email <strong>on</strong> from ${esc(a.from)}: the recipient’s certificate, the buyer’s receipt, and a help email 10 min after an unpaid order (paced, max 60 a day).`:'Automatic email is off — set GMAIL_APP_PASSWORD in Vercel.'}${a.emailReady?` <button class="btn ghost" data-testmail style="margin-left:6px;min-height:30px;padding:0 10px">Send test email</button>`:''}</div>`;};
 function viewTasks(){
   const ts=tasks();const groups=[['review','Check these payments'],['congrats','Say congrats'],['to','Text the recipient'],['email','Email certificates'],['help','Help them pay'],['inq','SIDEWAYS inquiries']];
   if(!ts.length)return autoLine()+`<div class="card empty" style="margin-top:16px">✓ All caught up. New tasks show up here automatically.</div>`;
@@ -663,8 +679,11 @@ function viewTasks(){
 function followChips(o){
   const f=F(o),c=[];
   const add=(k,label)=>{if(f[k])c.push(`<span class="chip done">✓ ${label}${(o.auto||{})[k]?' (auto)':''} ${ago(f[k])}</span>`);};
-  add('help_sms','Help SMS');add('congrats_sms','Congrats SMS');add('to_sms','Texted them');add('buyer_email','Receipt emailed');add('help_email','Help emailed');add('email','Emailed');add('call','Called');
-  for(const [k,e] of Object.entries(o.autoErr||{}))if(e&&!f[k])c.push(`<span class="chip bad" title="${esc(e.msg)}">✕ Auto ${/email/.test(k)?'email':'SMS'} failed ${ago(e.at)}${/email/.test(k)&&e.n<3?` (try ${e.n} of 3, retries tomorrow)`:' — send it by hand'}</span>`);
+  const dl=k=>{const x=(o.sms||{})[k];return !x?'':x.st==='DELIVERED'?' · delivered':x.late?' · not delivered':' · '+String(x.st||'').toLowerCase();};
+  const add0=add;
+  const addSms=(k,label)=>{if(!f[k])return;add0(k,label+dl(k));if(o.status!=='removed')c.push(`<button class="chip" data-resend="${k}" data-id="${esc(o.id)}">↻ Resend</button>`);};
+  addSms('help_sms','Help SMS');addSms('congrats_sms','Congrats SMS');addSms('to_sms','Texted them');add('buyer_email','Receipt emailed');add('help_email','Help emailed');add('email','Emailed');add('call','Called');
+  for(const [k,e] of Object.entries(o.autoErr||{}))if(e&&!f[k])c.push(`<span class="chip bad" title="${esc(e.msg)}">✕ Auto ${/email/.test(k)?'email':'SMS'} failed ${ago(e.at)}${/email/.test(k)&&e.n<3?` (try ${e.n} of 3, retries tomorrow)`:' — send it by hand'}</span>`+(/email/.test(k)||!['help_sms','congrats_sms','to_sms'].includes(k)?'':`<button class="chip" data-resend="${k}" data-id="${esc(o.id)}">↻ Retry</button>`));
   return c.length?`<div class="chips">${c.join('')}</div>`:'';
 }
 function orderCard(o){
@@ -868,6 +887,9 @@ document.addEventListener('click',async e=>{
     if(o){o.follow={...F(o),[what]:Date.now()};}
     api('POST',{id,action:'mark',what}).catch(()=>{});
     setTimeout(()=>{render();if(what!=='call'&&!tg)toast('Marked as sent');},700);return;}
+  const rs=e.target.closest('[data-resend]');
+  if(rs){const id=rs.dataset.id,what=rs.dataset.resend;if(!confirm('Send this SMS again now?'))return;rs.disabled=true;
+    try{const j=await api('POST',{id,action:'resend',what});replaceOrder(j.order);render();toast('SMS sent again');}catch(err){alert(err.message);rs.disabled=false;}return;}
   const sk=e.target.closest('[data-skip]');
   if(sk){const id=sk.dataset.id,what=sk.dataset.skip;sk.disabled=true;
     try{const j=await api('POST',{id,action:'mark',what});replaceOrder(j.order);render();toast('Skipped');}catch(err){alert(err.message);sk.disabled=false;}return;}
