@@ -2,6 +2,7 @@
 // PARTNER_PASSWORD works too (it's only counts).
 // GET /api/analytics          → the report (cached in KV for 10 minutes)
 // GET /api/analytics?fresh=1  → skip the cache
+// GET /api/analytics?export=1 → every day GA has, as tables (daily, sources, pages, places & devices, events) for /office to save as CSV
 // Needs two Vercel env vars; without them the answer is {setup:true, missing:[…]} and /office shows the steps.
 //   GA_PROPERTY_ID          — the number from GA → Admin → Property details (not the G-… measurement ID)
 //   GA_SERVICE_ACCOUNT_JSON — the whole JSON key of a Google Cloud service account that has Viewer access
@@ -117,6 +118,35 @@ async function report({ property, sa }) {
   };
 }
 
+/* ---------- export: everything, day by day ---------- */
+// GA4 keeps data from the property's start; asking from GA4's earliest allowed date returns all of it.
+const ALL = [{ startDate: '2015-08-14', endDate: 'today' }];
+const EXPORTS = {
+  daily: { dimensions: ['date'], metrics: ['activeUsers', 'newUsers', 'sessions', 'engagedSessions', 'screenPageViews', 'averageSessionDuration', 'bounceRate', 'eventCount'] },
+  sources: { dimensions: ['date', 'sessionSource', 'sessionMedium'], metrics: ['activeUsers', 'sessions'] },
+  pages: { dimensions: ['date', 'pagePath'], metrics: ['screenPageViews', 'activeUsers'] },
+  places_devices: { dimensions: ['date', 'country', 'city', 'deviceCategory'], metrics: ['activeUsers', 'sessions'] },
+  events: { dimensions: ['date', 'eventName'], metrics: ['eventCount', 'activeUsers'] },
+};
+async function exportAll({ property, sa }) {
+  const names = Object.keys(EXPORTS);
+  const r = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${property}:batchRunReports`, {
+    method: 'POST',
+    headers: { authorization: 'Bearer ' + (await accessToken(sa)), 'content-type': 'application/json' },
+    body: JSON.stringify({ requests: names.map((k) => ({ dateRanges: ALL, dimensions: EXPORTS[k].dimensions.map((name) => ({ name })), metrics: EXPORTS[k].metrics.map((name) => ({ name })),
+      orderBys: [{ dimension: { dimensionName: 'date' } }], limit: 100000, keepEmptyRows: false })) }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error((j.error && j.error.message) || 'Google Analytics answered ' + r.status);
+  const day = (v) => /^\d{8}$/.test(v) ? `${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6)}` : v;
+  const out = {};
+  names.forEach((k, i) => {
+    const rows = (j.reports[i].rows || []).map((row) => [...row.dimensionValues.map((d, x) => (x === 0 ? day(d.value) : d.value)), ...row.metricValues.map((m) => Number(m.value))]);
+    out[k] = { headers: [...EXPORTS[k].dimensions, ...EXPORTS[k].metrics], rows };
+  });
+  return out;
+}
+
 export default async function handler(req, res) {
   try {
     if (!process.env.ADMIN_PASSWORD) return send(res, 503, { error: 'ADMIN_PASSWORD is not set in Vercel.' });
@@ -130,6 +160,10 @@ export default async function handler(req, res) {
 
     const cfg = config();
     if (cfg.missing.length) return send(res, 200, { setup: true, missing: cfg.missing, email: cfg.sa && cfg.sa.client_email });
+    if (req.query.export) {
+      try { return send(res, 200, { property: cfg.property, at: Date.now(), reports: await exportAll(cfg) }); }
+      catch (e) { console.error('analytics export', e.message); return send(res, 502, { error: e.message }); }
+    }
     if (!req.query.fresh) { const hit = await getJSON(CACHE); if (hit && hit.property === cfg.property) return send(res, 200, { ...hit, cached: true }); }
     try {
       const out = { ...(await report(cfg)), property: cfg.property };

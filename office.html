@@ -479,7 +479,7 @@ function viewVisitors(st){
       ${plot('Visitors → paid <span class="readout" style="font-weight:400">7 days</span>',hb(funnel,fMax,f=>f[0],f=>f[1])
         +`<div class="readout" style="margin-top:10px;font-size:12px">${pct(conv)} of visitors paid. Paid orders come from the Office’s own records${E('purchase')?`; Google counted ${num((ev.purchase||{}).count)} purchases`:''}.</div>`)}
     </div>`;
-  return card(T,'From Google Analytics · this week vs the week before',body,'s12',`<span class="via">${g.cached?'Updated '+ago(g.at):'Just updated'}</span>`);
+  return card(T,'From Google Analytics · this week vs the week before',body,'s12',`<span class="via">${g.cached?'Updated '+ago(g.at):'Just updated'}</span>${P()?'':' <button class="btn ghost" data-export="ga" style="min-height:30px;padding:0 10px">⬇ Analytics CSV</button>'}`);
 }
 // A dashboard card: title, a line under it, an optional button on the right.
 const card=(t,sub,body,cls='',extra='')=>`<section class="card ${cls}"><div class="ch"><div><h3>${t}</h3>${sub?`<p>${sub}</p>`:''}</div>${extra}</div>${body}</section>`;
@@ -735,13 +735,42 @@ function editForm(o){
     <div class="acts" style="margin-top:0"><button class="btn" type="submit">Save changes</button><button class="btn ghost" type="button" data-edit="${esc(o.id)}">Cancel</button></div>
   </form>`;
 }
+/* ---------- exports (CSV for Excel / Google Sheets) ---------- */
+const csvCell=v=>{const t=v==null?'':String(v);return /[",\n\r]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t;};
+const csvOf=(head,rows)=>'\ufeff'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n'); // BOM so Excel reads Amharic
+function saveFile(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);}
+const addisTime=t=>t?new Intl.DateTimeFormat('sv-SE',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(t)):'';
+const stamp=()=>addisTime(Date.now()).slice(0,10);
+// Every order the server keeps, all statuses (from the Google Sheet export, api/_broadcast.js), without customer details.
+// Paid via / amount received / paid at sit next to the asked-for columns, for revenue sums.
+const ORDER_CSV=[['Order ID','Order'],['Ordered (Addis)','Date/time (Addis)'],['Stone','Product'],['Friend / Loved one','Tier'],['Price (Birr)','Price (Birr)'],['Status','Payment status'],['Paid via','Paid via'],['Amount received (Birr)','Paid amount (Birr)'],['Paid (Addis)','Paid at (Addis)'],['Occasion','Occasion'],['Telebirr transaction','Telebirr transaction ID']];
+async function exportOrders(btn){
+  btn.disabled=true;
+  try{const j=await api('GET',null,'?export=1');const ix=ORDER_CSV.map(([c])=>j.columns.indexOf(c));
+    if(ix.includes(-1))throw new Error('the export is missing a column');
+    saveFile(`dinguy-orders-${stamp()}.csv`,csvOf(ORDER_CSV.map(c=>c[1]),j.rows.map(r=>ix.map(i=>r[i]))));toast(`Saved ${j.rows.length} orders`);}
+  catch(err){alert('Couldn’t export orders: '+err.message);}
+  btn.disabled=false;
+}
+// Every day Google Analytics has, as five files: daily totals, sources, pages, places & devices, events.
+async function exportGA(btn){
+  btn.disabled=true;const t=btn.textContent;btn.textContent='Exporting…';
+  try{const r=await fetch('/api/analytics?export=1',{headers:{'x-admin-password':pw}});const j=await r.json().catch(()=>({error:'Bad response'}));
+    if(!r.ok||j.error)throw new Error(j.error||r.status);
+    const names=Object.keys(j.reports);
+    for(const k of names){const x=j.reports[k];saveFile(`dinguy-analytics-${k}-${stamp()}.csv`,csvOf(x.headers,x.rows));await new Promise(r=>setTimeout(r,400));}
+    toast(`Saved ${names.length} files: ${names.join(', ')}`);}
+  catch(err){alert('Couldn’t export Google Analytics: '+err.message);}
+  btn.disabled=false;btn.textContent=t;
+}
 function viewOrders(){
   const FIL=[['all','All'],['review','Check'],['awaiting','Not paid'],['paid','Paid'],['jami','Paid on Jami'],['rejected','Rejected'],['removed','Removed']];
   const q=S.q.trim().toLowerCase();
   const list=S.orders.filter(o=>(S.filter==='all'||(S.filter==='jami'?byJami(o)&&o.status==='paid':o.status===S.filter))&&(!q||[o.id,o.to,o.by,o.phone,o.toPhone,o.txn,o.email,o.byEmail].some(v=>String(v||'').toLowerCase().includes(q))));
   const cnt=k=>k==='all'?S.orders.length:k==='jami'?S.orders.filter(o=>byJami(o)&&o.status==='paid').length:S.orders.filter(o=>o.status===k).length;
   return `<div style="margin-top:14px"><input class="search" id="q" type="search" placeholder="Search name, phone, DG-…, transaction" value="${esc(S.q)}">
-    <div class="filters">${FIL.map(([k,l])=>`<button data-filter="${k}" aria-pressed="${S.filter===k}">${l} · ${cnt(k)}</button>`).join('')}</div></div>
+    <div class="filters">${FIL.map(([k,l])=>`<button data-filter="${k}" aria-pressed="${S.filter===k}">${l} · ${cnt(k)}</button>`).join('')}</div>
+    <div style="margin-top:8px"><button class="btn ghost" data-export="orders">⬇ Download all orders (CSV)</button></div></div>
     <div class="grid" style="margin-top:12px">${list.slice(0,80).map(orderCard).join('')||'<div class="card empty">Nothing here.</div>'}</div>
     ${list.length>80?`<div class="empty">Showing 80 of ${list.length}. Search to narrow down.</div>`:''}
     <h2 class="sec"><span>Add by hand</span></h2>${newForm()}`;
@@ -887,6 +916,8 @@ document.addEventListener('click',async e=>{
     if(o){o.follow={...F(o),[what]:Date.now()};}
     api('POST',{id,action:'mark',what}).catch(()=>{});
     setTimeout(()=>{render();if(what!=='call'&&!tg)toast('Marked as sent');},700);return;}
+  const ex=e.target.closest('[data-export]');
+  if(ex){if(ex.dataset.export==='orders')exportOrders(ex);else exportGA(ex);return;}
   const rs=e.target.closest('[data-resend]');
   if(rs){const id=rs.dataset.id,what=rs.dataset.resend;if(!confirm('Send this SMS again now?'))return;rs.disabled=true;
     try{const j=await api('POST',{id,action:'resend',what});replaceOrder(j.order);render();toast('SMS sent again');}catch(err){alert(err.message);rs.disabled=false;}return;}
