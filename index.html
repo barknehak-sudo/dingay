@@ -1022,7 +1022,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;heroStone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cobble&quot;,&quot;blocket&quot;,&quot;river&quot;,&quot;foundation&quot;,&quot;opal&quot;,&quot;choc&quot;,&quot;emerald&quot;,&quot;diamond&quot;],&quot;default&quot;:&quot;cobble&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Experience&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Experience&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;heroStone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cobble&quot;,&quot;blocket&quot;,&quot;river&quot;,&quot;foundation&quot;,&quot;pebble&quot;,&quot;iron&quot;,&quot;charcoal&quot;,&quot;opal&quot;,&quot;choc&quot;,&quot;emerald&quot;,&quot;diamond&quot;,&quot;tikimt&quot;],&quot;default&quot;:&quot;cobble&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Experience&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Experience&quot;}}">
 const P=[
  {slug:'cobblestone',w:'friend',name:'COBBLESTONE',sub:'The Urban Classic',kind:'cobble',fig:'F-01',cls:'Urban Sedimentary',
   d:['For the friend who has survived traffic, construction, bad decisions and somehow still made it here.','A dependable Dinguy with strong infrastructure energy.'],
@@ -1036,6 +1036,18 @@ const P=[
  {slug:'foundation-stone',w:'friend',name:'መሰረት ድንጋይ',sub:'The Foundation',kind:'foundation',fig:'F-04',cls:'Foundational Basalt',
   d:['For the friend who has always been there.','Holding things together.\nTaking up space.\nRefusing to move.','A true foundation of the community.'],
   meta:[['Specimen No.','F-04'],['Classification','Foundational basalt'],['Origin','The community'],['Mobility','Refuses'],['Surface','Rough, dependable'],['Emotional weight','Holding everything']]},
+ {slug:'pebble',w:'friend',name:'ጠጠር',sub:'The Small But Mighty',kind:'pebble',fig:'F-05',cls:'Pocket Sedimentary',
+  d:['For the friend who is small in size and enormous in opinions.','Fits in a pocket.\nGets into every shoe.\nImpossible to ignore.'],
+  meta:[['Specimen No.','F-05'],['Classification','Pocket-sized, surprisingly tough'],['Origin','Every shoe you have ever owned'],['Size','Small'],['Attitude','Enormous'],['Emotional weight','Deceptively high']]},
+ {slug:'alolo',w:'friend',name:'አሎሎ',sub:'The Heavy Hitter',kind:'iron',fig:'F-06',cls:'Solid Iron · Olympic Weight',
+  d:['For the friend who carries the whole team.','Throws their weight around.\nAlways lands somewhere.\nNobody asks where.'],
+  meta:[['Specimen No.','F-06'],['Classification','Solid iron, perfectly round'],['Origin','The school sports field'],['Weight','Yes'],['Range','Further than expected'],['Emotional weight','Olympic']]},
+ {slug:'kesel-dingay',w:'friend',name:'ከሰል ድንጋይ',sub:'The One Who Keeps the Fire Going',kind:'charcoal',fig:'F-07',cls:'Carbon · Slow Burn',
+  d:['For the friend behind every coffee ceremony and every late-night talk.','Quiet on the outside.\nWarm on the inside.\nStill glowing at 2 a.m.'],
+  meta:[['Specimen No.','F-07'],['Classification','Carbon, slow burn'],['Origin','Next to the ጀበና'],['Temperature','Warm'],['Burn time','All night'],['Emotional weight','Glowing']]},
+ {slug:'tikimt-abeba',w:'loved',name:'የጥቅምት አበባ',sub:'The One Who Brings the Sunshine',kind:'tikimt',fig:'L-05',cls:'Bloom · Symbolic',
+  d:['The yellow flower that covers the hills after the rains.','For the person who makes everything feel new again.','Bright. Hopeful. Back every year.','A bloom that never wilts, because it is registered.'],
+  meta:[['Specimen No.','L-05'],['Classification','Bloom (symbolic)'],['Season','After the rains'],['Colour','Sunshine yellow'],['Blooms','Every year'],['Wilting','Not registered']]},
  {slug:'queen-of-sheba',w:'loved',name:'THE QUEEN OF SHEBA',sub:'Opal',kind:'opal',fig:'L-01',cls:'Precious Opal · Symbolic',
   d:["A stone inspired by Ethiopia's royal imagination.",'For someone who deserves to be treated like royalty.','Soft light. Shifting colour. A little mysterious.','Much like them.'],
   meta:[['Specimen No.','L-01'],['Classification','Precious opal (symbolic)'],['Inspiration','Royal imagination'],['Play of colour','Shifting'],['Light','Soft'],['Temperament','A little mysterious']]},
@@ -1224,7 +1236,7 @@ class Component extends DCLogic {
     if(this.storyBusy)return;this.storyBusy=true;this.toastMsg('Making your story…');
     try{
       const W=1080,H=1920,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-      const loved=['opal','choc','emerald','diamond'].includes(reg.kind);
+      const loved=['opal','choc','emerald','diamond','tikimt'].includes(reg.kind);
       const F='"Helvetica Neue",Helvetica,Arial,"Noto Sans Ethiopic",sans-serif',M='"IBM Plex Mono",ui-monospace,monospace';
       const bg=x.createRadialGradient(W/2,560,80,W/2,820,1500);
       if(loved){bg.addColorStop(0,'#4b6a80');bg.addColorStop(.45,'#132531');bg.addColorStop(1,'#000');}else{bg.addColorStop(0,'#f4f4f1');bg.addColorStop(.55,'#d6d6d2');bg.addColorStop(1,'#a9a9a4');}
@@ -1255,10 +1267,10 @@ class Component extends DCLogic {
   async download(reg){
     const W=1240,H=1711,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
     // Loved-one stones get the romantic certificate (blush paper, gold hairlines, serif italics, rose stamp) — same as on screen.
-    const loved=['opal','choc','emerald','diamond'].includes(reg.kind);
+    const loved=['opal','choc','emerald','diamond','tikimt'].includes(reg.kind);
     if(loved&&document.fonts)try{await Promise.race([document.fonts.load('italic 64px "Instrument Serif"'),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
     const F='"Helvetica Neue",Helvetica,Arial,"Noto Sans Ethiopic",sans-serif',M='"IBM Plex Mono",ui-monospace,monospace',S='"Instrument Serif",Georgia,"Noto Serif Ethiopic",serif';
-    const party=reg.kind==='cake',friend=['cobble','blocket','river','foundation'].includes(reg.kind);
+    const party=reg.kind==='cake',friend=['cobble','blocket','river','foundation','pebble','iron','charcoal'].includes(reg.kind);
     const C=friend?{ink:'#0b0b0b',sub:'#3b3b3b',mut:'#6a6a64',acc:'#0b0b0b',rule:'rgba(11,11,11,.5)',b1:'#0b0b0b',b2:'rgba(11,11,11,.18)',stamp:'#0b0b0b'}
            :party?{ink:'#2b1d2e',sub:'#6b5566',mut:'#8c7488',acc:'#d6336c',rule:'rgba(214,51,108,.4)',b1:'rgba(214,51,108,.65)',b2:'rgba(76,201,240,.6)',stamp:'#d6336c'}
            :loved?{ink:'#3a1f24',sub:'#7a4d55',mut:'#9a6b72',acc:'#a83f58',rule:'rgba(184,146,90,.6)',b1:'rgba(184,146,90,.9)',b2:'rgba(184,146,90,.4)',stamp:'#a83f58'}

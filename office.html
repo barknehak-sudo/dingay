@@ -852,7 +852,7 @@ function viewInq(){
     <div class="acts">${h?`<a class="btn" href="${esc(h)}">${h.startsWith('mailto')?'Email':'Call'}</a>`:''}<button class="btn ghost" data-q="${esc(q.id)}" data-qa="${q.status==='done'?'new':'done'}">${q.status==='done'?'Mark as new':'Mark done'}</button></div>
   </div>`;}).join('')}</div>`;
 }
-const STONES=[['cobblestone','COBBLESTONE · 89'],['bloket','ብሎኬት · 89'],['river-stone','የወንዝ ድንጋይ · 89'],['foundation-stone','መሰረት ድንጋይ · 89'],['queen-of-sheba','THE QUEEN OF SHEBA · 199'],['mezezo-chocolate-opal','MEZEZO CHOCOLATE OPAL · 199'],['shakiso-emerald','SHAKISO EMERALD · 199'],['diamond','DIAMOND · 199']];
+const STONES=[['cobblestone','COBBLESTONE · 89'],['bloket','ብሎኬት · 89'],['river-stone','የወንዝ ድንጋይ · 89'],['foundation-stone','መሰረት ድንጋይ · 89'],['pebble','ጠጠር · 89'],['alolo','አሎሎ · 89'],['kesel-dingay','ከሰል ድንጋይ · 89'],['tikimt-abeba','የጥቅምት አበባ · 199'],['queen-of-sheba','THE QUEEN OF SHEBA · 199'],['mezezo-chocolate-opal','MEZEZO CHOCOLATE OPAL · 199'],['shakiso-emerald','SHAKISO EMERALD · 199'],['diamond','DIAMOND · 199']];
 function newForm(){
   return `<details class="new"><summary>+ New registration (paid another way, or a gift)</summary>
     <form class="f" id="newform">

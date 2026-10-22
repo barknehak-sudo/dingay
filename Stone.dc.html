@@ -35,7 +35,7 @@
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:360,&quot;height&quot;:360},&quot;kind&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cobble&quot;,&quot;blocket&quot;,&quot;river&quot;,&quot;foundation&quot;,&quot;opal&quot;,&quot;choc&quot;,&quot;emerald&quot;,&quot;diamond&quot;],&quot;default&quot;:&quot;cobble&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;spin&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:4,&quot;tsType&quot;:&quot;number&quot;},&quot;drag&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;hold&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;gl&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;scrollLink&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:360,&quot;height&quot;:360},&quot;kind&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cobble&quot;,&quot;blocket&quot;,&quot;river&quot;,&quot;foundation&quot;,&quot;pebble&quot;,&quot;iron&quot;,&quot;charcoal&quot;,&quot;opal&quot;,&quot;choc&quot;,&quot;emerald&quot;,&quot;diamond&quot;,&quot;tikimt&quot;],&quot;default&quot;:&quot;cobble&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;spin&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:4,&quot;tsType&quot;:&quot;number&quot;},&quot;drag&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;hold&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;gl&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;scrollLink&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
 const N=(f,o,s)=>`url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${f}' numOctaves='${o}' seed='${s}' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")`;
 const OCT='polygon(20% 0,80% 0,100% 14%,100% 86%,80% 100%,20% 100%,0 86%,0 14%)';
 const K={
@@ -44,12 +44,16 @@ const K={
   blocket:{box:['26%','4%','20%','4%'],r:'3%',base:'#a09c94',g:[1.3,4,.8,'overlay'],m:[.06,3,.35,'multiply'],hi:.3,sh:.5,seed:9},
   river:{box:['24%','6%','16%','6%'],r:'52% 48% 46% 54% / 60% 56% 44% 40%',base:'radial-gradient(120% 120% at 40% 30%,#737a7d,#3f4447 45%,#1b1e20 100%)',g:[.6,2,.16,'overlay'],m:[.02,2,.3,'soft-light'],vein:'linear-gradient(118deg,transparent 44%,rgba(236,233,226,.5) 47%,rgba(236,233,226,.18) 50%,transparent 53%)',hi:.62,sh:.6,gloss:true,seed:5},
   foundation:{box:['18%','4%','10%','4%'],r:'9% 14% 7% 12% / 14% 9% 12% 8%',base:'linear-gradient(160deg,#81796c,#5c554b 50%,#342f29)',g:[1.1,4,.75,'overlay'],m:[.05,3,.5,'multiply'],hi:.3,sh:.6,seed:12},
+  pebble:{box:['30%','18%','24%','18%'],r:'50% 50% 46% 54% / 58% 54% 46% 42%',base:'radial-gradient(120% 120% at 38% 30%,#d9d2c5,#a99f90 45%,#6e665b 100%)',g:[.8,2,.3,'overlay'],m:[.04,2,.35,'multiply'],hi:.5,sh:.5,gloss:true,seed:8},
+  iron:{box:['14%','14%','14%','14%'],r:'50%',base:'radial-gradient(100% 100% at 36% 30%,#9aa0a6,#4a4f55 40%,#1d2023 75%,#0b0c0d 100%)',g:[1.2,3,.25,'overlay'],m:[.05,2,.3,'multiply'],hi:.55,sh:.5,gloss:true,seed:10},
+  charcoal:{box:['20%','8%','14%','8%'],r:'30% 44% 28% 46% / 40% 30% 50% 36%',base:'radial-gradient(120% 110% at 40% 32%,#3a3735,#1c1a19 55%,#0a0909 100%)',vein:'radial-gradient(14% 10% at 62% 64%,rgba(255,110,30,.85),rgba(255,60,0,0) 100%),radial-gradient(10% 8% at 34% 52%,rgba(255,140,40,.7),rgba(255,60,0,0) 100%)',g:[1.1,4,.5,'overlay'],m:[.05,3,.5,'multiply'],hi:.18,sh:.6,seed:13},
+  tikimt:{box:['10%','10%','10%','10%'],clip:'polygon(50.0% 0.0%,52.6% 1.1%,54.8% 4.4%,56.4% 9.8%,56.9% 17.5%,55.2% 30.7%,60.3% 18.4%,64.6% 12.0%,68.7% 8.1%,72.2% 6.4%,75.0% 6.7%,76.7% 8.9%,77.0% 12.9%,75.6% 18.4%,72.2% 25.3%,64.1% 35.9%,74.7% 27.8%,81.6% 24.4%,87.1% 23.0%,91.1% 23.3%,93.3% 25.0%,93.6% 27.8%,91.9% 31.3%,88.0% 35.4%,81.6% 39.7%,69.3% 44.8%,82.5% 43.1%,90.2% 43.6%,95.6% 45.2%,98.9% 47.4%,100.0% 50.0%,98.9% 52.6%,95.6% 54.8%,90.2% 56.4%,82.5% 56.9%,69.3% 55.2%,81.6% 60.3%,88.0% 64.6%,91.9% 68.7%,93.6% 72.2%,93.3% 75.0%,91.1% 76.7%,87.1% 77.0%,81.6% 75.6%,74.7% 72.2%,64.1% 64.1%,72.2% 74.7%,75.6% 81.6%,77.0% 87.1%,76.7% 91.1%,75.0% 93.3%,72.2% 93.6%,68.7% 91.9%,64.6% 88.0%,60.3% 81.6%,55.2% 69.3%,56.9% 82.5%,56.4% 90.2%,54.8% 95.6%,52.6% 98.9%,50.0% 100.0%,47.4% 98.9%,45.2% 95.6%,43.6% 90.2%,43.1% 82.5%,44.8% 69.3%,39.7% 81.6%,35.4% 88.0%,31.3% 91.9%,27.8% 93.6%,25.0% 93.3%,23.3% 91.1%,23.0% 87.1%,24.4% 81.6%,27.8% 74.7%,35.9% 64.1%,25.3% 72.2%,18.4% 75.6%,12.9% 77.0%,8.9% 76.7%,6.7% 75.0%,6.4% 72.2%,8.1% 68.7%,12.0% 64.6%,18.4% 60.3%,30.7% 55.2%,17.5% 56.9%,9.8% 56.4%,4.4% 54.8%,1.1% 52.6%,0.0% 50.0%,1.1% 47.4%,4.4% 45.2%,9.8% 43.6%,17.5% 43.1%,30.7% 44.8%,18.4% 39.7%,12.0% 35.4%,8.1% 31.3%,6.4% 27.8%,6.7% 25.0%,8.9% 23.3%,12.9% 23.0%,18.4% 24.4%,25.3% 27.8%,35.9% 35.9%,27.8% 25.3%,24.4% 18.4%,23.0% 12.9%,23.3% 8.9%,25.0% 6.7%,27.8% 6.4%,31.3% 8.1%,35.4% 12.0%,39.7% 18.4%,44.8% 30.7%,43.1% 17.5%,43.6% 9.8%,45.2% 4.4%,47.4% 1.1%)',base:'radial-gradient(circle at 50% 50%,#6b3a0c 0 13%,#c98a12 14% 19%,#ffd21f 21%,#f5b800 70%,#e9a600 100%)',g:[.6,2,.12,'overlay'],m:[.03,2,.2,'soft-light'],hi:.35,sh:.25,seed:14},
   opal:{box:['18%','10%','16%','10%'],r:'50% 50% 48% 52% / 54% 54% 46% 46%',base:'radial-gradient(100% 100% at 40% 35%,#fdfbff,#dedae8 50%,#b5b0c3 100%)',iris:'conic-gradient(from 0deg at 55% 55%,#7fe3d4,#9aa8ff,#ff9ad5,#ffe38a,#8dffb0,#7fe3d4)',io:.55,ib:'multiply',g:[.7,2,.1,'overlay'],m:[.012,2,.35,'overlay'],hi:.75,sh:.35,gloss:true,seed:2},
   choc:{box:['20%','8%','16%','8%'],r:'48% 52% 50% 50% / 56% 54% 46% 44%',base:'radial-gradient(100% 100% at 40% 35%,#6e4631,#3c2317 50%,#1b0e08 100%)',iris:'conic-gradient(from 40deg at 50% 55%,#ff7a2f,#3fe0a0,#2f7dff,#ffcf3f,#ff5a3f,#ff7a2f)',io:.32,ib:'screen',g:[.7,2,.12,'overlay'],m:[.015,2,.5,'soft-light'],hi:.5,sh:.55,gloss:true,seed:7},
   emerald:{box:['12%','18%','12%','18%'],clip:OCT,base:'linear-gradient(135deg,#27a56d 0%,#0a5a39 34%,#04331f 64%,#0f6e47 100%)',table:{inset:'17% 17%',bg:'linear-gradient(160deg,#35c486,#07402a 58%,#1d9161)',op:.85},iris:'linear-gradient(90deg,transparent 30%,rgba(190,255,220,.35) 50%,transparent 70%)',io:.8,ib:'screen',g:[.8,2,.08,'overlay'],m:[.04,2,.28,'overlay'],hi:.4,sh:.5,seed:4},
   diamond:{box:['12%','12%','12%','12%'],r:'50%',base:'repeating-conic-gradient(from 11deg at 50% 50%,#f8fafc 0deg 11.25deg,#aab2bc 11.25deg 22.5deg,#e4e9ef 22.5deg 33.75deg,#7c858f 33.75deg 45deg)',table:{inset:'27%',bg:'radial-gradient(circle at 45% 40%,#fff,#cdd4dc 60%,#99a2ac)',op:1},iris:'conic-gradient(from 0deg,#ff6b6b,#ffd36b,#6bffb0,#6bc7ff,#b06bff,#ff6b6b)',io:.16,ib:'overlay',g:[.5,1,0,'overlay'],m:[.05,1,0,'overlay'],hi:.7,sh:.3,gloss:true,seed:1}
 };
-const NAMES={cake:'Slice of birthday cake',cobble:'Cobblestone specimen',blocket:'Concrete block specimen',river:'River stone specimen',foundation:'Foundation stone specimen',opal:'Opal specimen',choc:'Chocolate opal specimen',emerald:'Emerald specimen',diamond:'Diamond specimen'};
+const NAMES={pebble:'Pebble specimen',iron:'Iron ball specimen',charcoal:'Charcoal stone specimen',tikimt:'Tikimt flower specimen',cake:'Slice of birthday cake',cobble:'Cobblestone specimen',blocket:'Concrete block specimen',river:'River stone specimen',foundation:'Foundation stone specimen',opal:'Opal specimen',choc:'Chocolate opal specimen',emerald:'Emerald specimen',diamond:'Diamond specimen'};
 
 /* ---------- 3D ---------- */
 const TV='0.170.0';
@@ -62,7 +66,9 @@ const fbm=(x,y,z,o)=>{let a=.5,f=1,s=0,n=0;for(let i=0;i<o;i++){s+=a*vn(x*f,y*f,
 const ROCK={
   cobble:{cube:.55,s:[1.12,.8,.95],big:.24,fine:.05,crack:.05,seed:3,tex:'assets/tex-rock.png',rep:[2,1],color:'#d6d2ca',rough:.88,bump:3},
   foundation:{cube:.82,s:[1.38,.72,.9],big:.14,fine:.07,crack:.07,seed:11,tex:'assets/tex-rock.png',rep:[3,1.5],color:'#e3cfb0',rough:.95,bump:4},
-  river:{cube:.08,s:[1.25,.52,.92],big:.08,fine:.006,crack:0,seed:5,tex:'assets/tex-rock.png',rep:[1.5,1],color:'#a9bcc9',rough:.32,bump:.6,coat:.8}
+  river:{cube:.08,s:[1.25,.52,.92],big:.08,fine:.006,crack:0,seed:5,tex:'assets/tex-rock.png',rep:[1.5,1],color:'#a9bcc9',rough:.32,bump:.6,coat:.8},
+  pebble:{cube:.04,s:[1.15,.56,.95],big:.1,fine:.004,crack:0,seed:9,tex:'assets/tex-rock.png',rep:[4,3],color:'#d9cbb6',rough:.55,bump:.3,coat:.15},
+  charcoal:{cube:.5,s:[1.15,.78,.92],big:.2,fine:.08,crack:.12,seed:17,tex:'assets/tex-rock.png',rep:[3,2],color:'#4a4643',rough:.92,bump:5,ember:true}
 };
 function rockGeo(T,c){
   const g=new T.SphereGeometry(1,160,112),p=g.attributes.position,n=p.count,d=new Float32Array(n);let mn=1e9,mx=-1e9;const s=c.seed*7.3;
@@ -103,6 +109,8 @@ function simpleMat(T,kind,old,level){
   const map=old&&old.map||null;
   if(level===1&&(kind==='opal'||kind==='choc'))return new T.MeshPhysicalMaterial({map,color:'#ffffff',roughness:kind==='opal'?.16:.22,clearcoat:1,clearcoatRoughness:.05});
   if(level===1&&(kind==='emerald'||kind==='diamond'))return new T.MeshStandardMaterial({color:kind==='emerald'?'#1c9a62':'#e9eef3',roughness:.08,metalness:.15,flatShading:true,envMapIntensity:2,emissive:kind==='emerald'?'#04331f':'#000000',emissiveIntensity:.4});
+  if(kind==='iron')return new T.MeshStandardMaterial({color:'#5d6166',metalness:.85,roughness:.4});
+  if(kind==='charcoal')return new T.MeshStandardMaterial({map,color:'#3a3634',roughness:.9,vertexColors:!!(old&&old.vertexColors)});
   return new T.MeshStandardMaterial({map,color:kind==='choc'?'#6e4631':(kind==='emerald'?'#1c9a62':'#ffffff'),roughness:.3,metalness:0,vertexColors:!!(old&&old.vertexColors),flatShading:kind==='emerald'||kind==='diamond'});
 }
 /* A slice of birthday cake: sponge / jam / cream layers, pink frosting, sprinkles, a cream dollop and a candle.
@@ -135,10 +143,43 @@ function cakeGeo(T){
   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(P,3));geo.setAttribute('normal',new T.BufferAttribute(N,3));
   geo.setAttribute('color',new T.BufferAttribute(C,3));geo.setAttribute('uv',new T.BufferAttribute(U,2));geo.rotateY(-A/2+.35);return geo;
 }
+/* የጥቅምት አበባ: the yellow flower of the hills after the rains — a ring of soft, slightly cupped petals
+   around a dark golden centre, with a short stem. One mesh with per-vertex colours, like the cake. */
+function tikimtGeo(T){
+  const parts=[];
+  const add=(g,col)=>{g=g.index?g.toNonIndexed():g;const c=new T.Color(col),n=g.attributes.position.count,a=new Float32Array(n*3);
+    for(let i=0;i<n;i++){a[i*3]=c.r;a[i*3+1]=c.g;a[i*3+2]=c.b;}g.setAttribute('color',new T.BufferAttribute(a,3));
+    for(const k of Object.keys(g.attributes))if(!['position','normal','color','uv'].includes(k))g.deleteAttribute(k);parts.push(g);};
+  const N=12;
+  for(let i=0;i<N;i++){// petal: a flattened, cupped ellipsoid pointing outwards
+    const g=new T.SphereGeometry(1,28,16),p=g.attributes.position;
+    for(let j=0;j<p.count;j++){let x=p.getX(j),y=p.getY(j),z=p.getZ(j);const t=(x+1)/2;// 0 at the centre end, 1 at the tip
+      const w=.26*Math.sin(Math.PI*Math.min(1,t*1.08))+.02;x=.08+t*1.02;z=z*w;y=y*.035+.16*t*t-.05*Math.abs(z)/.28;p.setXYZ(j,x,y,z);}
+    g.computeVertexNormals();g.rotateY(i/N*Math.PI*2+(i%2?.06:0));g.translate(0,i%2?.015:0,0);add(g,i%2?'#d98600':'#e89a00');}
+  {const g=new T.SphereGeometry(.3,40,24);g.scale(1,.42,1);g.translate(0,.06,0);add(g,'#3d1e06');}// seed head
+  {const g=new T.TorusGeometry(.3,.045,12,48);g.rotateX(Math.PI/2);g.translate(0,.05,0);add(g,'#b86f05');}// golden rim
+  {const g=new T.CylinderGeometry(.05,.06,.9,16);g.translate(0,-.47,0);g.rotateZ(.18);add(g,'#3f7a2a');}// stem
+  let n=0;parts.forEach(g=>n+=g.attributes.position.count);
+  const P=new Float32Array(n*3),Nn=new Float32Array(n*3),C=new Float32Array(n*3),U=new Float32Array(n*2);let o=0,u=0;
+  parts.forEach(g=>{const c=g.attributes.position.count;P.set(g.attributes.position.array,o);Nn.set(g.attributes.normal.array,o);C.set(g.attributes.color.array,o);
+    if(g.attributes.uv)U.set(g.attributes.uv.array,u);o+=c*3;u+=c*2;g.dispose();});
+  const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(P,3));geo.setAttribute('normal',new T.BufferAttribute(Nn,3));
+  geo.setAttribute('color',new T.BufferAttribute(C,3));geo.setAttribute('uv',new T.BufferAttribute(U,2));return geo;
+}
 function buildMesh(T,kind){
   let geo,mat,ready=Promise.resolve();
   if(ROCK[kind]){const c=ROCK[kind];geo=rockGeo(T,c);
-    mat=new T.MeshPhysicalMaterial({bumpScale:c.bump,color:c.color,roughness:c.rough,metalness:0,vertexColors:true,clearcoat:c.coat||0,clearcoatRoughness:.25});ready=texInto(T,c.tex,c.rep,mat);}
+    mat=new T.MeshPhysicalMaterial({bumpScale:c.bump,color:c.color,roughness:c.rough,metalness:0,vertexColors:true,clearcoat:c.coat||0,clearcoatRoughness:.25});ready=texInto(T,c.tex,c.rep,mat);
+    // charcoal: a few embers still glowing in the cracks
+    if(c.ember){mat.emissive=new T.Color('#ff5a14');mat.emissiveIntensity=1.6;mat.emissiveMap=canvasTex(T,x=>{x.fillStyle='#000';x.fillRect(0,0,512,512);x.globalCompositeOperation='lighter';
+      for(let i=0;i<26;i++){const cx=Math.random()*512,cy=Math.random()*512,r=6+Math.random()*26,g=x.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,'rgba(255,170,90,.95)');g.addColorStop(.5,'rgba(255,80,20,.5)');g.addColorStop(1,'rgba(255,40,0,0)');x.fillStyle=g;x.fillRect(cx-r,cy-r,r*2,r*2);}});}}
+  else if(kind==='iron'){// አሎሎ: a cast-iron shot-put ball, slightly pitted
+    geo=new T.SphereGeometry(1,128,96);const p=geo.attributes.position;
+    for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),d=1+.012*(fbm(x*6+2,y*6,z*6,3)-.5);p.setXYZ(i,x*d,y*d,z*d);}geo.computeVertexNormals();
+    const rough=canvasTex(T,x=>{x.fillStyle='#8a8a8a';x.fillRect(0,0,512,512);for(let i=0;i<5000;i++){const v=60+Math.random()*150|0;x.fillStyle=`rgb(${v},${v},${v})`;x.beginPath();x.arc(Math.random()*512,Math.random()*512,.6+Math.random()*2.2,0,7);x.fill();}});
+    mat=new T.MeshPhysicalMaterial({color:'#5d6166',metalness:.92,roughness:.42,roughnessMap:rough,bumpMap:rough,bumpScale:.8,clearcoat:.15,clearcoatRoughness:.5,envMapIntensity:1.3});}
+  else if(kind==='tikimt'){geo=tikimtGeo(T);
+    mat=new T.MeshPhysicalMaterial({vertexColors:true,color:'#ffffff',roughness:.75,metalness:0,envMapIntensity:.45,side:T.DoubleSide});}
   else if(kind==='cake'){geo=cakeGeo(T);
     // fine crumb on the sponge
     const bump=canvasTex(T,x=>{x.fillStyle='#808080';x.fillRect(0,0,512,512);for(let i=0;i<9000;i++){const v=90+Math.random()*90|0;x.fillStyle=`rgb(${v},${v},${v})`;x.fillRect(Math.random()*512,Math.random()*512,2+Math.random()*3,2+Math.random()*3);}});
@@ -167,14 +208,14 @@ function stage(T,Room,renderer){
   scene.add(new T.HemisphereLight('#dfe8ee','#132531',.5));
   return{scene,cam,envT};
 }
-const PITCH={blocket:.5,emerald:.5,diamond:.5,cake:.55};
+const PITCH={blocket:.5,emerald:.5,diamond:.5,cake:.55,tikimt:.7,pebble:.35};
 /* reads the centre pixels straight after a render: catches GPUs that "succeed" but draw nothing or pure black */
 function drewOk(renderer,kind){
   if(kind==='blocket')return true;
   try{const g=renderer.getContext(),c=renderer.domElement,px=new Uint8Array(4*9);let lum=0,alpha=0;
     g.readPixels(Math.floor(c.width/2)-1,Math.floor(c.height/2)-1,3,3,g.RGBA,g.UNSIGNED_BYTE,px);
     for(let i=0;i<9;i++){alpha=Math.max(alpha,px[i*4+3]);lum=Math.max(lum,px[i*4]+px[i*4+1]+px[i*4+2]);}
-    const minLum=(kind==='opal'||kind==='diamond')?120:(kind==='choc'||kind==='emerald'?12:30);
+    const minLum=(kind==='opal'||kind==='diamond')?120:(['choc','emerald','charcoal','iron','tikimt'].includes(kind)?12:30);
     return alpha>40&&lum>=minLum;}catch(e){return true;}
 }
 // Render once; if the GPU can't handle the material, step down to simpler ones. Returns the level used, or -1.
