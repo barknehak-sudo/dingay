@@ -76,7 +76,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
           </div>
         </div>
       </sc-if>
-      <button onClick="{{ openNew }}" aria-label="New Dinguys — coming soon" style="display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 2px;border:0;background:none;color:#0b0b0b;cursor:pointer"><span class="sw-ring"><span class="sw-pill" style="display:inline-flex;align-items:center;gap:4px;padding:7px 9px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.08em;line-height:1;white-space:nowrap;box-shadow:0 6px 18px -8px rgba(200,107,255,.8)">{{ newLabel }}</span></span></button>
+      <button onClick="{{ openNew }}" aria-label="New Dinguys" style="display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 2px;border:0;background:none;color:#0b0b0b;cursor:pointer"><span class="sw-ring"><span class="sw-pill" style="display:inline-flex;align-items:center;gap:4px;padding:7px 9px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.08em;line-height:1;white-space:nowrap;box-shadow:0 6px 18px -8px rgba(200,107,255,.8)">{{ newLabel }}</span></span></button>
       <button onClick="{{ openSheet }}" style="background:#eef2f4;color:#132531;border:0;height:44px;padding:0 16px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer">BUY</button>
       <button onClick="{{ toggleMenu }}" aria-expanded="{{ menu }}" aria-label="Menu" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:50%;width:44px;height:44px;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer">
         <span style="display:block;width:18px;height:1.5px;background:#eef2f4;transition:transform .3s;transform:{{ bar1 }}"></span>
@@ -281,16 +281,16 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
   </section>
   <div ref="{{ carRef }}" class="dg-scroll" onScroll="{{ onCarScroll }}" style="display:grid;grid-auto-flow:column;grid-auto-columns:min(84vw,400px);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 clamp(20px,5vw,56px) 8px;scroll-padding:0 clamp(20px,5vw,56px);scrollbar-width:none;-webkit-overflow-scrolling:touch">
     <sc-for list="{{ cat.items }}" as="p" hint-placeholder-count="4">
-      <article onClick="{{ p.open }}" style="scroll-snap-align:start;background:{{ cat.card }};border:1px solid {{ cat.line }};border-radius:{{ cat.r }};overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1)" style-active="transform:scale(.985)">
-        <div style="height:{{ cat.topH }};background:{{ cat.top }};flex:none"></div>
-        <div style="display:flex;justify-content:space-between;padding:12px 14px;border-bottom:1px solid {{ cat.line }};font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:{{ cat.sub }}"><span>{{ p.fig }}</span><span>{{ p.cls }}</span></div>
-        <div style="padding:26px 34px 10px;background:{{ cat.glow }}"><dc-import name="Stone" kind="{{ p.kind }}" spin="{{ spinRate }}" hold="{{ true }}" gl="{{ true }}" hint-size="100%,300px"></dc-import></div>
+      <article onClick="{{ p.open }}" style="scroll-snap-align:start;background:{{ p.cardBg }};border:{{ p.cardBorder }};border-radius:{{ cat.r }};box-shadow:{{ p.cardShadow }};overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1)" style-active="transform:scale(.985)">
+        <div class="{{ p.topClass }}" style="height:{{ p.topH }};background:{{ p.top }};flex:none"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;padding:8px 14px;border-bottom:1px solid {{ cat.line }};font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:{{ cat.sub }}"><span style="display:inline-flex;align-items:center;gap:8px;flex:none">{{ p.fig }}<sc-if value="{{ p.isNew }}"><span class="sw-pill" style="display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;color:#0b0b0b;font-weight:800;letter-spacing:.1em;line-height:1">NEW ✦</span></sc-if></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right">{{ p.cls }}</span></div>
+        <div style="padding:26px 34px 10px;background:{{ p.glow }}"><dc-import name="Stone" kind="{{ p.kind }}" spin="{{ spinRate }}" hold="{{ true }}" gl="{{ true }}" hint-size="100%,300px"></dc-import></div>
         <div style="padding:6px 16px 18px;display:flex;flex-direction:column;flex:1">
           <h2 data-reveal="text" style="margin:0;font-size:clamp(28px,7vw,40px);line-height:.95;font-family:{{ cat.hf }};font-style:{{ cat.hs }};font-weight:{{ cat.hw }};letter-spacing:{{ cat.hl }}">{{ p.name }}</h2>
           <div style="margin-top:6px;font-size:15px;font-weight:500">{{ p.sub }}</div>
           <p style="margin:12px 0 0;font-size:15px;line-height:1.4;color:{{ cat.sub }};flex:1">{{ p.tag }}</p>
           <div style="display:flex;align-items:center;gap:8px;margin-top:18px">
-            <button onClick="{{ p.register }}" style="flex:1;display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 16px;background:{{ cat.btnBg }};color:{{ cat.btnFg }};border-radius:{{ cat.btnR }};border:0;font-size:11px;font-weight:600;letter-spacing:.1em;cursor:pointer">BUY THIS STONE<span>{{ p.priceLabel }}</span></button>
+            <button onClick="{{ p.register }}" style="flex:1;display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 16px;background:{{ cat.btnBg }};color:{{ cat.btnFg }};border-radius:{{ cat.btnR }};border:0;font-size:11px;font-weight:600;letter-spacing:.1em;cursor:pointer">{{ p.buyLabel }}<span>{{ p.priceLabel }}</span></button>
             <button onClick="{{ p.open }}" aria-label="View specimen" style="width:52px;height:52px;background:transparent;border:1px solid {{ cat.line }};cursor:pointer;color:{{ cat.ink }};display:grid;place-items:center"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" style="display:block;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M7 17 17 7M8.5 7H17v8.5"></path></svg></button>
           </div>
         </div>
@@ -346,7 +346,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <span style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:{{ prod.sub }}">Registration</span>
         <span style="font-size:32px;font-weight:600;letter-spacing:-.03em">{{ prod.priceLabel }}</span>
       </div>
-      <button onClick="{{ prod.register }}" style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;width:100%;height:58px;padding:0 20px;background:{{ prod.btnBg }};color:{{ prod.btnFg }};border-radius:{{ prod.btnR }};border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">BUY THIS STONE<span>→</span></button>
+      <button onClick="{{ prod.register }}" style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;width:100%;height:58px;padding:0 20px;background:{{ prod.btnBg }};color:{{ prod.btnFg }};border-radius:{{ prod.btnR }};border:0;font-size:12px;font-weight:600;letter-spacing:.1em;cursor:pointer">{{ prod.buyLabel }}<span>→</span></button>
       <div style="margin-top:10px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:{{ prod.sub }}">Digital registration. No physical stone included.</div>
 
       <h2 data-reveal="text" style="margin:56px 0 0;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:{{ prod.sub }}">Specimen metadata</h2>
@@ -958,17 +958,19 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <!-- CHOOSER SHEET -->
 <sc-if value="{{ newOpen }}">
   <div onClick="{{ closeNew }}" class="dg-overlay" style="position:fixed;inset:0;z-index:80;touch-action:none;background:rgba(5,10,14,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:dg-fade .2s ease"></div>
-  <div role="dialog" aria-label="New Dinguys" class="dg-overlay" style="position:fixed;left:16px;right:16px;top:50%;transform:translateY(-50%);z-index:81;max-width:440px;margin:0 auto;border-radius:24px;padding:2px;background:linear-gradient(120deg,#ff5f6d,#ffc371,#47e5bc,#5f8bff,#c86bff);box-shadow:0 30px 80px -20px rgba(0,0,0,.7);animation:dg-fade .3s ease">
+  <div role="dialog" aria-label="New Dinguys" class="dg-overlay" style="position:fixed;left:16px;right:16px;top:50%;transform:translateY(-50%);z-index:81;max-width:440px;max-height:calc(100dvh - 32px);overflow-y:auto;margin:0 auto;border-radius:24px;padding:2px;background:linear-gradient(120deg,#ff5f6d,#ffc371,#47e5bc,#5f8bff,#c86bff);box-shadow:0 30px 80px -20px rgba(0,0,0,.7);animation:dg-fade .3s ease">
     <div style="border-radius:22px;background:radial-gradient(120% 80% at 50% 0%,#24394a 0%,#0e1a23 60%,#060b0f 100%);color:#eef2f4;padding:22px 20px 20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#a9bccb"><span>Registry · Coming soon</span><button onClick="{{ closeNew }}" aria-label="Close" style="background:none;border:0;width:40px;height:40px;margin:-10px -10px -10px 0;font-size:22px;cursor:pointer;color:#eef2f4">×</button></div>
-      <h2 style="margin:10px 0 0;font-size:clamp(30px,8vw,40px);line-height:1;letter-spacing:-.035em;font-weight:800">New Dinguys are coming.</h2>
-      <p style="margin:12px 0 0;font-size:16px;line-height:1.45;color:#b9c9d4">We’re digging up the next collection — new stones, new occasions, new ways to say it.</p>
-      <div aria-hidden="true" style="margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-        <sc-for list="{{ newTeasers }}" as="n" hint-placeholder-count="3"><div style="aspect-ratio:3/4;border-radius:14px;border:1px solid rgba(238,242,244,.16);background:radial-gradient(60% 50% at 50% 42%,rgba(143,179,204,.28),rgba(0,0,0,0) 72%),rgba(255,255,255,.03);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;animation:dg-fade .5s ease both;animation-delay:{{ n.delay }}">
-          <div style="width:56%;aspect-ratio:1.2/1;border-radius:{{ n.shape }};background:#05090c;box-shadow:0 0 22px rgba(143,179,204,.35),inset 0 0 12px rgba(255,255,255,.06);display:grid;place-items:center;font-size:22px;font-weight:800;color:rgba(238,242,244,.5)">?</div>
-          <div style="font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9px;letter-spacing:.1em;color:#a9bccb">{{ n.label }}</div></div></sc-for>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#a9bccb"><span>Registry · Just added</span><button onClick="{{ closeNew }}" aria-label="Close" style="background:none;border:0;width:40px;height:40px;margin:-10px -10px -10px 0;font-size:22px;cursor:pointer;color:#eef2f4">×</button></div>
+      <h2 style="margin:10px 0 0;font-size:clamp(30px,8vw,40px);line-height:1;letter-spacing:-.035em;font-weight:800">New Dinguys are here.</h2>
+      <p style="margin:12px 0 0;font-size:16px;line-height:1.45;color:#b9c9d4">Three new stones for your friends, and our first flower for someone you love.</p>
+      <div style="margin-top:18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+        <sc-for list="{{ newItems }}" as="n" hint-placeholder-count="4"><button onClick="{{ n.open }}" style="min-width:0;border-radius:14px;border:1px solid rgba(238,242,244,.16);background:radial-gradient(60% 50% at 50% 38%,rgba(255,195,113,.22),rgba(0,0,0,0) 72%),rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:8px 10px 12px;text-align:left;color:#eef2f4;cursor:pointer;animation:dg-fade .5s ease both;animation-delay:{{ n.delay }}">
+          <div style="width:78%;margin:0 auto"><dc-import name="Stone" kind="{{ n.kind }}" spin="{{ spinRate }}" hint-size="100%,100px"></dc-import></div>
+          <span style="font-size:16px;font-weight:800;letter-spacing:-.02em;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ n.name }}</span>
+          <span style="font-size:12px;line-height:1.25;color:#b9c9d4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ n.sub }}</span>
+          <span style="margin-top:4px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;color:#ffc371">{{ n.price }} →</span></button></sc-for>
       </div>
-      <button onClick="{{ closeNew }}" style="margin-top:18px;width:100%;min-height:54px;border:0;border-radius:14px;background:#eef2f4;color:#0b1720;font-size:13px;font-weight:800;letter-spacing:.1em;cursor:pointer">CAN’T WAIT</button>
+      <button onClick="{{ closeNew }}" style="margin-top:18px;width:100%;min-height:54px;border:0;border-radius:14px;background:#eef2f4;color:#0b1720;font-size:13px;font-weight:800;letter-spacing:.1em;cursor:pointer">CLOSE</button>
     </div>
   </div>
 </sc-if>
@@ -1024,6 +1026,15 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;heroStone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cobble&quot;,&quot;blocket&quot;,&quot;river&quot;,&quot;foundation&quot;,&quot;pebble&quot;,&quot;iron&quot;,&quot;charcoal&quot;,&quot;opal&quot;,&quot;choc&quot;,&quot;emerald&quot;,&quot;diamond&quot;,&quot;tikimt&quot;],&quot;default&quot;:&quot;cobble&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Experience&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Experience&quot;}}">
 const P=[
+ {slug:'pebble',isNew:true,w:'friend',name:'ጠጠር',sub:'The Small But Mighty',kind:'pebble',fig:'F-05',cls:'Pocket Sedimentary',
+  d:['For the friend who is small in size and enormous in opinions.','Fits in a pocket.\nGets into every shoe.\nImpossible to ignore.'],
+  meta:[['Specimen No.','F-05'],['Classification','Pocket-sized, surprisingly tough'],['Origin','Every shoe you have ever owned'],['Size','Small'],['Attitude','Enormous'],['Emotional weight','Deceptively high']]},
+ {slug:'alolo',isNew:true,w:'friend',name:'አሎሎ',sub:'The Heavy Hitter',kind:'iron',fig:'F-06',cls:'Solid Iron · Olympic Weight',
+  d:['For the friend who carries the whole team.','Throws their weight around.\nAlways lands somewhere.\nNobody asks where.'],
+  meta:[['Specimen No.','F-06'],['Classification','Solid iron, perfectly round'],['Origin','The school sports field'],['Weight','Yes'],['Range','Further than expected'],['Emotional weight','Olympic']]},
+ {slug:'kesel-dingay',isNew:true,w:'friend',name:'ከሰል ድንጋይ',sub:'The One Who Keeps the Fire Going',kind:'charcoal',fig:'F-07',cls:'Carbon · Slow Burn',
+  d:['For the friend behind every coffee ceremony and every late-night talk.','Quiet on the outside.\nWarm on the inside.\nStill glowing at 2 a.m.'],
+  meta:[['Specimen No.','F-07'],['Classification','Carbon, slow burn'],['Origin','Next to the ጀበና'],['Temperature','Warm'],['Burn time','All night'],['Emotional weight','Glowing']]},
  {slug:'cobblestone',w:'friend',name:'COBBLESTONE',sub:'The Urban Classic',kind:'cobble',fig:'F-01',cls:'Urban Sedimentary',
   d:['For the friend who has survived traffic, construction, bad decisions and somehow still made it here.','A dependable Dinguy with strong infrastructure energy.'],
   meta:[['Specimen No.','F-01'],['Classification','Urban Sedimentary'],['Origin','A road near you'],['Hardness','Reliable'],['Surface','Traffic-worn'],['Emotional weight','Moderate']]},
@@ -1036,16 +1047,7 @@ const P=[
  {slug:'foundation-stone',w:'friend',name:'መሰረት ድንጋይ',sub:'The Foundation',kind:'foundation',fig:'F-04',cls:'Foundational Basalt',
   d:['For the friend who has always been there.','Holding things together.\nTaking up space.\nRefusing to move.','A true foundation of the community.'],
   meta:[['Specimen No.','F-04'],['Classification','Foundational basalt'],['Origin','The community'],['Mobility','Refuses'],['Surface','Rough, dependable'],['Emotional weight','Holding everything']]},
- {slug:'pebble',w:'friend',name:'ጠጠር',sub:'The Small But Mighty',kind:'pebble',fig:'F-05',cls:'Pocket Sedimentary',
-  d:['For the friend who is small in size and enormous in opinions.','Fits in a pocket.\nGets into every shoe.\nImpossible to ignore.'],
-  meta:[['Specimen No.','F-05'],['Classification','Pocket-sized, surprisingly tough'],['Origin','Every shoe you have ever owned'],['Size','Small'],['Attitude','Enormous'],['Emotional weight','Deceptively high']]},
- {slug:'alolo',w:'friend',name:'አሎሎ',sub:'The Heavy Hitter',kind:'iron',fig:'F-06',cls:'Solid Iron · Olympic Weight',
-  d:['For the friend who carries the whole team.','Throws their weight around.\nAlways lands somewhere.\nNobody asks where.'],
-  meta:[['Specimen No.','F-06'],['Classification','Solid iron, perfectly round'],['Origin','The school sports field'],['Weight','Yes'],['Range','Further than expected'],['Emotional weight','Olympic']]},
- {slug:'kesel-dingay',w:'friend',name:'ከሰል ድንጋይ',sub:'The One Who Keeps the Fire Going',kind:'charcoal',fig:'F-07',cls:'Carbon · Slow Burn',
-  d:['For the friend behind every coffee ceremony and every late-night talk.','Quiet on the outside.\nWarm on the inside.\nStill glowing at 2 a.m.'],
-  meta:[['Specimen No.','F-07'],['Classification','Carbon, slow burn'],['Origin','Next to the ጀበና'],['Temperature','Warm'],['Burn time','All night'],['Emotional weight','Glowing']]},
- {slug:'tikimt-abeba',w:'loved',name:'የጥቅምት አበባ',sub:'The One Who Brings the Sunshine',kind:'tikimt',fig:'L-05',cls:'Bloom · Symbolic',
+ {slug:'tikimt-abeba',isNew:true,w:'loved',name:'የጥቅምት አበባ',sub:'The One Who Brings the Sunshine',kind:'tikimt',fig:'L-05',cls:'Bloom · Symbolic',
   d:['The yellow flower that covers the hills after the rains.','For the person who makes everything feel new again.','Bright. Hopeful. Back every year.','A bloom that never wilts, because it is registered.'],
   meta:[['Specimen No.','L-05'],['Classification','Bloom (symbolic)'],['Season','After the rains'],['Colour','Sunshine yellow'],['Blooms','Every year'],['Wilting','Not registered']]},
  {slug:'queen-of-sheba',w:'loved',name:'THE QUEEN OF SHEBA',sub:'Opal',kind:'opal',fig:'L-01',cls:'Precious Opal · Symbolic',
@@ -1365,7 +1367,15 @@ class Component extends DCLogic {
     const world=isCatalog?(a==='friend'?'friend':'loved'):(pr?pr.w:'friend');const T=THEME[world];
     const go=p=>()=>this.go(p);
     const price=w=>w==='friend'?'89 ETB':'199 ETB';
-    const mk=(p)=>({slug:p.slug,name:p.name,sub:p.sub,kind:p.kind,fig:p.fig,cls:p.cls,tag:typeof p.d[0]==='string'?p.d[0]:'',priceLabel:price(p.w),open:go('dengay/'+p.slug),register:e=>{e&&e.stopPropagation();this.go('register/'+p.slug);}});
+    // New Dinguys get a premium card: rainbow border and top band, a NEW badge and a warmer glow.
+    const RAINBOW='linear-gradient(120deg,#ff5f6d,#ffc371,#47e5bc,#5f8bff,#c86bff)';
+    const mk=(p)=>{const Th=THEME[p.w],nw=!!p.isNew;return{slug:p.slug,name:p.name,sub:p.sub,kind:p.kind,fig:p.fig,cls:p.cls,isNew:nw,tag:typeof p.d[0]==='string'?p.d[0]:'',priceLabel:price(p.w),
+      buyLabel:p.kind==='tikimt'?'BUY THIS FLOWER':'BUY THIS STONE',
+      cardBg:nw?`linear-gradient(${p.w==='friend'?'#f3f2ee,#f3f2ee':'#17293a,#0d1a24'}) padding-box,${RAINBOW} border-box`:Th.card,
+      cardBorder:nw?'2px solid transparent':`1px solid ${Th.line}`,cardShadow:nw?'0 24px 50px -24px rgba(200,107,255,.55),0 10px 30px -18px rgba(255,95,109,.45)':'none',
+      top:nw?'':Th.top,topH:nw?'6px':Th.topH,topClass:nw?'sw-pill':'',
+      glow:nw?(p.w==='friend'?'radial-gradient(70% 60% at 50% 50%,rgba(255,195,113,.35),rgba(243,242,238,0) 72%)':'radial-gradient(60% 55% at 50% 50%,rgba(255,195,113,.32),rgba(19,37,49,0) 72%)'):Th.glow,
+      open:go('dengay/'+p.slug),register:e=>{e&&e.stopPropagation();this.go('register/'+p.slug);}};};
     const cat={...T,price:price(world),items:P.filter(p=>p.w===world).map(mk),
       suggestions:MS[world].map((m,i)=>{const sel=st.msgPick===i;return{text:`“${m}”`,sel,tagline:sel?'Selected':'Tap to select',bg:sel?T.btnBg:'transparent',fg:sel?T.btnFg:T.ink,pick:()=>this.setState({msgPick:sel?-1:i})};})};
     const prod=pr?{...T,...mk(pr),sub2:pr.sub,world:T.world,paras:pr.d.map(d=>typeof d==='string'?{t:d,w:400}:{t:d.b,w:600}),meta:pr.meta.map(([k,v])=>({k,v})),back:go(pr.w==='friend'?'friend':'loved-one'),register:go('register/'+pr.slug)}:{kind:'cobble',name:'',sub2:'',priceLabel:'',back:go('friend')};
@@ -1383,7 +1393,7 @@ class Component extends DCLogic {
     const full=!!rr.by;
     const rec={...rr,reg:rr,full,isPublic:!full,badge:full?'Private record':'Public record',message:rr.message?`“${rr.message}”`:'—',rows:(full?[['Registered To',rr.to],['Dinguy Type',rr.type],['Dedicated By',rr.by],['Registered On',rr.date],['Occasion',rr.occasion||'—']]:[['Registered To',rr.to],['Dinguy Type',rr.type],['Registered On',rr.date]]).map(([k,v])=>({k,v})),download:()=>this.download(rr),share:()=>this.share(rr),story:()=>this.story(rr)};
     let showBar=false,barLabel='BUY A STONE',barRight='→',barAction=()=>this.setState({sheet:true});
-    if(!wide&&!st.menu){if(a===''||isCatalog)showBar=true;if(isProduct){showBar=true;barLabel='BUY THIS STONE';barRight=prod.priceLabel;barAction=prod.register;}}
+    if(!wide&&!st.menu){if(a===''||isCatalog)showBar=true;if(isProduct){showBar=true;barLabel=prod.buyLabel;barRight=prod.priceLabel;barAction=prod.register;}}
     const rvs=st.rvs;
     return{
       isDinguy:!isSW,isSW,isHome:a===''&&!isNotFound,isCatalog,isProduct,isRegister,isPay,isLoadingRec,lookupBusy:st.lookupBusy,po:this.payVals(),setTxn:e=>{const v=this.cleanCode(e.target.value);this.setState(s=>({pay:{...s.pay,txn:v,error:''}}));},pasteTxn:this.pasteTxn,sentMoney:()=>this.setPayStep(2),payJami:this.payJami,payAuto:()=>this.setState(s=>({pay:{...s.pay,manual:false,error:''}})),payManual:()=>{clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,manual:true,error:''}}));},jamiRetry:()=>{clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,order:{...s.pay.order,jami:{...s.pay.order.jami,state:'retry'}}}}));},notSentYet:()=>this.setPayStep(1),verifyPay:this.verifyPay,
@@ -1393,15 +1403,15 @@ class Component extends DCLogic {
       toggleMenu:()=>this.setState(s=>({menu:!s.menu,sheet:false})),openSheet:()=>this.setState({sheet:true,menu:false}),closeSheet:()=>this.setState({sheet:false}),
       goHome:go(''),goFriend:go('friend'),goLoved:go('loved-one'),goRegistry:go('registry'),goFaq:go('faq'),goTerms:go('terms'),goSample:go('registry/DG-004281'),
       goSW:go('sideways'),goWebsites:go('sideways/websites'),goGuerrilla:go('sideways/guerrilla'),goContact:go('contact'),startReveal:this.startReveal,openNew:this.openNew,closeNew:()=>this.setState({newOpen:false}),newOpen:!!st.newOpen,newLabel:wide?'NEW DINGUYS ✦':'NEW ✦',
-      newTeasers:[['SPECIMEN ???','50% 50% 46% 54% / 58% 54% 46% 42%','0s'],['CLASS UNKNOWN','12%','.08s'],['COMING SOON','50%','.16s']].map(([label,shape,delay])=>({label,shape,delay})),
+      newItems:P.filter(p=>p.isNew).map((p,i)=>({kind:p.kind,name:p.name,sub:p.sub,price:price(p.w),delay:(i*.07)+'s',open:()=>{this.setState({newOpen:false});this.go('dengay/'+p.slug);}})),
       heroStoneRef:this.heroStoneRef,bridgeRef:this.bridgeRef,starRef:this.starRef,macroRef:this.macroRef,bridgeTitleRef:this.bridgeTitleRef,capARef:this.capARef,capBRef:this.capBRef,capPRef:this.capPRef,carRef:this.carRef,
       entriesLabel:`Registry open · ${String(Object.keys(st.regs).length+4280).padStart(6,'0')} entries`,
       steps:['Choose your Dinguy.','Give it a name.','Dedicate it to someone.','Write your message.'].map((t,i)=>({n:'0'+(i+1),t,d:i*90})),
       zoomRef:this.zoomRef,parRef:this.parRef,bridgeEndRef:this.bridgeEndRef,bridgeShadeRef:this.bridgeShadeRef,zoomDepthRef:this.zoomDepthRef,
       zoomLines:[['Why stop at the stars?','clamp(34px,min(11vw,12vh),130px)',600],['Dinguys deserve names too.','clamp(32px,min(9.6vw,11vh),116px)',600]].map(([t,size,w],i)=>({t,size,w,ref:this.zTxt[i]})),
       sampleRows:[['Registration No.','DG-004281'],['Registered To','Abel'],['Dinguy Type','Certified Heavy'],['Dedicated By','Samuel'],['Occasion','Birthday']].map(([k,v])=>({k,v})),
-      cat,carLabel:`${String(st.carIndex).padStart(2,'0')} / 04`,
-      onCarScroll:e=>{this.coverflow();const el=e.currentTarget;const c=el.firstElementChild;const w=c?c.getBoundingClientRect().width+12:1;const i=Math.min(4,Math.round(el.scrollLeft/w)+1);if(i!==st.carIndex)this.setState({carIndex:i});},
+      cat,carLabel:`${String(st.carIndex).padStart(2,"0")} / ${String(cat.items.length).padStart(2,"0")}`,
+      onCarScroll:e=>{this.coverflow();const el=e.currentTarget;const c=el.firstElementChild;const w=c?c.getBoundingClientRect().width+12:1;const i=Math.min(cat.items.length,Math.round(el.scrollLeft/w)+1);if(i!==st.carIndex)this.setState({carIndex:i});},
       carPrev:()=>this.carBy(-1),carNext:()=>this.carBy(1),
       chooseMessage:()=>{if(st.msgPick<0){this.toastMsg('Select a message first.');return;}this.setState(s=>({draft:{...s.draft,message:MS[world][st.msgPick]}}));this.toastMsg('Message reserved. Now choose your Dinguy.');const el=this.carRef.current;if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});},
       prod,receive:RECEIVE.map(([k,v],i)=>({n:'0'+(i+1),k,v})),stickyPos:wide?'sticky':'relative',stickyTopA:wide?'72px':'auto',stickyTopB:wide?'84px':'auto',
