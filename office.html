@@ -777,6 +777,7 @@ function viewOrders(){
 }
 /* ---------- send: SMS / email to many customers (api/_broadcast.js) ---------- */
 const BC_TPL={
+  followup:{t:'Unpaid follow-up',who:'unpaid',sms:'Hi {name}! Someone special is still waiting for their DINGUY stone. Register it in 1 minute from 89 Birr with PAY NOW: dinguy.xyz',subject:'Your DINGUY stone is still waiting',email:'Hi {name},\n\nSomeone special is still waiting for their DINGUY stone.\n\nRegister it in 1 minute, from 89 Birr, with PAY NOW (telebirr, M-Pesa or CBE Birr):\nhttps://dinguy.xyz\n\nDINGUY'},
   telegram:{t:'Telegram invite',sms:'Hi {name}! DINGUY now has a Telegram group: new stones, monthly winners and offers first. Join here: https://t.me/+XXXX',subject:'Join DINGUY on Telegram',email:'Hi {name},\n\nThank you for being part of DINGUY.\n\nWe now have a Telegram group where new stones, the monthly winners and offers show up first. Join here:\nhttps://t.me/+XXXX\n\nSee you there!\nDINGUY'},
   newstone:{t:'New stones',sms:'Hi {name}! New DINGUY stones just landed. Register one for someone special: dinguy.xyz',subject:'New DINGUY stones are here',email:'Hi {name},\n\nNew stones just landed in the DINGUY Registry.\n\nRegister one for someone who deserves it: https://dinguy.xyz\n\nDINGUY'},
 };
@@ -895,7 +896,7 @@ document.addEventListener('click',async e=>{
   if(e.target.closest('[data-addhand]')){const d=document.querySelector('#addhand details');if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});}return;}
   const row=e.target.closest('tr[data-open]');if(row){S.q=row.dataset.open;S.filter='all';setTab('orders');return;}
   const bch=e.target.closest('[data-bcf-ch]');if(bch){S.bcForm.channel=bch.dataset.bcfCh;render();return;}
-  const tpl=e.target.closest('[data-bctpl]');if(tpl){const t=BC_TPL[tpl.dataset.bctpl],f=S.bcForm;f.text=f.channel==='sms'?t.sms:t.email;if(f.channel==='email')f.subject=t.subject;render();return;}
+  const tpl=e.target.closest('[data-bctpl]');if(tpl){const t=BC_TPL[tpl.dataset.bctpl],f=S.bcForm;f.text=f.channel==='sms'?t.sms:t.email;if(f.channel==='email')f.subject=t.subject;if(t.who)f.who=t.who;render();bcCount();return;}
   const ou=e.target.closest('[data-optundo]');if(ou){try{const j=await api('POST',{bc:{do:'optout',value:ou.dataset.optundo,undo:true}});S.optouts=j.optouts;render();}catch(err){alert(err.message);}return;}
   const bca=e.target.closest('[data-bc]');if(bca){const f=S.bcForm,d=bca.dataset.bc;
     if(d==='test'){const to=($('#bctest')||{}).value||'';if(!to.trim())return alert('Type your own phone or email for the test.');if(!String(f.text||'').trim())return alert('Write the message first (or pick a template).');bca.disabled=true;
