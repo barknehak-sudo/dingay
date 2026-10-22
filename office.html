@@ -250,7 +250,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const TZ='Africa/Addis_Ababa';
 let SW_MAIL='offscriptet@gmail.com'; // the sending address; the server's setting wins (see load())
 let pw='';try{pw=sessionStorage.getItem('dg-admin')||''}catch(e){}
-const S={bcForm:{channel:'sms',who:'paid',subject:'',text:''},bcCount:{},role:'admin',orders:[],inquiries:[],auto:{},lb:'30d',tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
+const S={bcForm:{channel:'sms',who:'paid',subject:'',text:''},bcCount:{},bcNames:{},role:'admin',orders:[],inquiries:[],auto:{},lb:'30d',tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
 try{const t=sessionStorage.getItem('dg-tab');if(t)S.tab=t;}catch(e){}
 // Partner password: read-only, Dashboard only, no customer details (the server leaves them out too).
 const P=()=>S.role==='partner';
@@ -777,13 +777,20 @@ function viewOrders(){
 }
 /* ---------- send: SMS / email to many customers (api/_broadcast.js) ---------- */
 const BC_TPL={
-  followup:{t:'Unpaid follow-up',who:'unpaid',sms:'Hi {name}! Someone special is still waiting for their DINGUY stone. Register it in 1 minute from 89 Birr with PAY NOW: dinguy.xyz',subject:'Your DINGUY stone is still waiting',email:'Hi {name},\n\nSomeone special is still waiting for their DINGUY stone.\n\nRegister it in 1 minute, from 89 Birr, with PAY NOW (telebirr, M-Pesa or CBE Birr):\nhttps://dinguy.xyz\n\nDINGUY'},
+  followup:{t:'Unpaid follow-up',who:'unpaid',sms:'Hi {name}! {to} is still waiting for their DINGUY stone. Register it in 1 minute from 89 Birr with PAY NOW: dinguy.xyz',subject:'Your DINGUY stone is still waiting',email:'Hi {name},\n\n{to} is still waiting for their DINGUY stone.\n\nRegister it in 1 minute, from 89 Birr, with PAY NOW (telebirr, M-Pesa or CBE Birr):\nhttps://dinguy.xyz\n\nDINGUY'},
   telegram:{t:'Telegram invite',sms:'Hi {name}! DINGUY now has a Telegram group: new stones, monthly winners and offers first. Join here: https://t.me/+XXXX',subject:'Join DINGUY on Telegram',email:'Hi {name},\n\nThank you for being part of DINGUY.\n\nWe now have a Telegram group where new stones, the monthly winners and offers show up first. Join here:\nhttps://t.me/+XXXX\n\nSee you there!\nDINGUY'},
   newstone:{t:'New stones',sms:'Hi {name}! New DINGUY stones just landed. Register one for someone special: dinguy.xyz',subject:'New DINGUY stones are here',email:'Hi {name},\n\nNew stones just landed in the DINGUY Registry.\n\nRegister one for someone who deserves it: https://dinguy.xyz\n\nDINGUY'},
 };
 // SMS cost: 160 letters per SMS (70 if it has Amharic or emoji — avoid emoji in SMS); long messages are split into parts.
 function smsParts(t){const uni=/[^\x00-\x7F£¥èéùìòÇØøÅå_ÆæßÉ¤¡ÄÖÑÜ§¿äöñüà€]/.test(t),one=uni?70:160,many=uni?67:153;return t.length<=one?1:Math.ceil(t.length/many);}
-function bcInfo(){const f=S.bcForm,t=f.text||'';if(f.channel!=='sms')return `${t.length} characters`;const n=S.bcCount[f.channel+':'+f.who],p=smsParts(t);return `${t.length} characters · ${p} SMS part${p>1?'s':''} per person${n!=null?` · about ${n*p} SMS in total`:''}`;}
+// The SMS this send will really use: each person's own {name}/{to} filled in (same rule as api/_broadcast.js).
+const bcFirst=s=>String(s||'').trim().split(/\s+/)[0];
+function bcTotal(){const f=S.bcForm,k=f.channel+':'+f.who,names=S.bcNames[k],t=f.text||'';
+  if(!names)return S.bcCount[k]!=null?S.bcCount[k]*smsParts(t):null;
+  let total=0,long=0;const one=smsParts(t.replace(/\{name\}/gi,'').replace(/\{to\}/gi,''));
+  for(const [n,to] of names){const p=smsParts(t.replace(/\{name\}/gi,bcFirst(n)||'there').replace(/\{to\}/gi,bcFirst(to)||'someone special'));total+=p;if(p>one)long++;}
+  return {total,long};}
+function bcInfo(){const f=S.bcForm,t=f.text||'';if(f.channel!=='sms')return `${t.length} characters`;const n=S.bcCount[f.channel+':'+f.who],p=smsParts(t);const bt=bcTotal(),tot=bt&&bt.total!=null?bt.total:bt;return `${t.length} characters · ${p} SMS part${p>1?'s':''} per person${bt&&bt.long?` (${bt.long} with Amharic or long names use more)`:''}${n!=null&&tot!=null?` · about ${tot} SMS in total`:''}`;}
 function bcProgress(){
   const b=S.bc;if(!b)return '';
   const pct=b.total?Math.round(b.done/b.total*100):0,st={sending:'Sending…',done:'Finished',stopped:'Stopped'}[b.state]||b.state;
@@ -802,7 +809,7 @@ function viewSend(){
   <div class="dgrid">
     <div class="s8" style="display:grid;gap:14px">
       <div id="bcprog">${bcProgress()}</div>
-      ${card('New message','Write <b>{name}</b> to put in each person’s first name.',`
+      ${card('New message','Write <b>{name}</b> for each person’s first name, <b>{to}</b> for who their order was for (test: “Abel”).',`
       <form class="f" id="bcform" style="padding-bottom:0">
         <div class="chips" style="margin:0">${ch('sms','SMS')}${ch('email','Email')}</div>
         ${ready?'':`<div class="reason">${f.channel==='sms'?'SMS isn’t set up (SMSETHIOPIA_KEY in Vercel).':'Email isn’t set up (GMAIL_APP_PASSWORD in Vercel).'}</div>`}
@@ -823,7 +830,7 @@ function viewSend(){
 }
 async function bcCount(){
   const f=S.bcForm,k=f.channel+':'+f.who;if(S.bcCount[k]!=null||bcCount.busy===k)return;bcCount.busy=k;
-  try{const j=await api('POST',{bc:{do:'count',channel:f.channel,who:f.who}});S.bcCount[k]=j.count;}catch(e){}
+  try{const j=await api('POST',{bc:{do:'count',channel:f.channel,who:f.who}});S.bcCount[k]=j.count;S.bcNames[k]=j.names||null;}catch(e){}
   bcCount.busy=null;if(S.tab==='send'&&!(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))render();
   else{const b=document.querySelector('[data-bc="start"]');if(b)b.textContent=`Send to ${S.bcCount[k]} people`;}
 }
@@ -902,7 +909,7 @@ document.addEventListener('click',async e=>{
     if(d==='test'){const to=($('#bctest')||{}).value||'';if(!to.trim())return alert('Type your own phone or email for the test.');if(!String(f.text||'').trim())return alert('Write the message first (or pick a template).');bca.disabled=true;
       try{const j=await api('POST',{bc:{do:'test',channel:f.channel,subject:f.subject,text:f.text,to}});toast('Test sent to '+j.to);}catch(err){alert(err.message);}bca.disabled=false;return;}
     if(d==='start'){const n=S.bcCount[f.channel+':'+f.who];
-      if(!confirm(`Send this ${f.channel==='sms'?'SMS':'email'} to ${n} ${n===1?'person':'people'} (${S.audiences[f.who]})?${f.channel==='sms'?`\n\nAbout ${n*smsParts(f.text||'')} SMS will be used.`:''}`))return;bca.disabled=true;
+      if(!confirm(`Send this ${f.channel==='sms'?'SMS':'email'} to ${n} ${n===1?'person':'people'} (${S.audiences[f.who]})?${f.channel==='sms'?`\n\nAbout ${(b=>b&&b.total!=null?b.total:b)(bcTotal())??n*smsParts(f.text||'')} SMS will be used.`:''}`))return;bca.disabled=true;
       try{const j=await api('POST',{bc:{do:'start',channel:f.channel,who:f.who,subject:f.subject,text:f.text}});S.bc=j.bc;S.bcForm={...f,text:'',subject:''};render();toast('Sending…');}catch(err){alert(err.message);bca.disabled=false;}return;}
     if(d==='stop'){if(!confirm('Stop sending? The people not reached yet won’t get it.'))return;try{const j=await api('POST',{bc:{do:'stop'}});S.bc=j.bc;render();}catch(err){alert(err.message);}return;}
     return;}

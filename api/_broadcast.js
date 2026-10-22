@@ -34,20 +34,22 @@ export async function audience(channel, who) {
   const paidKeys = new Set();
   for (const o of orders) if (o.status === 'paid') { const k = normPhone(o.phone) || normMail(o.byEmail); if (k) paidKeys.add(k); }
   const seen = new Set(), list = [];
-  const add = (to, name, lang) => { if (!to || out.has(to) || seen.has(to)) return; seen.add(to); list.push({ to, name: String(name || '').trim(), lang }); };
+  // forName: who the order was for (buyers only) — {to} in the message.
+  const add = (to, name, lang, forName) => { if (!to || out.has(to) || seen.has(to)) return; seen.add(to); list.push({ to, name: String(name || '').trim(), lang, forName: String(forName || '').trim() }); };
   for (const o of orders) {
     const buyer = channel === 'sms' ? normPhone(o.phone) : normMail(o.byEmail);
     const recv = channel === 'sms' ? normPhone(o.toPhone) : normMail(o.email);
     const paid = o.status === 'paid';
-    if ((who === 'paid' || who === 'everyone') && paid) add(buyer, o.by, o.lang);
-    if (who === 'unpaid' && !paid && o.status !== 'removed' && !paidKeys.has(normPhone(o.phone) || normMail(o.byEmail))) add(buyer, o.by, o.lang);
+    if ((who === 'paid' || who === 'everyone') && paid) add(buyer, o.by, o.lang, o.to);
+    if (who === 'unpaid' && !paid && o.status !== 'removed' && !paidKeys.has(normPhone(o.phone) || normMail(o.byEmail))) add(buyer, o.by, o.lang, o.to);
     if ((who === 'receivers' || who === 'everyone') && paid) add(recv, o.to, o.lang);
   }
   return list;
 }
 
-// {name} → the person's first name.
-const fill = (text, p) => String(text).replace(/\{name\}/gi, (p.name || '').split(/\s+/)[0] || 'there');
+// {name} → the person's first name. {to} → first name of who their (newest) order was for; "someone special" if none.
+const first = (s) => String(s || '').trim().split(/\s+/)[0];
+export const fill = (text, p) => String(text).replace(/\{name\}/gi, first(p.name) || 'there').replace(/\{to\}/gi, first(p.forName) || 'someone special');
 const mailFoot = `\n\n—\nDINGUY · dinguy.xyz\nDon’t want these emails? Reply “stop” and we’ll take you off the list.`;
 async function deliver(job, p) {
   if (job.channel === 'sms') return sendSMS(p.to, fill(job.text, p));
@@ -103,7 +105,7 @@ export async function stopJob() {
 }
 export const getJob = () => getJSON(JOB);
 export async function testSend({ channel, subject, text, to }) {
-  const p = { to: channel === 'sms' ? normPhone(to) : normMail(to), name: 'Test' };
+  const p = { to: channel === 'sms' ? normPhone(to) : normMail(to), name: 'Test', forName: 'Abel' };
   if (!p.to) throw new Error(channel === 'sms' ? 'Test phone number doesn’t look right.' : 'Test email doesn’t look right.');
   if (!String(text || '').trim()) throw new Error('Write the message first.');
   await deliver({ channel, subject: '[TEST] ' + String(subject || ''), text: String(text || '') }, p);

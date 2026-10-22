@@ -110,7 +110,8 @@ export default async function handler(req, res) {
     if (req.method === 'POST' && (req.body || {}).bc) {
       const b = req.body.bc;
       try {
-        if (b.do === 'count') return send(res, 200, { count: (await audience(b.channel, b.who)).length });
+        // names: each person's {name}/{to}, so /office can count the real SMS parts (Amharic names make an SMS longer).
+        if (b.do === 'count') { const l = await audience(b.channel, b.who); return send(res, 200, { count: l.length, names: b.channel === 'sms' ? l.map((p) => [p.name, p.forName]) : undefined }); }
         if (b.do === 'test') return send(res, 200, { to: await testSend(b) });
         if (b.do === 'start') return send(res, 200, { bc: jobView(await startJob(b)) });
         if (b.do === 'tick') return send(res, 200, { bc: jobView(await tick()) });
