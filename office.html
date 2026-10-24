@@ -250,7 +250,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const TZ='Africa/Addis_Ababa';
 let SW_MAIL='offscriptet@gmail.com'; // the sending address; the server's setting wins (see load())
 let pw='';try{pw=sessionStorage.getItem('dg-admin')||''}catch(e){}
-const S={bcForm:{channel:'sms',who:'paid',subject:'',text:''},bcCount:{},bcNames:{},role:'admin',orders:[],inquiries:[],auto:{},lb:'30d',tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
+const S={vcf:{who:'all',name:'DINGUY {name}'},bcForm:{channel:'sms',who:'paid',subject:'',text:''},bcCount:{},bcNames:{},role:'admin',orders:[],inquiries:[],auto:{},lb:'30d',tab:'dash',filter:'all',q:'',sel:null,loadedAt:0};
 try{const t=sessionStorage.getItem('dg-tab');if(t)S.tab=t;}catch(e){}
 // Partner password: read-only, Dashboard only, no customer details (the server leaves them out too).
 const P=()=>S.role==='partner';
@@ -752,6 +752,30 @@ async function exportOrders(btn){
   catch(err){alert('Couldn’t export orders: '+err.message);}
   btn.disabled=false;
 }
+// Phone contacts (.vcf) from every order: one card per phone number, the newest name wins, opt-outs left out.
+const VCF_WHO={all:'Everyone (buyers and receivers)',paid:'Buyers who paid',unpaid:'Buyers who never paid',receivers:'Receivers'};
+const vcfName=(t,p)=>String(t||'{name}').replace(/\{name\}/gi,p.name).replace(/\{first\}/gi,String(p.name).split(/\s+/)[0]).replace(/\{role\}/gi,p.role).replace(/\{stone\}/gi,p.stone).replace(/\{no\}/gi,p.no).replace(/\s+/g,' ').trim();
+const vEsc=v=>String(v||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/([,;])/g,'\\$1');
+const intl=p=>{const m=/^(?:\+?251|0)?([79]\d{8})$/.exec(String(p||'').replace(/[^\d+]/g,''));return m?'+251'+m[1]:null;};
+async function exportContacts(btn){
+  const {who,name}=S.vcf;btn.disabled=true;
+  try{const j=await api('GET',null,'?export=1'),c=k=>j.columns.indexOf(k);
+    const out=new Set((S.optouts||[]).map(intl).filter(Boolean)),seen=new Map();
+    // newest order first, so each number gets the name it was last ordered with; a buyer stays a buyer
+    for(const r of [...j.rows].reverse()){
+      const paid=r[c('Status')]==='Paid',base={stone:r[c('Stone')]||'',no:r[c('Order ID')]||'',status:r[c('Status')]||''};
+      if(r[c('Status')]==='Removed from registry')continue;
+      const add=(ph,nm,role)=>{const t=intl(ph);if(!t||out.has(t)||!String(nm||'').trim())return;const prev=seen.get(t);if(prev&&!(prev.role==='Receiver'&&role==='Buyer'))return;seen.set(t,{...base,tel:t,name:String(nm).trim(),role});};
+      if(who==='all'||(who==='paid'&&paid)||(who==='unpaid'&&!paid))add(r[c('Buyer phone')],r[c('Buyer name')],'Buyer');
+      if(who==='all'||who==='receivers')add(r[c('Receiver phone')],r[c('Receiver name')],'Receiver');}
+    if(who==='unpaid'){const paidPh=new Set(j.rows.filter(r=>r[c('Status')]==='Paid').map(r=>intl(r[c('Buyer phone')])));for(const t of [...seen.keys()])if(paidPh.has(t))seen.delete(t);}
+    const cards=[...seen.values()].map(p=>{const fn=vcfName(name,p);return ['BEGIN:VCARD','VERSION:3.0',`N:;${vEsc(fn)};;;`,`FN:${vEsc(fn)}`,`TEL;TYPE=CELL:${p.tel}`,'ORG:DINGUY',`NOTE:${vEsc(`${p.role} · ${p.no} · ${p.stone} · ${p.status}`)}`,'END:VCARD'].join('\r\n');});
+    if(!cards.length)throw new Error('nobody in that group has a phone number');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([cards.join('\r\n')+'\r\n'],{type:'text/vcard;charset=utf-8'}));a.download=`dinguy-contacts-${who}-${stamp()}.vcf`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+    toast(`Saved ${cards.length} contacts`);}
+  catch(err){alert('Couldn’t make the contacts file: '+err.message);}
+  btn.disabled=false;
+}
 // Every day Google Analytics has, as five files: daily totals, sources, pages, places & devices, events.
 async function exportGA(btn){
   btn.disabled=true;const t=btn.textContent;btn.textContent='Exporting…';
@@ -823,9 +847,19 @@ function viewSend(){
         ${sending?'<div class="readout">One message at a time — stop or finish the one that’s sending first.</div>':''}
       </form>`)}
     </div>
+    <div class="s4" style="display:grid;gap:14px;align-content:start">
+    ${card('Save to your phone','All customers as phone contacts (.vcf), named your way — then add them to the Telegram group from your contacts.',`
+      <form class="f" id="vcfform" style="padding-bottom:0">
+        <label>Who<select name="who">${Object.entries(VCF_WHO).map(([k,l])=>`<option value="${k}"${S.vcf.who===k?' selected':''}>${l}</option>`).join('')}</select></label>
+        <label>Contact name<input name="name" value="${esc(S.vcf.name)}" placeholder="DINGUY {name}"></label>
+        <div class="readout">Use <b>{name}</b> (their name), <b>{role}</b> (Buyer / Receiver), <b>{stone}</b>, <b>{no}</b> (order number). Example: “${esc(vcfName(S.vcf.name,{name:'Hana Bekele',role:'Buyer',stone:'COBBLESTONE',no:'DG-123456'}))}”.</div>
+        <button class="btn" style="min-height:48px">⬇ Download contacts</button>
+        <div class="readout">iPhone: open the file → <b>Add all contacts</b>. Android: Contacts app → Settings → <b>Import</b> → choose the file. People on the “Don’t message” list are left out.</div>
+      </form>`)}
     ${card('Don’t message','People who asked to stop. They’re skipped in every send.',`
       <form class="f" id="optform" style="padding-bottom:0"><div class="two" style="align-items:end"><label>Phone or email<input name="value" required></label><button class="btn ghost" style="min-height:48px">Add</button></div></form>
-      ${(S.optouts||[]).length?(S.optouts||[]).map(v=>`<div class="mrow"><span>${esc(v)}</span><button class="link" data-optundo="${esc(v)}">Remove</button></div>`).join(''):'<div class="readout">Nobody yet.</div>'}`,'s4')}
+      ${(S.optouts||[]).length?(S.optouts||[]).map(v=>`<div class="mrow"><span>${esc(v)}</span><button class="link" data-optundo="${esc(v)}">Remove</button></div>`).join(''):'<div class="readout">Nobody yet.</div>'}`)}
+    </div>
   </div>`;
 }
 async function bcCount(){
@@ -949,6 +983,7 @@ document.addEventListener('input',e=>{if(e.target.matches('[data-bcf]')){S.bcFor
 document.addEventListener('submit',async e=>{
   if(e.target.id==='optform'){e.preventDefault();const v=e.target.querySelector('[name=value]').value;try{const j=await api('POST',{bc:{do:'optout',value:v}});S.optouts=j.optouts;S.bcCount={};render();toast('Added');}catch(err){alert(err.message);}return;}
   if(e.target.id==='bcform'){e.preventDefault();return;}
+  if(e.target.id==='vcfform'){e.preventDefault();const fd=new FormData(e.target);S.vcf={who:fd.get('who'),name:String(fd.get('name')||'').trim()||'DINGUY {name}'};exportContacts(e.target.querySelector('button'));return;}
   const ef=e.target.closest('[data-editform]');
   if(ef){e.preventDefault();const id=ef.dataset.editform,btn=ef.querySelector('button[type=submit]');btn.disabled=true;
     try{const j=await api('POST',{id,action:'edit',edit:Object.fromEntries(new FormData(ef).entries())});replaceOrder(j.order);S.edit=null;render();toast('Saved — certificate updated');}
