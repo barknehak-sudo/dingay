@@ -118,6 +118,16 @@
     "Worth registering": "መመዝገብ ይገባዋል", "Very much": "በጣም", "Diamond (symbolic)": "አልማዝ (ምሳሌያዊ)",
     "Cut": "ቅርጽ", "Classic": "ክላሲክ", "Duration": "ቆይታ", "Forever (approx.)": "ለዘላለም (በግምት)",
     "Selection": "ምርጫ", "Chosen again": "በድጋሚ የተመረጠ", "And again": "ደግሞም", "Yes": "አዎ",
+    /* new: የወርቅ ቀሚስ (the gold dress, 280) */
+    "The 28 Million Birr Dress": "የ28 ሚሊዮን ብሩ ቀሚስ", "Couture · Symbolic": "ኩቱር · ምሳሌያዊ", "BUY THIS DRESS": "ይህን ቀሚስ ግዛ",
+    "Somebody wore a 28,000,000 Birr dress. Here it is for 280. We just took off five zeros.": "አንድ ሰው 28,000,000 ብር የሚያወጣ ቀሚስ ለበሰ። ይኸው በ280። አምስት ዜሮ ብቻ ነው ያነሳነው።",
+    "Solid gold beads. A corset bodice. A full ball gown.": "የወርቅ ዶቃዎች። ኮርሴት። ሙሉ የኳስ ጋውን።",
+    "For the person who deserves the red carpet, the photographers and the whole wedding hall standing up.": "ቀይ ምንጣፍ፣ ፎቶ አንሺዎችና ቆሞ የሚቀበላቸው ሙሉ የሰርግ አዳራሽ ለሚገባቸው ሰው።",
+    "It will never need dry cleaning, because it is registered.": "ተመዝግቧልና ደረቅ እጥበት አያስፈልገውም።",
+    "Ball gown (symbolic)": "የኳስ ጋውን (ምሳሌያዊ)", "Material": "ቁሳቁስ", "Gold beads, ivory silk": "የወርቅ ዶቃዎች፣ ነጭ ሐር",
+    "Original price": "የመጀመሪያ ዋጋ", "28,000,000 Birr": "28,000,000 ብር", "Your price": "የእርስዎ ዋጋ", "280 Birr": "280 ብር", "Zeros removed": "የተነሱ ዜሮዎች", "Five": "አምስት",
+    "Three new stones for your friends, and the 28,000,000 Birr dress for someone you love. For 280.": "ለጓደኞችዎ ሶስት አዳዲስ ድንጋዮች፣ ለሚወዱት ሰው ደግሞ የ28,000,000 ብሩ ቀሚስ። በ280።",
+    "Beautiful, meaningful and a little ridiculous. From 199 Birr.": "ውብ፣ ትርጉም ያላቸውና ትንሽ አስቂኝ። ከ199 ብር ጀምሮ።",
     /* new: ጠጠር, አሎሎ, ከሰል ድንጋይ, የጥቅምት አበባ */
     "DINGUY Registry": "የDINGUY መዝገብ", "Give someone a stone with their name on it.": "ስማቸው የተጻፈበት ድንጋይ ለአንድ ሰው ይስጡ።", "A registered Dinguy and a certificate, ready in 1 minute. From 89 Birr.": "የተመዘገበ ድንጋይና ሰርተፊኬት፣ በ1 ደቂቃ ውስጥ ዝግጁ። ከ89 ብር ጀምሮ።", "Just added · For your loved one": "አዲስ የገባ · ለሚወዱት ሰው", "For a friend · 89": "ለጓደኛ · 89", "For a loved one · 199": "ለሚወዱት ሰው · 199", "Funny, heavy, everyday stones. 89 Birr each.": "አስቂኝ፣ ከባድ፣ የዕለት ተዕለት ድንጋዮች። እያንዳንዳቸው 89 ብር።", "Beautiful, meaningful and a little ridiculous. 199 Birr each.": "ውብ፣ ትርጉም ያላቸውና ትንሽ አስቂኝ። እያንዳንዳቸው 199 ብር።", "How it works": "እንዴት ይሰራል", "Choose a Dinguy": "ድንጋይ ይምረጡ", "A stone for a friend, or something beautiful for someone you love.": "ለጓደኛ ድንጋይ፣ ወይም ለሚወዱት ሰው የሚያምር ነገር።", "Write their name and a message": "ስማቸውንና መልዕክት ይጻፉ", "It goes on the certificate and their registry page.": "በሰርተፊኬቱና በመዝገብ ገጻቸው ላይ ይወጣል።", "Pay with PAY NOW or telebirr": "በPAY NOW ወይም በቴሌብር ይክፈሉ", "They get an SMS with their certificate link. Digital only, no physical stone.": "የሰርተፊኬታቸው ሊንክ በSMS ይደርሳቸዋል። ዲጂታል ብቻ ነው፤ አካላዊ ድንጋይ የለም።", "Find a registration": "ምዝገባ ይፈልጉ", "See a sample": "ናሙና ይመልከቱ", "VIEW": "ይመልከቱ",
     "New Dinguys are here.": "አዳዲስ ድንጋዮች መጥተዋል።", "Three new stones for your friends, and our first flower for someone you love.": "ለጓደኞችዎ ሶስት አዳዲስ ድንጋዮች፣ ለሚወዱት ሰው ደግሞ የመጀመሪያ አበባችን።", "Registry · Just added": "መዝገብ · አዲስ የገቡ", "BUY THIS FLOWER": "ይህን አበባ ግዛ", "CLOSE": "ዝጋ",

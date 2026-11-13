@@ -1,7 +1,7 @@
 // POST /api/pay-jami {id, key, gateway} — start a JamiDev payment: Telebirr / M-Pesa / CBE Birr pushes a
 // request to the buyer's phone (production) or opens Jami's test simulator (sandbox).
 import { loadOrder, saveOrder, publicOrder, send, limited, ip } from './_lib.js';
-import { startJami, jamiOn, jamiSandbox, GATEWAYS } from './_jami.js';
+import { startJami, jamiOn, jamiFor, jamiSandbox, GATEWAYS } from './_jami.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
@@ -11,6 +11,7 @@ export default async function handler(req, res) {
     const gateway = GATEWAYS.includes((req.body || {}).gateway) ? req.body.gateway : 'telebirr';
     const o = await loadOrder(id);
     if (!o || o.key !== key) return send(res, 404, { error: 'Order not found.' });
+    if (!jamiFor(o)) return send(res, 503, { error: 'Please pay this one with the telebirr code.' });
     if (o.status !== 'awaiting' && o.status !== 'rejected') return send(res, 200, { order: publicOrder(o) });
     if (await limited('payjami:' + ip(req), 15, 300)) return send(res, 429, { error: 'Too many tries. Wait a few minutes.' });
     const site = 'https://' + (req.headers['x-forwarded-host'] || req.headers.host || 'dinguy.xyz');

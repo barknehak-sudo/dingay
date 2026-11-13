@@ -81,7 +81,7 @@ class Component extends DCLogic {
     // A public record (no private key) shows the certificate without the sender and the message.
     const pub=!!r.no&&!r.by&&!pending;
     // Loved-one stones get a romantic certificate: blush paper, gold hairlines, serif italics, rose accents.
-    const loved=['opal','choc','emerald','diamond','tikimt'].includes(r.kind);
+    const loved=['opal','choc','emerald','diamond','tikimt','dress'].includes(r.kind);
     const SERIF="'Instrument Serif',Georgia,'Noto Serif Ethiopic',serif";
     const party=r.kind==='cake',friend=['cobble','blocket','river','foundation','pebble','iron','charcoal'].includes(r.kind);
     const t=friend

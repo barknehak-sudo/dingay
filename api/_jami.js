@@ -3,6 +3,8 @@
 //   JAMI_TOKEN            — API token from Jami → Developer → API Tokens (jamidev_test_… sandbox, jamidev_live_… live)
 //   JAMI_PRODUCT_FRIEND   — optional: public product id (p_…) of the 89 ETB product (default: the DINGUY org's)
 //   JAMI_PRODUCT_LOVED    — optional: public product id (p_…) of the 199 ETB product (default: the DINGUY org's)
+//   JAMI_PRODUCT_280      — public product id (p_…) of a 280 ETB product (the gold dress). Until it is set,
+//                           280 Birr orders pay with the telebirr code only (never charged at the 199 price).
 //   JAMI_WEBHOOK_SECRET   — secret of the webhook pointing at https://dinguy.xyz/api/jami-webhook
 // Without JAMI_TOKEN the pay page keeps the paste-the-code flow only.
 import crypto from 'node:crypto';
@@ -13,7 +15,9 @@ const BASE = 'https://jami.bio/api/jamidev';
 export const GATEWAYS = ['telebirr', 'mpesa', 'cbe'];
 // Products in the DINGUY organization on JamiDev (public ids, safe to keep in code).
 const PRODUCT = { friend: process.env.JAMI_PRODUCT_FRIEND || 'p_4js0GdCu_nM8', loved: process.env.JAMI_PRODUCT_LOVED || 'p_Ny9Z5_qIBIVc' };
-const productFor = (price) => (price === 89 ? PRODUCT.friend : PRODUCT.loved);
+const productFor = (price) => (price === 89 ? PRODUCT.friend : price === 199 ? PRODUCT.loved : price === 280 ? process.env.JAMI_PRODUCT_280 || null : null);
+// Phone payment is offered only when Jami has a product at this order's exact price.
+export const jamiFor = (o) => jamiOn() && !!productFor(o.price);
 export const jamiOn = () => !!process.env.JAMI_TOKEN;
 export const jamiSandbox = () => String(process.env.JAMI_TOKEN || '').startsWith('jamidev_test_');
 

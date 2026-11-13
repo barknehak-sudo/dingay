@@ -9,7 +9,7 @@ export const PRODUCTS = {
   'pebble': { name: 'ጠጠር', kind: 'pebble', price: 89 },
   'alolo': { name: 'አሎሎ', kind: 'iron', price: 89 },
   'kesel-dingay': { name: 'ከሰል ድንጋይ', kind: 'charcoal', price: 89 },
-  'tikimt-abeba': { name: 'የጥቅምት አበባ', kind: 'tikimt', price: 199 },
+  'gold-dress': { name: 'የወርቅ ቀሚስ', kind: 'dress', price: 280 },
   'queen-of-sheba': { name: 'THE QUEEN OF SHEBA', kind: 'opal', price: 199 },
   'mezezo-chocolate-opal': { name: 'MEZEZO CHOCOLATE OPAL', kind: 'choc', price: 199 },
   'shakiso-emerald': { name: 'SHAKISO EMERALD', kind: 'emerald', price: 199 },
