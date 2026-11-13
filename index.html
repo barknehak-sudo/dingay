@@ -155,16 +155,16 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
   </section>
 
   <section aria-label="New" style="margin-top:22px">
-    <article onClick="{{ feat.open }}" class="app-feature">
+    <article onClick="{{ feat.open }}" class="app-feature" style="background:{{ feat.fbg }};box-shadow:{{ feat.fsh }}">
       <div style="width:min(78%,340px);margin:0 auto"><dc-import name="Stone" kind="{{ feat.kind }}" spin="{{ featSpin }}" hint-size="100%,260px"></dc-import></div>
-      <div style="color:#f4efe9">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="sw-pill app-badge">NEW ✦</span><span class="app-eyebrow" style="color:#ffc371">Just added · For your loved one</span></div>
+      <div style="color:{{ feat.fink }}">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="sw-pill app-badge">NEW ✦</span><span class="app-eyebrow" style="color:{{ feat.feye }}">Just added · For your loved one</span></div>
         <h2 style="margin:12px 0 0;font-family:'Instrument Serif',Georgia,'Noto Serif Ethiopic',serif;font-style:italic;font-weight:400;font-size:clamp(40px,9vw,64px);line-height:1;letter-spacing:-.01em">{{ feat.name }}</h2>
         <div style="margin-top:6px;font-size:16px;font-weight:600">{{ feat.sub }}</div>
-        <p style="margin:8px 0 0;font-size:15px;line-height:1.45;color:#b9c9d4;max-width:38ch">{{ feat.tag }}</p>
+        <p style="margin:8px 0 0;font-size:15px;line-height:1.45;color:{{ feat.fsub }};max-width:38ch">{{ feat.tag }}</p>
         <div style="display:flex;gap:8px;margin-top:16px">
-          <button onClick="{{ feat.register }}" class="app-btn" style="flex:1;justify-content:space-between"><span>BUY</span><span>{{ feat.priceLabel }}</span></button>
-          <button onClick="{{ feat.open }}" class="app-btn-ghost">VIEW</button>
+          <button onClick="{{ feat.register }}" class="app-btn" style="flex:1;justify-content:space-between;background:{{ feat.fbtnBg }};color:{{ feat.fbtnFg }}"><span>BUY</span><span>{{ feat.priceLabel }}</span></button>
+          <button onClick="{{ feat.open }}" class="app-btn-ghost" style="border-color:{{ feat.fghost }}">VIEW</button>
         </div>
       </div>
     </article>
@@ -183,7 +183,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <div class="app-tile-img"><dc-import name="Stone" kind="{{ p.kind }}" spin="{{ 0 }}" hint-size="100%,140px"></dc-import></div>
         <div class="app-tile-name" style="font-family:{{ p.hf }};font-style:{{ p.hs }};font-weight:{{ p.hw }}">{{ p.name }}</div>
         <div class="app-tile-sub" style="color:{{ p.tsub }}">{{ p.sub }}</div>
-        <button onClick="{{ p.register }}" class="app-tile-buy" style="background:{{ p.btnBg }};color:{{ p.btnFg }}"><span>{{ p.buyWord }}</span><span>{{ p.priceLabel }}</span></button>
+        <button onClick="{{ p.register }}" class="app-tile-buy" style="background:{{ p.tbtnBg }};color:{{ p.tbtnFg }}"><span>{{ p.buyWord }}</span><span>{{ p.priceLabel }}</span></button>
       </article>
       </sc-for>
     </div>
@@ -222,7 +222,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <div class="app-tile-img"><dc-import name="Stone" kind="{{ p.kind }}" spin="{{ 0 }}" hint-size="100%,140px"></dc-import></div>
         <div class="app-tile-name" style="font-family:{{ p.hf }};font-style:{{ p.hs }};font-weight:{{ p.hw }}">{{ p.name }}</div>
         <div class="app-tile-sub" style="color:{{ p.tsub }}">{{ p.sub }}</div>
-        <button onClick="{{ p.register }}" class="app-tile-buy" style="background:{{ p.btnBg }};color:{{ p.btnFg }}"><span>{{ p.buyWord }}</span><span>{{ p.priceLabel }}</span></button>
+        <button onClick="{{ p.register }}" class="app-tile-buy" style="background:{{ p.tbtnBg }};color:{{ p.tbtnFg }}"><span>{{ p.buyWord }}</span><span>{{ p.priceLabel }}</span></button>
       </article>
     </sc-for>
   </div>
@@ -970,7 +970,7 @@ const P=[
   d:['For the friend who has always been there.','Holding things together.\nTaking up space.\nRefusing to move.','A true foundation of the community.'],
   meta:[['Specimen No.','F-04'],['Classification','Foundational basalt'],['Origin','The community'],['Mobility','Refuses'],['Surface','Rough, dependable'],['Emotional weight','Holding everything']]},
  {slug:'gold-dress',isNew:true,w:'loved',price:280,name:'የወርቅ ቀሚስ',sub:'The 28 Million Birr Dress',kind:'dress',fig:'L-05',cls:'Couture · Symbolic',
-  d:['Somebody wore a 28,000,000 Birr dress. Here it is for 280. We just took off five zeros.','Solid gold beads. A corset bodice. A full ball gown.','For the person who deserves the red carpet, the photographers and the whole wedding hall standing up.','It will never need dry cleaning, because it is registered.'],
+  d:['Someone wore a 28,000,000 Birr dress. This one is 280.','Same gold. Five fewer zeros. Never needs dry cleaning.'],
   meta:[['Specimen No.','L-05'],['Classification','Ball gown (symbolic)'],['Material','Gold beads, ivory silk'],['Original price','28,000,000 Birr'],['Your price','280 Birr'],['Zeros removed','Five']]},
  {slug:'queen-of-sheba',w:'loved',name:'THE QUEEN OF SHEBA',sub:'Opal',kind:'opal',fig:'L-01',cls:'Precious Opal · Symbolic',
   d:["A stone inspired by Ethiopia's royal imagination.",'For someone who deserves to be treated like royalty.','Soft light. Shifting colour. A little mysterious.','Much like them.'],
@@ -992,9 +992,11 @@ const P=[
 // Price in Birr: 89 for friends, 199 for loved ones, unless a Dinguy has its own.
 P.forEach(p=>{p.price=p.price||(p.w==='friend'?89:199);});
 const MSG={friend:['አንተ በእውነት ድንጋይ ነህ።',"For the weight you've carried and the weight you've become.",'Some people get stars. You get this.','I saw this and immediately thought of you.','በስምህ የተመዘገበ ድንጋይ እንኳን አይበቃህም።','ሁሉም ሰው ኮከብ አይኖረውም። አንተ ግን ድንጋይ አለህ። 😂','Congratulations. You are now the proud owner of absolutely nothing, but this stone has your name on it.','I spent 89 birr to make our friendship legally unnecessary.','Some people get flowers. You got a professionally registered stone.'],
- loved:['You are worth every stone in the world.',"I couldn't buy you a star, so I did the next logical thing.",'For something that lasts as long as you do.','A little piece of permanence for my favourite person.',"You're my favourite human. This is your favourite Dinguy.","I couldn't give you the stars, so I gave you something a little more grounded.",'A little piece of the earth, with a little piece of my heart attached to it.','It’s just a stone, but choosing it for you felt special.','For someone who deserves something beautiful, meaningful, and slightly ridiculous.','I wanted your name on something that lasts. This seemed like a good place to start.']};
+ loved:['You make ordinary days feel like a celebration.','Proof, on paper, that you are my favourite person.',"I can't give you the world, so I registered a small, shiny piece of it in your name.",'For the one who makes my coffee taste better just by being there.','You are rare. Now it is official.','My heart picked you a long time ago. This is just the paperwork.','Some people get flowers. You get something that never wilts.','Beautiful, a little ridiculous, and completely yours. Just like us.'],
+ dress:['Someone wore a 28 million Birr dress. You deserve one too. Here it is.','You look like a million Birr. Twenty-eight million, actually.','The red carpet called. They are waiting for you.','Your size? Perfect. Your price? 280. Your look? Priceless.',"I couldn't afford the dress, so I bought you the certificate.",'Gold suits you. Honestly, everything suits you.','For the queen of every wedding hall.','Five zeros removed. Zero love removed.']};
 const MSG_AM={friend:['አንተ በእውነት ድንጋይ ነህ።','ለተሸከምከው ክብደትና ለሆንከው ክብደት።','አንዳንዶች ኮከብ ያገኛሉ። አንተ ይሄን አገኘህ።','ይሄን ሳይ ወዲያው አንተ ትዝ አልከኝ።','በስምህ የተመዘገበ ድንጋይ እንኳን አይበቃህም።','ሁሉም ሰው ኮከብ አይኖረውም። አንተ ግን ድንጋይ አለህ። 😂','እንኳን ደስ አለህ። አሁን የምንም ነገር ኩሩ ባለቤት ነህ፤ ግን ይህ ድንጋይ ስምህን ይዟል።','ጓደኝነታችንን በሕግ አላስፈላጊ ለማድረግ 89 ብር አውጥቻለሁ።','አንዳንዶች አበባ ይሰጣቸዋል። አንተ በባለሙያ የተመዘገበ ድንጋይ ተሰጠህ።'],
- loved:['በዓለም ላይ ያለ እያንዳንዱ ድንጋይ ይገባሻል።','ኮከብ ልገዛልሽ አልቻልኩም፤ ስለዚህ ቀጣዩን ምክንያታዊ ነገር አደረግሁ።','እንዳንቺ ለሚዘልቅ ነገር።','ለምወዳት ሰው ትንሽ ዘላቂነት።','የምወድሽ ሰው ነሽ። ይሄ የምትወጂው ድንጋይ ነው።','ከዋክብትን ልሰጥሽ አልቻልኩም፤ ስለዚህ ትንሽ መሬት ላይ ያለ ነገር ሰጠሁሽ።','ከምድር ትንሽ ቁራጭ፣ ከልቤ ትንሽ ቁራጭ ጋር ተያይዞ።','ድንጋይ ብቻ ነው፤ ግን ላንቺ መምረጡ ልዩ ስሜት ሰጠኝ።','ውብ፣ ትርጉም ያለውና ትንሽ አስቂኝ ነገር ለሚገባሽ።','ስምሽ በሚዘልቅ ነገር ላይ እንዲሆን ፈለግሁ። ይሄ ጥሩ መነሻ መሰለኝ።']};
+ loved:['ተራ ቀኖችን በዓል ታደርጊያቸዋለሽ።','በጣም የምወድሽ ሰው መሆንሽ፣ በወረቀት የተረጋገጠ።','ዓለምን ልሰጥሽ አልችልም፤ ስለዚህ ትንሽ የሚያብረቀርቅ ቁራጩን በስምሽ አስመዘገብኩ።','አጠገቤ በመሆንሽ ብቻ ቡናዬን የምታጣፍጪው።','ብርቅ ነሽ። አሁን በይፋ ተረጋግጧል።','ልቤ ድሮ መርጦሻል። ይሄ ወረቀቱ ብቻ ነው።','አንዳንዶች አበባ ያገኛሉ። አንቺ የማይጠወልግ ነገር አገኘሽ።','ውብ፣ ትንሽ አስቂኝ፣ ሙሉ በሙሉ ያንቺ። ልክ እንደኛ።'],
+ dress:['አንድ ሰው 28 ሚሊዮን ብር የሚያወጣ ቀሚስ ለበሰ። አንቺም ይገባሻል። ይኸው።','ሚሊዮን ብር ትመስያለሽ። እንዲያውም 28 ሚሊዮን።','ቀይ ምንጣፉ ደውሎ ነበር። እየጠበቁሽ ነው።','ልክሽ? ፍጹም። ዋጋው? 280። ውበትሽ? ዋጋ የለውም።','ቀሚሱን መግዛት አልቻልኩም፤ ስለዚህ ሰርተፊኬቱን ገዛሁልሽ።','ወርቅ ያምርብሻል። እውነቱን ለመናገር ሁሉም ያምርብሻል።','ለእያንዳንዱ የሰርግ አዳራሽ ንግሥት።','አምስት ዜሮ ተነሳ። ከፍቅሬ ግን ምንም አልተነሳም።']};
 const LANG=(window.dgLang&&window.dgLang.lang)||'en';
 const T=s=>(window.dgLang?window.dgLang.t(s):s);
 const MS=LANG==='am'?MSG_AM:MSG;
@@ -1298,16 +1300,23 @@ class Component extends DCLogic {
     const price=w=>w==='friend'?'89 ETB':'199 ETB',priceOf=p=>p.price+' ETB';
     // New Dinguys get a premium card: rainbow border and top band, a NEW badge and a warmer glow.
     const RAINBOW='linear-gradient(120deg,#ff5f6d,#ffc371,#47e5bc,#5f8bff,#c86bff)';
-    const mk=(p)=>{const Th=THEME[p.w],nw=!!p.isNew;return{slug:p.slug,name:p.name,sub:p.sub,kind:p.kind,fig:p.fig,cls:p.cls,isNew:nw,tag:typeof p.d[0]==='string'?p.d[0]:'',priceLabel:p.soldOut?'':priceOf(p),soldOut:!!p.soldOut,
+    // The dress gets a clean, light card: warm ivory, a fine gold edge, dark ink and a gold-on-black button.
+    const LIGHT={tbg:'linear-gradient(180deg,#fffdf8,#f5eddf)',tborder:'1px solid rgba(201,150,46,.45)',tink:'#1c1609',tsub:'#7a6844',shadow:'0 22px 44px -26px rgba(201,150,46,.6)',btnBg:'#1c1609',btnFg:'#f2c25a'};
+    const mk=(p)=>{const Th=THEME[p.w],nw=!!p.isNew,lt=p.kind==='dress'?LIGHT:null;return{light:!!lt,slug:p.slug,name:p.name,sub:p.sub,kind:p.kind,fig:p.fig,cls:p.cls,isNew:nw,tag:typeof p.d[0]==='string'?p.d[0]:'',priceLabel:p.soldOut?'':priceOf(p),soldOut:!!p.soldOut,
       buyWord:p.soldOut?'OUT OF STOCK':'BUY',buyLabel:p.soldOut?'OUT OF STOCK':p.kind==='dress'?'BUY THIS DRESS':'BUY THIS STONE',
       cardBg:nw?`linear-gradient(${p.w==='friend'?'#f3f2ee,#f3f2ee':'#17293a,#0d1a24'}) padding-box,${RAINBOW} border-box`:Th.card,
-      cardBorder:nw?'2px solid transparent':`1px solid ${Th.line}`,cardShadow:nw?'0 24px 50px -24px rgba(200,107,255,.55),0 10px 30px -18px rgba(255,95,109,.45)':'none',
+      cardBorder:nw?'2px solid transparent':`1px solid ${Th.line}`,cardShadow:lt?lt.shadow:nw?'0 24px 50px -24px rgba(200,107,255,.55),0 10px 30px -18px rgba(255,95,109,.45)':'none',
       top:nw?'':Th.top,topH:nw?'6px':Th.topH,topClass:nw?'sw-pill':'',
       glow:nw?(p.w==='friend'?'radial-gradient(70% 60% at 50% 50%,rgba(255,195,113,.35),rgba(243,242,238,0) 72%)':'radial-gradient(60% 55% at 50% 50%,rgba(255,195,113,.32),rgba(19,37,49,0) 72%)'):Th.glow,
       // tiles (home + catalog grid): light card for friends, deep navy for loved ones
-      tbg:nw?`${p.w==='friend'?'linear-gradient(#f3f2ee,#f3f2ee)':'linear-gradient(180deg,#1f3a4d,#0e1c26)'} padding-box,${RAINBOW} border-box`:(p.w==='friend'?'#ecebe6':'linear-gradient(180deg,#1c3343,#0e1c26)'),
-      tborder:nw?'2px solid transparent':(p.w==='friend'?'1px solid rgba(0,0,0,.1)':'1px solid rgba(255,255,255,.12)'),
-      tink:p.w==='friend'?'#0b0b0b':'#f4efe9',tsub:p.w==='friend'?'#55554f':'#b9c9d4',
+      tbg:lt?lt.tbg:nw?`${p.w==='friend'?'linear-gradient(#f3f2ee,#f3f2ee)':'linear-gradient(180deg,#1f3a4d,#0e1c26)'} padding-box,${RAINBOW} border-box`:(p.w==='friend'?'#ecebe6':'linear-gradient(180deg,#1c3343,#0e1c26)'),
+      tborder:lt?lt.tborder:nw?'2px solid transparent':(p.w==='friend'?'1px solid rgba(0,0,0,.1)':'1px solid rgba(255,255,255,.12)'),
+      tink:lt?lt.tink:p.w==='friend'?'#0b0b0b':'#f4efe9',tsub:lt?lt.tsub:p.w==='friend'?'#55554f':'#b9c9d4',
+      tbtnBg:lt?lt.btnBg:p.soldOut?'rgba(255,255,255,.1)':p.w==='friend'?'#0b0b0b':'#f4efe9',tbtnFg:lt?lt.btnFg:p.soldOut?'#9fb6c6':p.w==='friend'?'#f2c230':'#132531',
+      // the home feature card
+      fbg:lt?`${lt.tbg} padding-box,linear-gradient(120deg,#e9c46a,#fff3d1,#c9962e) border-box`:`linear-gradient(160deg,#20384a,#0d1a23) padding-box,${RAINBOW} border-box`,
+      fsh:lt?lt.shadow:'0 30px 60px -30px rgba(255,195,113,.35)',fink:lt?lt.tink:'#f4efe9',fsub:lt?lt.tsub:'#b9c9d4',feye:lt?'#a8791c':'#ffc371',
+      fbtnBg:lt?lt.btnBg:'#f4f4f1',fbtnFg:lt?lt.btnFg:'#0b1720',fghost:lt?'rgba(28,22,9,.25)':'rgba(238,242,244,.28)',
       btnBg:p.soldOut?'rgba(255,255,255,.1)':p.w==='friend'?'#0b0b0b':'#f4efe9',btnFg:p.soldOut?'#9fb6c6':p.w==='friend'?'#f2c230':'#132531',
       hf:p.w==='friend'?'inherit':"'Instrument Serif',Georgia,'Noto Serif Ethiopic',serif",hs:p.w==='friend'?'normal':'italic',hw:p.w==='friend'?800:400,
       open:go('dengay/'+p.slug),register:e=>{e&&e.stopPropagation();if(!p.soldOut)this.go('register/'+p.slug);}};};
@@ -1327,7 +1336,8 @@ class Component extends DCLogic {
     const okMail=v=>{v=(v||'').trim();return !v||/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v);};const emailOk=okMail(draft.email),byEmailOk=okMail(draft.byEmail);
     const regOk=hasDed&&phoneOk&&toPhoneOk&&emailOk&&byEmailOk&&draft.agree&&!st.busy;
     const progress=[['Specimen selected',true],['Dedication recorded',hasDed],['Registry entry prepared',hasDed&&!!draft.message.trim()],['Certificate generated',false]].map(([label,d])=>({label,dot:d?'#0b1720':'transparent',c:d?'#0b1720':'#6f8797'}));
-    const regSuggest=MS[world].map(m=>{const sel=draft.message===m;return{text:`“${m}”`,bg:sel?'#0b1720':'#f3f5f6',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('message',m)};});
+    const MSGS=pr&&pr.kind==='dress'?MS.dress:MS[world];
+    const regSuggest=MSGS.map(m=>{const sel=draft.message===m;return{text:`“${m}”`,bg:sel?'#0b1720':'#f3f5f6',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('message',m)};});
     const sreg=st.regs[st.lastNo]||SEED['DG-004281'];
     const rr=recReg||SEED['DG-004281'];
     const full=!!rr.by;
@@ -1366,7 +1376,7 @@ class Component extends DCLogic {
       toPhoneHint:tp&&!toPhoneOk?'That phone number doesn’t look right.':'We’ll text them their record and certificate once it’s paid.',toPhoneHintColor:tp&&!toPhoneOk?'#b3261e':'#435f73',toggleAgree:e=>this.upd('agree',e.target.checked),
       msgCount:`${draft.message.length} / 140`,
       occasions:OCC.map(o=>{const sel=draft.occasion===o;return{label:o,sel,bg:sel?'#0b1720':'transparent',fg:sel?'#e6ecef':'#0b1720',pick:()=>this.upd('occasion',sel?'':o)};}),
-      generate:()=>{const l=MS[world].filter(m=>m!==draft.message);this.upd('message',l[Math.floor(Math.random()*l.length)]);},
+      generate:()=>{const l=MSGS.filter(m=>m!==draft.message);this.upd('message',l[Math.floor(Math.random()*l.length)]);},
       regBlocked:!regOk,regOpacity:regOk?1:.35,regBtn:st.busy?'CREATING ORDER…':'CONTINUE TO PAYMENT',regHintColor:st.regErr?'#b3261e':'#435f73',regHint:st.regErr||(st.busy?'Reserving your registration number…':(regOk?'Next: pay with telebirr.':(!hasDed?'Add a recipient and your name to continue.':(!phoneOk?'Add your phone number to continue.':(!toPhoneOk?'Check their phone number.':!byEmailOk||!emailOk?'Check the email address.':'Please confirm the registration type.'))))),
       submitReg:()=>{if(regOk)this.createOrder();},
       processing:st.proc>=0,procNo:st.pay.id,procSteps:['Finding your telebirr receipt','Confirming the payment','Registry entry created','Certificate issued'].map((label,i)=>({label:label.toUpperCase(),op:st.proc>=i?1:.25,dot:st.proc>i?'#eef2f4':'transparent'})),

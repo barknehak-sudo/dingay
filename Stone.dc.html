@@ -12,6 +12,9 @@
   <sc-if value="{{ showShot }}">
     <img ref="{{ shotRef }}" src="{{ shot }}" alt="" draggable="false" style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;will-change:transform">
   </sc-if>
+  <sc-if value="{{ showLoad }}">
+    <div aria-hidden="true" style="position:absolute;inset:0;display:grid;place-items:center;pointer-events:none"><div class="dg-load"><i></i></div></div>
+  </sc-if>
   <sc-if value="{{ showFb }}">
   <div ref="{{ fbRef }}" style="position:absolute;top:0;right:0;bottom:0;left:0">
     <sc-if value="{{ isBlocket }}">
@@ -312,7 +315,7 @@ function dressGeo(T){
   for(let k=0;k<16;k++){const th=k/16*TWO;for(let y=W+.035;y<2.1;y+=.034)bead(bP(th,y,.01),.011,gv(1.08),DM.gold);}
   /* wide beaded straps over the shoulders */
   for(const s of[-1,1]){const fa=s*.66,ba=s*(Math.PI-.66);
-    const curve=new T.CatmullRomCurve3([new T.Vector3(...bP(fa,yt(fa)-.02,0)),new T.Vector3(s*.215,2.62,.165),new T.Vector3(s*.22,2.765,0),new T.Vector3(s*.215,2.62,-.165),new T.Vector3(...bP(ba,yt(ba)-.02,0))]);
+    const curve=new T.CatmullRomCurve3([new T.Vector3(...bP(fa,yt(fa)-.02,0)),new T.Vector3(s*.215,2.6,.17),new T.Vector3(s*.22,2.725,0),new T.Vector3(s*.215,2.6,-.17),new T.Vector3(...bP(ba,yt(ba)-.02,0))]);
     {const g=new T.TubeGeometry(curve,80,.024,10,false);add(g,gv(.85),DM.gold);}
     const L=curve.getLength(),n=Math.floor(L/.028),X=new T.Vector3(1,0,0),ctr=new T.Vector3(0,2.5,0);
     for(let i=0;i<=n;i++){const t=i/n,p=curve.getPointAt(t),tg=curve.getTangentAt(t),side=X.clone().addScaledVector(tg,-X.dot(tg)).normalize(),out=new T.Vector3().crossVectors(tg,side).normalize();
@@ -320,31 +323,43 @@ function dressGeo(T){
       for(const o of[-.054,-.027,0,.027,.054])bead(p.clone().addScaledVector(side,o).addScaledVector(out,.008+.006*Math.cos(o*25)).toArray(),.017,gv(),DM.gold);}}
   /* the gold mannequin: torso and shoulders, neck, egg head, arms (right hangs, left hand on the hip) */
   const CH=C('#f2c25a'),chrome=g=>add(g,CH,DM.chrome);
-  const cap=y=>.30*Math.sqrt(Math.max(0,1-((y-2.6)/.185)**2));// rounded shoulders into the neck
-  const tw=y=>y>2.6?Math.max(.066,cap(y)):y<2.3?.24+.06*sm(1.95,2.3,y):.30;
-  const td=y=>{let d=y<2.25?.17+.04*sm(1.95,2.25,y):.21-.05*sm(2.5,2.72,y);return y>2.6?Math.max(.066,Math.min(d,cap(y)*.75)):d;};
-  {const AN=72,YN=90,y0=1.95,y1=2.8,pos=[],idx=[];
-    for(let j=0;j<=YN;j++){const y=y0+(y1-y0)*j/YN;for(let i=0;i<=AN;i++){const a=i/AN*TWO;pos.push(Math.sin(a)*tw(y),y,Math.cos(a)*td(y));}}
+  // torso: a slightly boxy cross-section (superellipse), ribcage widening to the chest, rounded shoulder
+  // caps sloping into the neck, and a soft bust at the front
+  const SH=2.62,tu=y=>Math.max(0,Math.min(1,(y-SH)/.18));
+  const tw=y=>y>SH?.072+.258*(1-sm(0,1,tu(y))):y<2.3?.24+.06*sm(1.95,2.3,y):.30+.03*sm(2.3,SH,y);
+  const td=y=>y>SH?.07+.1*(1-sm(0,1,tu(y))):y<2.25?.17+.04*sm(1.95,2.25,y):.21-.04*sm(2.45,SH,y);
+  {const AN=96,YN=110,y0=1.95,y1=2.8,E=2/2.4,pos=[],idx=[];
+    for(let j=0;j<=YN;j++){const y=y0+(y1-y0)*j/YN,w=tw(y),d=td(y);
+      for(let i=0;i<=AN;i++){const a=i/AN*TWO,sa=Math.sin(a),ca=Math.cos(a),x=Math.sign(sa)*Math.pow(Math.abs(sa),E)*w;
+        let z=Math.sign(ca)*Math.pow(Math.abs(ca),E)*d;
+        if(z>0){const q=x/w;z+=.05*(Math.exp(-(((q-.46)/.26)**2))+Math.exp(-(((q+.46)/.26)**2)))*Math.exp(-(((y-2.36)/.1)**2));// bust
+          z+=.008*Math.exp(-(((y-2.66)/.025)**2))*Math.exp(-((q/.6)**2));}// collarbones
+        pos.push(x,y,z);}}
     for(let j=0;j<YN;j++)for(let i=0;i<AN;i++){const a=j*(AN+1)+i,b=a+1,c=a+AN+1,d=c+1;idx.push(a,c,b,b,c,d);}
     const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();chrome(g);}
-  chrome(new T.LatheGeometry([[.072,2.76],[.064,2.82],[.06,2.88],[.062,2.93],[.0,2.96]].map(([r,y])=>new T.Vector2(r,y)),40));
-  {const g=new T.SphereGeometry(1,56,40),p=g.attributes.position;// egg-shaped head, narrower at the chin
-    for(let i=0;i<p.count;i++){const y=p.getY(i),k=y<0?1-.28*(-y)**1.5:1;p.setXYZ(i,p.getX(i)*k,y,p.getZ(i)*k);}
-    g.scale(.112,.152,.128);g.rotateX(-.1);g.translate(0,3.06,.014);g.computeVertexNormals();chrome(g);}
-  const limb=(pts,rad)=>{const cv=new T.CatmullRomCurve3(pts.map(q=>new T.Vector3(...q))),N=72,M=18,fr=cv.computeFrenetFrames(N,false),pos=[],idx=[];
-    for(let i=0;i<=N;i++){const t=i/N,q=cv.getPointAt(t),r=rad(t),nn=fr.normals[i],bb=fr.binormals[i];
-      for(let k=0;k<=M;k++){const a=k/M*TWO,ca=Math.cos(a)*r,sa=Math.sin(a)*r;pos.push(q.x+ca*nn.x+sa*bb.x,q.y+ca*nn.y+sa*bb.y,q.z+ca*nn.z+sa*bb.z);}}
+  // neck, a little forward, and the egg head: fuller at the back of the skull, narrow chin, tipped down a touch
+  {const g=new T.LatheGeometry([[.074,2.76],[.066,2.81],[.06,2.87],[.058,2.92],[.05,2.95],[0,2.96]].map(([r,y])=>new T.Vector2(r,y)),48);g.translate(0,0,.008);chrome(g);}
+  {const g=new T.SphereGeometry(1,64,48),p=g.attributes.position;
+    for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),k=y<0?1-.3*(-y)**1.4:1,back=z<0?1+.08*(1-y*y):1;p.setXYZ(i,x*k,y,z*k*back+(y<0?.12*y*y:0));}
+    g.scale(.108,.15,.124);g.rotateX(-.14);g.translate(0,3.06,.02);g.computeVertexNormals();chrome(g);}
+  // arms: swept along a curve with a real profile (deltoid, biceps, slim elbow, forearm, wrist)
+  const prof=[[0,.068],[.12,.063],[.3,.053],[.47,.041],[.53,.04],[.63,.044],[.86,.032],[1,.027]];
+  const armR=t=>{for(let i=1;i<prof.length;i++)if(t<=prof[i][0]){const[a0,r0]=prof[i-1],[a1,r1]=prof[i],f=(t-a0)/(a1-a0);return r0+(r1-r0)*f*f*(3-2*f);}return .027;};
+  const limb=pts=>{const cv=new T.CatmullRomCurve3(pts.map(q=>new T.Vector3(...q)),false,'centripetal'),N=90,M=20,fr=cv.computeFrenetFrames(N,false),pos=[],idx=[];
+    for(let i=0;i<=N;i++){const t=i/N,q=cv.getPointAt(t),r=armR(t),nn=fr.normals[i],bb=fr.binormals[i];
+      for(let k=0;k<=M;k++){const a=k/M*TWO,ca=Math.cos(a)*r,sa=Math.sin(a)*r*.9;pos.push(q.x+ca*nn.x+sa*bb.x,q.y+ca*nn.y+sa*bb.y,q.z+ca*nn.z+sa*bb.z);}}
     for(let i=0;i<N;i++)for(let k=0;k<M;k++){const a=i*(M+1)+k,b=a+1,c=a+M+1,d=c+1;idx.push(a,c,b,b,c,d);}
     const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();chrome(g);
-    return cv;};
-  const armR=t=>.066-.03*t+.008*Math.sin(Math.PI*Math.min(1,t*2));
-  const hand=(at,dir,s3)=>{const g=new T.SphereGeometry(1,28,20);g.scale(...s3);
-    g.applyQuaternion(new T.Quaternion().setFromUnitVectors(new T.Vector3(0,-1,0),new T.Vector3(...dir).normalize()));g.translate(...at);chrome(g);};
-  for(const s of[-1,1]){const g=new T.SphereGeometry(.074,32,24);g.translate(s*.268,2.625,0);chrome(g);}
-  {const cv=limb([[.27,2.64,0],[.385,2.44,-.02],[.41,2.2,-.025],[.43,1.97,.015],[.448,1.83,.05]],armR);
-    const e=cv.getPointAt(1),d=cv.getTangentAt(1);hand([e.x+d.x*.06,e.y+d.y*.06,e.z+d.z*.06],[d.x,d.y,d.z],[.04,.085,.026]);}
-  {const cv=limb([[-.27,2.64,0],[-.42,2.42,-.05],[-.53,2.18,-.06],[-.43,1.98,.02],[-.32,1.87,.09]],armR);
-    const e=cv.getPointAt(1),d=cv.getTangentAt(1);hand([e.x+d.x*.055,e.y+d.y*.055-.01,e.z+d.z*.055],[d.x,d.y,d.z],[.036,.078,.026]);}
+    const e=cv.getPointAt(1);chrome(new T.SphereGeometry(.027,20,14).translate(e.x,e.y,e.z));return cv;};
+  // hand: palm, closed fingers (slightly curled) and a thumb, in the frame X = across the palm, Y = towards the fingertips
+  const hand=(cv,upHint,thumbSide)=>{const w=cv.getPointAt(1),Y=cv.getTangentAt(1).normalize(),X=new T.Vector3(...upHint).addScaledVector(Y,-new T.Vector3(...upHint).dot(Y)).normalize(),Z=new T.Vector3().crossVectors(X,Y),M=new T.Matrix4().makeBasis(X,Y,Z);
+    const put=(g,o)=>{g.applyMatrix4(M);g.translate(w.x+o[0]*X.x+o[1]*Y.x+o[2]*Z.x,w.y+o[0]*X.y+o[1]*Y.y+o[2]*Z.y,w.z+o[0]*X.z+o[1]*Y.z+o[2]*Z.z);chrome(g);};
+    {const g=new T.SphereGeometry(1,28,20);g.scale(.04,.05,.017);put(g,[0,.045,0]);}
+    {const g=new T.SphereGeometry(1,28,20);g.scale(.037,.058,.014);g.rotateX(.25);put(g,[0,.105,.006]);}
+    {const g=new T.CapsuleGeometry(.012,.032,6,12);g.rotateZ(thumbSide*.55);put(g,[thumbSide*.038,.05,.008]);}};
+  for(const s of[-1,1])chrome(new T.SphereGeometry(.072,36,28).scale(1,.92,.95).translate(s*.296,2.6,0));// deltoids
+  hand(limb([[.3,2.63,0],[.395,2.46,-.02],[.415,2.24,-.03],[.43,2.0,-.005],[.445,1.86,.025]]),[0,0,1],1);
+  hand(limb([[-.3,2.63,0],[-.43,2.42,-.05],[-.54,2.19,-.065],[-.44,1.98,.02],[-.315,1.89,.09]]),[0,1,0],-1);
   {const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(BP,3));g.setAttribute('normal',new T.Float32BufferAttribute(BN,3));
     g.setAttribute('color',new T.Float32BufferAttribute(BC,3));g.setAttribute('uv',new T.Float32BufferAttribute(BU,2));parts.push(g);}
   let n=0;parts.forEach(g=>n+=g.attributes.position.count);
@@ -397,7 +412,10 @@ function buildMesh(T,kind){
   else{// round brilliant: table, star and crown facets, girdle, then pavilion — more facets = more sparkle
     const q=Math.PI/32;geo=ringsGeo(T,[{r:.56,y:.31},{r:.74,y:.25,rot:q},{r:.9,y:.15},{r:1,y:.06,rot:q},{r:1,y:.02,rot:q},{r:.72,y:-.22},{r:.38,y:-.48,rot:q},{r:.02,y:-.68}],32,1,1);
     mat=new T.MeshPhysicalMaterial({color:'#f2f6ff',roughness:0,metalness:0,transmission:1,thickness:1.6,ior:2.42,dispersion:9,specularIntensity:1,envMapIntensity:1.5,attenuationColor:'#dfe8f5',attenuationDistance:2.5,flatShading:true,side:T.DoubleSide});}
-  geo.computeBoundingSphere();const m=new T.Mesh(geo,mat);const r=geo.boundingSphere.radius;m.scale.setScalar(1.22/r);
+  geo.computeBoundingSphere();const m=new T.Mesh(geo,mat);
+  // the dress stands centred: by its box, at a fixed height in frame, so it doesn't sit off to one side
+  if(kind==='dress'){geo.computeBoundingBox();const b=geo.boundingBox,c=b.getCenter(new T.Vector3()),k=2.15/(b.max.y-b.min.y);m.scale.setScalar(k);m.position.copy(c).multiplyScalar(-k);m.userData.ready=ready;return m;}
+  const r=geo.boundingSphere.radius;m.scale.setScalar(1.22/r);
   m.position.sub(geo.boundingSphere.center.clone().multiplyScalar(1.22/r));m.userData.ready=ready;return m;
 }
 function stage(T,Room,renderer){
@@ -454,6 +472,10 @@ function shot(kind){
   })));
 }
 window.dgStoneShot=shot;
+// loading preview: a soft warm glow that breathes, with a thin ring turning in it
+if(!document.getElementById('dg-load-css')){const st=document.createElement('style');st.id='dg-load-css';
+  st.textContent='.dg-load{position:relative;width:42%;aspect-ratio:1;border-radius:50%;background:radial-gradient(closest-side,rgba(255,206,120,.30),rgba(255,206,120,.08) 60%,rgba(255,206,120,0));animation:dg-breathe 1.8s ease-in-out infinite}.dg-load i{position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:2px solid rgba(150,150,150,.22);border-top-color:#d8a73a;animation:dg-turn .9s linear infinite}@keyframes dg-breathe{0%,100%{transform:scale(.86);opacity:.7}50%{transform:scale(1);opacity:1}}@keyframes dg-turn{to{transform:rotate(1turn)}}@media (prefers-reduced-motion:reduce){.dg-load,.dg-load i{animation:none}}';
+  document.head.appendChild(st);}
 
 class Component extends DCLogic {
   state={disturbed:false,shot:null,glReady:false};
@@ -467,7 +489,7 @@ class Component extends DCLogic {
     if(this.props.gl){this.initGL();
       // If 3D hasn't drawn after 8 s (slow network, weak GPU), keep the drawn version for good.
       this.gt=setTimeout(()=>{if(!this.state.glReady)this.glFallback();},8000);}
-    else shot(this.props.kind||'cobble').then(u=>{if(u&&!this.dead)this.setState({shot:u});});
+    else shot(this.props.kind||'cobble').then(u=>{if(this.dead)return;u?this.setState({shot:u}):this.setState({shotFail:true});});
   }
   // The page reuses this component when you switch collections (Friend ↔ Loved one), so follow kind changes.
   componentDidUpdate(prev){
@@ -475,7 +497,7 @@ class Component extends DCLogic {
     if(this.gl){const{T,grp,mesh}=this.gl;const m=buildMesh(T,kind);grp.remove(mesh);mesh.geometry.dispose();mesh.material.dispose();grp.add(m);this.gl.mesh=m;
       this.pitch=this.basePitch=PITCH[kind]||.25;
       const lv=renderChecked(T,this.gl.renderer,this.gl.scene,this.gl.cam,m,kind);if(lv<0)this.glFallback();}
-    else if(!this.props.gl){this.setState({shot:null});shot(kind).then(u=>{if(u&&!this.dead&&(this.props.kind||'cobble')===kind)this.setState({shot:u});});}
+    else if(!this.props.gl){this.setState({shot:null,shotFail:false});shot(kind).then(u=>{if(!this.dead&&(this.props.kind||'cobble')===kind)this.setState(u?{shot:u}:{shotFail:true});});}
   }
   componentWillUnmount(){this.dead=true;cancelAnimationFrame(this.raf);this.io&&this.io.disconnect();this.ro&&this.ro.disconnect();clearTimeout(this.ht);clearTimeout(this.gt);
     if(this.gl){const{renderer,mesh,envT}=this.gl;mesh.geometry.dispose();mesh.material.dispose();envT&&envT.dispose();renderer.dispose();try{renderer.forceContextLoss()}catch(e){}renderer.domElement.remove();this.gl=null;}}
@@ -503,12 +525,14 @@ class Component extends DCLogic {
   }
   glFrame(t,dt){
     const{renderer,scene,cam,grp}=this.gl;if(renderer.getContext().isContextLost()){this.glFallback();return;}const spin=this.reduce?0:(this.props.spin??4);
-    if(!this.dragging){this.vel*=.94;this.yaw+=spin*dt/1000*Math.PI/180*3+this.vel;this.pitch+=(this.basePitch-this.pitch)*.03;}
+    if(!this.dragging){this.vel*=.955;this.yaw+=spin*dt/1000*Math.PI/180*3+this.vel;this.pitch+=(this.basePitch-this.pitch)*.03;}
     let ox=0,oy=0;const r=this.wrapRef.current&&this.wrapRef.current.getBoundingClientRect();
     if(r&&this.props.scrollLink!==false){ox=((r.left+r.width/2)/window.innerWidth-.5);oy=((r.top+r.height/2)/window.innerHeight-.5);}
     this.tx+=(this.hx-this.tx)*.08;this.ty+=(this.hy-this.ty)*.08;
-    grp.rotation.set(this.pitch+oy*.5+this.ty*.35,this.yaw+ox*2.4+this.tx*.5,0);
-    if(this.state.disturbed){grp.position.set((Math.random()-.5)*.05,(Math.random()-.5)*.05,0);}else grp.position.set(0,Math.sin(t/1400)*.03,0);
+    // tall things (the dress) stay upright and still: no scroll tilt, only a slow breath of movement
+    const calm=this.props.kind==='dress';
+    grp.rotation.set(this.pitch+(calm?this.ty*.12:oy*.5+this.ty*.35),this.yaw+(calm?ox*.5:ox*2.4)+this.tx*.5,0);
+    if(this.state.disturbed){grp.position.set((Math.random()-.5)*.05,(Math.random()-.5)*.05,0);}else grp.position.set(0,calm?Math.sin(t/2600)*.012:Math.sin(t/1400)*.03,0);
     renderer.render(scene,cam);
   }
   frame(t,dt){
@@ -534,7 +558,7 @@ class Component extends DCLogic {
     if(!this.isDown){if(e.pointerType==='mouse'&&this.props.drag!==undefined){const r=e.currentTarget.getBoundingClientRect();this.hx=((e.clientX-r.left)/r.width-.5);this.hy=((e.clientY-r.top)/r.height-.5);}return;}
     const dx=e.clientX-this.lx,dy=e.clientY-this.ly;this.lx=e.clientX;this.ly=e.clientY;
     if(Math.hypot(e.clientX-this.sx,e.clientY-this.sy)>8){this.moved=true;clearTimeout(this.ht);}
-    if(this.dragging){if(this.gl){this.yaw+=dx*.012;this.vel=dx*.004;this.pitch=Math.max(-1.3,Math.min(1.3,this.pitch+dy*.01));}else{this.a+=dx*.5;this.vel=dx*.22;this.tx=Math.max(-1,Math.min(1,(e.clientX-this.sx)*.006));this.ty=Math.max(-1,Math.min(1,-(e.clientY-this.sy)*.006));}}};
+    if(this.dragging){if(this.gl){const lim=this.props.kind==='dress'?.45:1.3;this.yaw+=dx*.022;this.vel=dx*.008;this.pitch=Math.max(-lim,Math.min(lim,this.pitch+dy*.008));}else{this.a+=dx*.5;this.vel=dx*.22;this.tx=Math.max(-1,Math.min(1,(e.clientX-this.sx)*.006));this.ty=Math.max(-1,Math.min(1,-(e.clientY-this.sy)*.006));}}};
   up=()=>{this.isDown=false;this.dragging=false;clearTimeout(this.ht);};
   leave=()=>{this.up();this.hx=0;this.hy=0;};
   clickCap=e=>{if(this.moved){e.stopPropagation();e.preventDefault();this.moved=false;}};
@@ -547,7 +571,10 @@ class Component extends DCLogic {
       down:this.down,move:this.move,up:this.up,leave:this.leave,clickCap:this.clickCap,ctx:this.ctx,
       alt:NAMES[kind]||'Stone specimen',isBlocket:kind==='blocket',notBlocket:kind!=='blocket',
       touch:this.props.drag?'pan-y':'manipulation',cursor:this.props.drag?'grab':'inherit',
-      disturbed:this.state.disturbed,hasTable:!!k.table,showFb:this.props.gl?(!!this.state.glFail||!this.state.glReady):!this.state.shot,
+      disturbed:this.state.disturbed,hasTable:!!k.table,
+      // the flat drawing is only a fallback now; while the 3D (or its still) loads, show the loading preview
+      showFb:this.props.gl?!!this.state.glFail:!!this.state.shotFail&&!this.state.shot,
+      showLoad:this.props.gl?(!this.state.glFail&&!this.state.glReady):(!this.state.shot&&!this.state.shotFail),
       bodyStyle:{position:'absolute',top:k.box[0],right:k.box[1],bottom:k.box[2],left:k.box[3],borderRadius:k.r||0,clipPath:k.clip||'none',overflow:'hidden',background:k.base,willChange:'transform'},
       mottleStyle:{...L,backgroundImage:N(k.m[0],k.m[1],k.seed+20),backgroundSize:'100% 100%',opacity:k.m[2],mixBlendMode:k.m[3]},
       irisStyle:k.iris?{position:'absolute',inset:'-40%',background:k.iris,opacity:k.io,mixBlendMode:k.ib,filter:'blur(10px)',pointerEvents:'none'}:{display:'none'},
