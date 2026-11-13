@@ -3,8 +3,9 @@
 //   JAMI_TOKEN            — API token from Jami → Developer → API Tokens (jamidev_test_… sandbox, jamidev_live_… live)
 //   JAMI_PRODUCT_FRIEND   — optional: public product id (p_…) of the 89 ETB product (default: the DINGUY org's)
 //   JAMI_PRODUCT_LOVED    — optional: public product id (p_…) of the 199 ETB product (default: the DINGUY org's)
-//   JAMI_PRODUCT_280      — public product id (p_…) of a 280 ETB product (the gold dress). Until it is set,
-//                           280 Birr orders pay with the telebirr code only (never charged at the 199 price).
+//   JAMI_PRODUCT_280      — optional: public product id (p_…) of the 280 ETB product (the gold dress). If unset,
+//                           the site finds or creates "DINGUY · Gold dress · 280 ETB" in Jami itself with
+//                           JAMI_TOKEN and remembers its id in KV, so a 280 order is never charged 199.
 //   JAMI_WEBHOOK_SECRET   — secret of the webhook pointing at https://dinguy.xyz/api/jami-webhook
 // Without JAMI_TOKEN the pay page keeps the paste-the-code flow only.
 import crypto from 'node:crypto';
@@ -15,9 +16,41 @@ const BASE = 'https://jami.bio/api/jamidev';
 export const GATEWAYS = ['telebirr', 'mpesa', 'cbe'];
 // Products in the DINGUY organization on JamiDev (public ids, safe to keep in code).
 const PRODUCT = { friend: process.env.JAMI_PRODUCT_FRIEND || 'p_4js0GdCu_nM8', loved: process.env.JAMI_PRODUCT_LOVED || 'p_Ny9Z5_qIBIVc' };
-const productFor = (price) => (price === 89 ? PRODUCT.friend : price === 199 ? PRODUCT.loved : price === 280 ? process.env.JAMI_PRODUCT_280 || null : null);
-// Phone payment is offered only when Jami has a product at this order's exact price.
-export const jamiFor = (o) => jamiOn() && !!productFor(o.price);
+// Prices Jami can charge exactly. 89 and 199 are fixed products; 280 is found or made on first use.
+const PRICES = [89, 199, 280];
+// Phone payment is offered only for a price Jami can charge exactly.
+export const jamiFor = (o) => jamiOn() && PRICES.includes(o.price);
+const auth = () => ({ authorization: 'Bearer ' + process.env.JAMI_TOKEN, 'content-type': 'application/json' });
+const T280 = 'DINGUY · Gold dress · 280 ETB';
+async function product280() {
+  if (process.env.JAMI_PRODUCT_280) return process.env.JAMI_PRODUCT_280;
+  const key = 'jamiproduct:280:' + (jamiSandbox() ? 'test' : 'live');
+  const known = await kv('GET', key);
+  if (known) return known;
+  // already made (e.g. by an earlier request)? look for it before creating another
+  const l = await fetch(BASE + '/products?status=published&limit=100', { headers: auth(), signal: AbortSignal.timeout(15000) });
+  const lj = await l.json().catch(() => ({}));
+  let id = ((lj.items || []).find((p) => p.title === T280 && p.price && p.price.amount === 28000) || {}).checkoutToken;
+  if (!id) {
+    const r = await fetch(BASE + '/products', {
+      method: 'POST', headers: auth(), signal: AbortSignal.timeout(15000),
+      body: JSON.stringify({ title: T280, pricingModel: 'fixed', price: { amount: 28000 }, status: 'published',
+        description: 'የወርቅ ቀሚስ — The 28 Million Birr Dress. A symbolic DINGUY registration with a digital certificate.', metadata: { dinguyPrice: '280' } }),
+    });
+    const j = await r.json().catch(() => ({}));
+    console.log('jami product 280', r.status, JSON.stringify(j).slice(0, 300));
+    id = j.product && j.product.checkoutToken;
+  }
+  if (!id) throw new Error('Jami 280 product unavailable');
+  await kv('SET', key, id);
+  return id;
+}
+async function productFor(price) {
+  if (price === 89) return PRODUCT.friend;
+  if (price === 199) return PRODUCT.loved;
+  if (price === 280) return product280();
+  throw new Error('No Jami product at ' + price + ' Birr');
+}
 export const jamiOn = () => !!process.env.JAMI_TOKEN;
 export const jamiSandbox = () => String(process.env.JAMI_TOKEN || '').startsWith('jamidev_test_');
 
@@ -25,9 +58,9 @@ export const jamiSandbox = () => String(process.env.JAMI_TOKEN || '').startsWith
 export async function startJami(o, gateway, site) {
   const r = await fetch(BASE + '/checkout', {
     method: 'POST',
-    headers: { authorization: 'Bearer ' + process.env.JAMI_TOKEN, 'content-type': 'application/json' },
+    headers: auth(),
     body: JSON.stringify({
-      productId: productFor(o.price),
+      productId: await productFor(o.price),
       // Jami needs an email; buyers who didn't give one get an address that just identifies the order.
       customer: { email: o.byEmail || `${o.id.toLowerCase()}@orders.dinguy.xyz`, phone: o.phone, name: o.by, externalId: o.id },
       gateway,

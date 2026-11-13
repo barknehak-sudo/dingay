@@ -111,7 +111,7 @@ function simpleMat(T,kind,old,level){
   if(level===1&&(kind==='opal'||kind==='choc'))return new T.MeshPhysicalMaterial({map,color:'#ffffff',roughness:kind==='opal'?.16:.22,clearcoat:1,clearcoatRoughness:.05});
   if(level===1&&(kind==='emerald'||kind==='diamond'))return new T.MeshStandardMaterial({color:kind==='emerald'?'#1c9a62':'#e9eef3',roughness:.08,metalness:.15,flatShading:true,envMapIntensity:2,emissive:kind==='emerald'?'#04331f':'#000000',emissiveIntensity:.4});
   if(kind==='iron')return new T.MeshStandardMaterial({color:'#5d6166',metalness:.85,roughness:.4});
-  if(kind==='dress')return level===1?new T.MeshStandardMaterial({vertexColors:true,color:'#ffffff',roughness:1,metalness:1,roughnessMap:old&&old.roughnessMap,metalnessMap:old&&old.metalnessMap,side:T.DoubleSide}):new T.MeshStandardMaterial({vertexColors:true,color:'#ffffff',roughness:.5,metalness:.3});
+  if(kind==='dress')return level===1?new T.MeshStandardMaterial({vertexColors:true,color:'#ffffff',roughness:1,metalness:1,roughnessMap:old&&old.roughnessMap,metalnessMap:old&&old.metalnessMap,bumpMap:old&&old.bumpMap,bumpScale:2.2,side:T.DoubleSide}):new T.MeshStandardMaterial({vertexColors:true,color:'#ffffff',roughness:.5,metalness:.3});
   if(kind==='charcoal')return new T.MeshStandardMaterial({map,color:'#3a3634',roughness:.9,vertexColors:!!(old&&old.vertexColors)});
   return new T.MeshStandardMaterial({map,color:kind==='choc'?'#6e4631':(kind==='emerald'?'#1c9a62':'#ffffff'),roughness:.3,metalness:0,vertexColors:!!(old&&old.vertexColors),flatShading:kind==='emerald'||kind==='diamond'});
 }
@@ -211,15 +211,16 @@ function tikimtGeo(T){
 /* የወርቅ ቀሚስ: the gold ball gown. Ivory silk skirt with raised gold arches rising from the hem, rows of
    gold beads and pearls along them, a ring of medallions and a band of square frames at the hem; a gold
    corset bodice with boning, a beaded sweetheart neckline, a beaded V waist and wide beaded straps.
-   One mesh: per-vertex colours, and uv.x picks silk / gold / pearl from a 3-pixel roughness+metalness map,
-   so the gold shines like metal and the silk stays soft. */
-const DM={silk:1/6,gold:.5,pearl:5/6};
+   It is worn by a glossy gold mannequin (egg head, one hand on the hip). One mesh: per-vertex colours,
+   uv.x picks silk / gold / pearl / chrome from a 4-pixel roughness+metalness map, and uv1 carries a woven
+   cloth bump on the skirt. */
+const DM={silk:1/8,gold:3/8,pearl:5/8,chrome:7/8};
 function dressGeo(T){
   const parts=[],TWO=Math.PI*2;
   const add=(g,col,m)=>{g=g.index?g.toNonIndexed():g;const n=g.attributes.position.count;
     if(!g.attributes.color){const c=new T.Color(col),a=new Float32Array(n*3);for(let i=0;i<n;i++){a[i*3]=c.r;a[i*3+1]=c.g;a[i*3+2]=c.b;}g.setAttribute('color',new T.BufferAttribute(a,3));}
     if(m!==undefined){const u=new Float32Array(n*2);for(let i=0;i<n;i++){u[i*2]=m;u[i*2+1]=.5;}g.setAttribute('uv',new T.BufferAttribute(u,2));}
-    for(const k of Object.keys(g.attributes))if(!['position','normal','color','uv'].includes(k))g.deleteAttribute(k);parts.push(g);};
+    for(const k of Object.keys(g.attributes))if(!['position','normal','color','uv','uv1'].includes(k))g.deleteAttribute(k);parts.push(g);};
   const C=h=>new T.Color(h),GOLD=C('#e2a41f'),GOLD_D=C('#6e4205'),SILK=C('#d6c5a2'),PEARL=C('#f8f1e3');
   const gv=(k=1)=>GOLD.clone().multiplyScalar(k*rnd(.86,1.1));
   const sm=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
@@ -251,20 +252,21 @@ function dressGeo(T){
   // tilt for things that sit flat on the cone of the skirt
   const tilt=y=>Math.atan(-(baseR(y+.01)-baseR(y-.01))/.02);
   /* skirt */
-  {const AN=256,YN=150,n=(AN+1)*(YN+1),pos=new Float32Array(n*3),col=new Float32Array(n*3),uv=new Float32Array(n*2),c=new T.Color();
+  {const AN=256,YN=150,n=(AN+1)*(YN+1),pos=new Float32Array(n*3),col=new Float32Array(n*3),uv=new Float32Array(n*2),uv1=new Float32Array(n*2),c=new T.Color();
     for(let j=0;j<=YN;j++){const y=W*j/YN;for(let i=0;i<=AN;i++){const th=Math.PI+i/AN*TWO,k=j*(AN+1)+i,p=sP(th,y,0);pos.set(p,k*3);
+      uv1[k*2]=(th-Math.PI)*baseR(y)/WEAVE;uv1[k*2+1]=y/WEAVE;
       const d=arch(th)-y,inV=y>bandLow(th);
       if(d>0||inV){const nz=.86+.28*vn(Math.sin(th)*40,y*40,Math.cos(th)*40);
         if(inV)c.copy(GOLD).multiplyScalar(.78*nz);
         else if(y<.2)c.copy(GOLD).multiplyScalar(.7*nz);
         else if(y<.44)c.copy(GOLD).multiplyScalar(.82*nz);
         else{c.copy(GOLD_D).lerp(GOLD,.35+.65*ridge(d)).multiplyScalar(nz);if(d<.012)c.multiplyScalar(.75);}
-        uv[k*2]=DM.gold;}
+        uv[k*2]=DM.gold;uv1[k*2]=uv1[k*2+1]=0;}
       else{c.copy(SILK).multiplyScalar(1-4.5*Math.max(0,-pleat(th,y))+.04*Math.max(0,pleat(th,y))/.028-.07*sm(.08,0,-d));uv[k*2]=DM.silk;}
       uv[k*2+1]=.5;col[k*3]=c.r;col[k*3+1]=c.g;col[k*3+2]=c.b;}}
     const idx=[];for(let j=0;j<YN;j++)for(let i=0;i<AN;i++){const a=j*(AN+1)+i,b=a+1,cc=a+AN+1,dd=cc+1;idx.push(a,cc,b,b,cc,dd);}
     const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos,3));g.setAttribute('color',new T.BufferAttribute(col,3));g.setAttribute('uv',new T.BufferAttribute(uv,2));
-    g.setIndex(idx);g.computeVertexNormals();add(g);}
+    g.setAttribute('uv1',new T.BufferAttribute(uv1,2));g.setIndex(idx);g.computeVertexNormals();add(g);}
   // under the skirt and inside the waist, so nothing looks hollow
   {const g=new T.CircleGeometry(HEMR+.04,96);g.rotateX(Math.PI/2);g.scale(1,1,sSz(0));g.translate(0,.004,0);add(g,'#cdbf9f',DM.silk);}
   {const g=new T.CircleGeometry(.28,48);g.rotateX(-Math.PI/2);g.scale(1,1,.76);g.translate(0,W,0);add(g,'#2e2010',DM.silk);}
@@ -310,23 +312,57 @@ function dressGeo(T){
   for(let k=0;k<16;k++){const th=k/16*TWO;for(let y=W+.035;y<2.1;y+=.034)bead(bP(th,y,.01),.011,gv(1.08),DM.gold);}
   /* wide beaded straps over the shoulders */
   for(const s of[-1,1]){const fa=s*.66,ba=s*(Math.PI-.66);
-    const curve=new T.CatmullRomCurve3([new T.Vector3(...bP(fa,yt(fa)-.02,0)),new T.Vector3(s*.215,2.62,.15),new T.Vector3(s*.225,2.72,0),new T.Vector3(s*.215,2.62,-.15),new T.Vector3(...bP(ba,yt(ba)-.02,0))]);
+    const curve=new T.CatmullRomCurve3([new T.Vector3(...bP(fa,yt(fa)-.02,0)),new T.Vector3(s*.215,2.62,.165),new T.Vector3(s*.22,2.765,0),new T.Vector3(s*.215,2.62,-.165),new T.Vector3(...bP(ba,yt(ba)-.02,0))]);
     {const g=new T.TubeGeometry(curve,80,.024,10,false);add(g,gv(.85),DM.gold);}
     const L=curve.getLength(),n=Math.floor(L/.028),X=new T.Vector3(1,0,0),ctr=new T.Vector3(0,2.5,0);
     for(let i=0;i<=n;i++){const t=i/n,p=curve.getPointAt(t),tg=curve.getTangentAt(t),side=X.clone().addScaledVector(tg,-X.dot(tg)).normalize(),out=new T.Vector3().crossVectors(tg,side).normalize();
       if(out.dot(p.clone().sub(ctr))<0)out.negate();
       for(const o of[-.054,-.027,0,.027,.054])bead(p.clone().addScaledVector(side,o).addScaledVector(out,.008+.006*Math.cos(o*25)).toArray(),.017,gv(),DM.gold);}}
+  /* the gold mannequin: torso and shoulders, neck, egg head, arms (right hangs, left hand on the hip) */
+  const CH=C('#f2c25a'),chrome=g=>add(g,CH,DM.chrome);
+  const cap=y=>.30*Math.sqrt(Math.max(0,1-((y-2.6)/.185)**2));// rounded shoulders into the neck
+  const tw=y=>y>2.6?Math.max(.066,cap(y)):y<2.3?.24+.06*sm(1.95,2.3,y):.30;
+  const td=y=>{let d=y<2.25?.17+.04*sm(1.95,2.25,y):.21-.05*sm(2.5,2.72,y);return y>2.6?Math.max(.066,Math.min(d,cap(y)*.75)):d;};
+  {const AN=72,YN=90,y0=1.95,y1=2.8,pos=[],idx=[];
+    for(let j=0;j<=YN;j++){const y=y0+(y1-y0)*j/YN;for(let i=0;i<=AN;i++){const a=i/AN*TWO;pos.push(Math.sin(a)*tw(y),y,Math.cos(a)*td(y));}}
+    for(let j=0;j<YN;j++)for(let i=0;i<AN;i++){const a=j*(AN+1)+i,b=a+1,c=a+AN+1,d=c+1;idx.push(a,c,b,b,c,d);}
+    const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();chrome(g);}
+  chrome(new T.LatheGeometry([[.072,2.76],[.064,2.82],[.06,2.88],[.062,2.93],[.0,2.96]].map(([r,y])=>new T.Vector2(r,y)),40));
+  {const g=new T.SphereGeometry(1,56,40),p=g.attributes.position;// egg-shaped head, narrower at the chin
+    for(let i=0;i<p.count;i++){const y=p.getY(i),k=y<0?1-.28*(-y)**1.5:1;p.setXYZ(i,p.getX(i)*k,y,p.getZ(i)*k);}
+    g.scale(.112,.152,.128);g.rotateX(-.1);g.translate(0,3.06,.014);g.computeVertexNormals();chrome(g);}
+  const limb=(pts,rad)=>{const cv=new T.CatmullRomCurve3(pts.map(q=>new T.Vector3(...q))),N=72,M=18,fr=cv.computeFrenetFrames(N,false),pos=[],idx=[];
+    for(let i=0;i<=N;i++){const t=i/N,q=cv.getPointAt(t),r=rad(t),nn=fr.normals[i],bb=fr.binormals[i];
+      for(let k=0;k<=M;k++){const a=k/M*TWO,ca=Math.cos(a)*r,sa=Math.sin(a)*r;pos.push(q.x+ca*nn.x+sa*bb.x,q.y+ca*nn.y+sa*bb.y,q.z+ca*nn.z+sa*bb.z);}}
+    for(let i=0;i<N;i++)for(let k=0;k<M;k++){const a=i*(M+1)+k,b=a+1,c=a+M+1,d=c+1;idx.push(a,c,b,b,c,d);}
+    const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();chrome(g);
+    return cv;};
+  const armR=t=>.066-.03*t+.008*Math.sin(Math.PI*Math.min(1,t*2));
+  const hand=(at,dir,s3)=>{const g=new T.SphereGeometry(1,28,20);g.scale(...s3);
+    g.applyQuaternion(new T.Quaternion().setFromUnitVectors(new T.Vector3(0,-1,0),new T.Vector3(...dir).normalize()));g.translate(...at);chrome(g);};
+  for(const s of[-1,1]){const g=new T.SphereGeometry(.074,32,24);g.translate(s*.268,2.625,0);chrome(g);}
+  {const cv=limb([[.27,2.64,0],[.385,2.44,-.02],[.41,2.2,-.025],[.43,1.97,.015],[.448,1.83,.05]],armR);
+    const e=cv.getPointAt(1),d=cv.getTangentAt(1);hand([e.x+d.x*.06,e.y+d.y*.06,e.z+d.z*.06],[d.x,d.y,d.z],[.04,.085,.026]);}
+  {const cv=limb([[-.27,2.64,0],[-.42,2.42,-.05],[-.53,2.18,-.06],[-.43,1.98,.02],[-.32,1.87,.09]],armR);
+    const e=cv.getPointAt(1),d=cv.getTangentAt(1);hand([e.x+d.x*.055,e.y+d.y*.055-.01,e.z+d.z*.055],[d.x,d.y,d.z],[.036,.078,.026]);}
   {const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(BP,3));g.setAttribute('normal',new T.Float32BufferAttribute(BN,3));
     g.setAttribute('color',new T.Float32BufferAttribute(BC,3));g.setAttribute('uv',new T.Float32BufferAttribute(BU,2));parts.push(g);}
   let n=0;parts.forEach(g=>n+=g.attributes.position.count);
-  const P=new Float32Array(n*3),Nn=new Float32Array(n*3),Cc=new Float32Array(n*3),U=new Float32Array(n*2);let o=0,u=0;
+  const P=new Float32Array(n*3),Nn=new Float32Array(n*3),Cc=new Float32Array(n*3),U=new Float32Array(n*2),U1=new Float32Array(n*2);let o=0,u=0;
   parts.forEach(g=>{const c=g.attributes.position.count;P.set(g.attributes.position.array,o);Nn.set(g.attributes.normal.array,o);Cc.set(g.attributes.color.array,o);
-    U.set(g.attributes.uv.array,u);o+=c*3;u+=c*2;g.dispose();});
+    U.set(g.attributes.uv.array,u);if(g.attributes.uv1)U1.set(g.attributes.uv1.array,u);o+=c*3;u+=c*2;g.dispose();});
   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.BufferAttribute(P,3));geo.setAttribute('normal',new T.BufferAttribute(Nn,3));
-  geo.setAttribute('color',new T.BufferAttribute(Cc,3));geo.setAttribute('uv',new T.BufferAttribute(U,2));return geo;
+  geo.setAttribute('color',new T.BufferAttribute(Cc,3));geo.setAttribute('uv',new T.BufferAttribute(U,2));geo.setAttribute('uv1',new T.BufferAttribute(U1,2));return geo;
 }
+/* woven silk: one tile is 24 × 24 threads, over-under, each thread rounded with a few loose fibres */
+const WEAVE=.6;
+function weaveTex(T){const t=canvasTex(T,x=>{const n=24,c=512/n;x.fillStyle='#5a5a5a';x.fillRect(0,0,512,512);
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++){const over=(i+j)%2===0,X=i*c,Y=j*c,g=over?x.createLinearGradient(X,Y,X,Y+c):x.createLinearGradient(X,Y,X+c,Y);
+    g.addColorStop(0,'#3c3c3c');g.addColorStop(.5,over?'#e0e0e0':'#c4c4c4');g.addColorStop(1,'#3c3c3c');x.fillStyle=g;x.fillRect(X+.5,Y+.5,c-1,c-1);}
+  x.globalAlpha=.25;speckle(x,9000,['#ffffff','#202020'],.3,.9);x.globalAlpha=1;});
+  t.colorSpace=T.NoColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.channel=1;return t;}
 // roughness (G) and metalness (B) for silk / gold / pearl, picked by uv.x
-function dressOrm(T){const t=new T.DataTexture(new Uint8Array([255,190,0,255,255,72,255,255,255,48,0,255]),3,1);t.magFilter=t.minFilter=T.NearestFilter;t.needsUpdate=true;return t;}
+function dressOrm(T){const t=new T.DataTexture(new Uint8Array([255,190,0,255,255,72,255,255,255,48,0,255,255,22,255,255]),4,1);t.magFilter=t.minFilter=T.NearestFilter;t.needsUpdate=true;return t;}
 function buildMesh(T,kind){
   let geo,mat,ready=Promise.resolve();
   if(ROCK[kind]){const c=ROCK[kind];geo=rockGeo(T,c);
@@ -343,7 +379,7 @@ function buildMesh(T,kind){
   else if(kind==='tikimt'){geo=tikimtGeo(T);
     mat=new T.MeshPhysicalMaterial({vertexColors:true,color:'#d8cbb0',roughness:.62,metalness:0,sheen:.3,sheenColor:'#ffb000',sheenRoughness:.5,envMapIntensity:.35,side:T.DoubleSide});}
   else if(kind==='dress'){geo=dressGeo(T);const orm=dressOrm(T);
-    mat=new T.MeshPhysicalMaterial({vertexColors:true,color:'#ffffff',roughness:1,metalness:1,roughnessMap:orm,metalnessMap:orm,sheen:.3,sheenColor:'#fff1d6',sheenRoughness:.6,envMapIntensity:1.3,side:T.DoubleSide});}
+    mat=new T.MeshPhysicalMaterial({vertexColors:true,color:'#ffffff',roughness:1,metalness:1,roughnessMap:orm,metalnessMap:orm,bumpMap:weaveTex(T),bumpScale:2.2,sheen:.45,sheenColor:'#fff1d6',sheenRoughness:.6,envMapIntensity:1.3,side:T.DoubleSide});}
   else if(kind==='cake'){geo=cakeGeo(T);
     // fine crumb on the sponge
     const bump=canvasTex(T,x=>{x.fillStyle='#808080';x.fillRect(0,0,512,512);for(let i=0;i<9000;i++){const v=90+Math.random()*90|0;x.fillStyle=`rgb(${v},${v},${v})`;x.fillRect(Math.random()*512,Math.random()*512,2+Math.random()*3,2+Math.random()*3);}});

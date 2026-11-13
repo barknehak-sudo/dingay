@@ -183,7 +183,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <div class="app-tile-img"><dc-import name="Stone" kind="{{ p.kind }}" spin="{{ 0 }}" hint-size="100%,140px"></dc-import></div>
         <div class="app-tile-name" style="font-family:{{ p.hf }};font-style:{{ p.hs }};font-weight:{{ p.hw }}">{{ p.name }}</div>
         <div class="app-tile-sub" style="color:{{ p.tsub }}">{{ p.sub }}</div>
-        <button onClick="{{ p.register }}" class="app-tile-buy" style="background:{{ p.btnBg }};color:{{ p.btnFg }}"><span>BUY</span><span>{{ p.priceLabel }}</span></button>
+        <button onClick="{{ p.register }}" class="app-tile-buy" style="background:{{ p.btnBg }};color:{{ p.btnFg }}"><span>{{ p.buyWord }}</span><span>{{ p.priceLabel }}</span></button>
       </article>
       </sc-for>
     </div>
@@ -222,7 +222,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
         <div class="app-tile-img"><dc-import name="Stone" kind="{{ p.kind }}" spin="{{ 0 }}" hint-size="100%,140px"></dc-import></div>
         <div class="app-tile-name" style="font-family:{{ p.hf }};font-style:{{ p.hs }};font-weight:{{ p.hw }}">{{ p.name }}</div>
         <div class="app-tile-sub" style="color:{{ p.tsub }}">{{ p.sub }}</div>
-        <button onClick="{{ p.register }}" class="app-tile-buy" style="background:{{ p.btnBg }};color:{{ p.btnFg }}"><span>BUY</span><span>{{ p.priceLabel }}</span></button>
+        <button onClick="{{ p.register }}" class="app-tile-buy" style="background:{{ p.btnBg }};color:{{ p.btnFg }}"><span>{{ p.buyWord }}</span><span>{{ p.priceLabel }}</span></button>
       </article>
     </sc-for>
   </div>
@@ -983,7 +983,11 @@ const P=[
   meta:[['Specimen No.','L-03'],['Classification','Emerald (symbolic)'],['Inspiration','Shakiso'],['Colour','Keeps growing'],['Rarity','Rare-looking'],['Worth registering','Very much']]},
  {slug:'diamond',w:'loved',name:'DIAMOND',sub:'The Forever One',kind:'diamond',fig:'L-04',cls:'Diamond · Symbolic',
   d:['For the person you would choose again.','And again.\nAnd again.','A classic for a classic.',"Because apparently saying “I love you” wasn't enough."],
-  meta:[['Specimen No.','L-04'],['Classification','Diamond (symbolic)'],['Cut','Classic'],['Duration','Forever (approx.)'],['Selection','Chosen again'],['And again','Yes']]}
+  meta:[['Specimen No.','L-04'],['Classification','Diamond (symbolic)'],['Cut','Classic'],['Duration','Forever (approx.)'],['Selection','Chosen again'],['And again','Yes']]},
+ // The flower is sold out: still shown last, but it can't be bought (the API no longer takes it either).
+ {slug:'tikimt-abeba',soldOut:true,w:'loved',name:'የጥቅምት አበባ',sub:'The One Who Brings the Sunshine',kind:'tikimt',fig:'L-06',cls:'Bloom · Symbolic',
+  d:['The yellow flower that covers the hills after the rains.','For the person who makes everything feel new again.','Bright. Hopeful. Back every year.','Out of stock until it blooms again.'],
+  meta:[['Specimen No.','L-06'],['Classification','Bloom (symbolic)'],['Season','After the rains'],['Colour','Sunshine yellow'],['Blooms','Every year'],['Stock','Out of stock']]}
 ];
 // Price in Birr: 89 for friends, 199 for loved ones, unless a Dinguy has its own.
 P.forEach(p=>{p.price=p.price||(p.w==='friend'?89:199);});
@@ -1281,7 +1285,7 @@ class Component extends DCLogic {
     const prodSlug=(a==='dengay'||a==='register')?route.b:'';
     const pr=P.find(p=>p.slug===prodSlug);
     const isCatalog=a==='friend'||a==='loved-one';
-    const isProduct=a==='dengay'&&!!pr,isRegister=a==='register'&&!!pr,isPay=a==='pay';
+    const isProduct=a==='dengay'&&!!pr,isRegister=a==='register'&&!!pr&&!pr.soldOut,isPay=a==='pay';
     const recReg=a==='registry'&&route.b?(hiddenRec(route.b,route.c)||st.regs[route.b.toUpperCase()]):null;
     const known=['','friend','loved-one','pay','success','faq','terms','registry','sideways','contact'].includes(a)||isProduct||isRegister;
     const isRecord=!!recReg,isRegistryIndex=a==='registry'&&!route.b;
@@ -1294,8 +1298,8 @@ class Component extends DCLogic {
     const price=w=>w==='friend'?'89 ETB':'199 ETB',priceOf=p=>p.price+' ETB';
     // New Dinguys get a premium card: rainbow border and top band, a NEW badge and a warmer glow.
     const RAINBOW='linear-gradient(120deg,#ff5f6d,#ffc371,#47e5bc,#5f8bff,#c86bff)';
-    const mk=(p)=>{const Th=THEME[p.w],nw=!!p.isNew;return{slug:p.slug,name:p.name,sub:p.sub,kind:p.kind,fig:p.fig,cls:p.cls,isNew:nw,tag:typeof p.d[0]==='string'?p.d[0]:'',priceLabel:priceOf(p),
-      buyLabel:p.kind==='dress'?'BUY THIS DRESS':'BUY THIS STONE',
+    const mk=(p)=>{const Th=THEME[p.w],nw=!!p.isNew;return{slug:p.slug,name:p.name,sub:p.sub,kind:p.kind,fig:p.fig,cls:p.cls,isNew:nw,tag:typeof p.d[0]==='string'?p.d[0]:'',priceLabel:p.soldOut?'':priceOf(p),soldOut:!!p.soldOut,
+      buyWord:p.soldOut?'OUT OF STOCK':'BUY',buyLabel:p.soldOut?'OUT OF STOCK':p.kind==='dress'?'BUY THIS DRESS':'BUY THIS STONE',
       cardBg:nw?`linear-gradient(${p.w==='friend'?'#f3f2ee,#f3f2ee':'#17293a,#0d1a24'}) padding-box,${RAINBOW} border-box`:Th.card,
       cardBorder:nw?'2px solid transparent':`1px solid ${Th.line}`,cardShadow:nw?'0 24px 50px -24px rgba(200,107,255,.55),0 10px 30px -18px rgba(255,95,109,.45)':'none',
       top:nw?'':Th.top,topH:nw?'6px':Th.topH,topClass:nw?'sw-pill':'',
@@ -1304,9 +1308,9 @@ class Component extends DCLogic {
       tbg:nw?`${p.w==='friend'?'linear-gradient(#f3f2ee,#f3f2ee)':'linear-gradient(180deg,#1f3a4d,#0e1c26)'} padding-box,${RAINBOW} border-box`:(p.w==='friend'?'#ecebe6':'linear-gradient(180deg,#1c3343,#0e1c26)'),
       tborder:nw?'2px solid transparent':(p.w==='friend'?'1px solid rgba(0,0,0,.1)':'1px solid rgba(255,255,255,.12)'),
       tink:p.w==='friend'?'#0b0b0b':'#f4efe9',tsub:p.w==='friend'?'#55554f':'#b9c9d4',
-      btnBg:p.w==='friend'?'#0b0b0b':'#f4efe9',btnFg:p.w==='friend'?'#f2c230':'#132531',
+      btnBg:p.soldOut?'rgba(255,255,255,.1)':p.w==='friend'?'#0b0b0b':'#f4efe9',btnFg:p.soldOut?'#9fb6c6':p.w==='friend'?'#f2c230':'#132531',
       hf:p.w==='friend'?'inherit':"'Instrument Serif',Georgia,'Noto Serif Ethiopic',serif",hs:p.w==='friend'?'normal':'italic',hw:p.w==='friend'?800:400,
-      open:go('dengay/'+p.slug),register:e=>{e&&e.stopPropagation();this.go('register/'+p.slug);}};};
+      open:go('dengay/'+p.slug),register:e=>{e&&e.stopPropagation();if(!p.soldOut)this.go('register/'+p.slug);}};};
     // home: the featured new one and the friend / loved-one switch
     const homeWorld=st.homeTab==='loved'?'loved':'friend';
     const feat=mk(P.find(p=>p.slug==='gold-dress')||P[0]);
@@ -1314,7 +1318,7 @@ class Component extends DCLogic {
     const homeIntro=homeWorld==='friend'?'Funny, heavy, everyday stones. 89 Birr each.':'Beautiful, meaningful and a little ridiculous. From 199 Birr.';
     const cat={...T,price:price(world),items:P.filter(p=>p.w===world).map(mk),
       suggestions:MS[world].map((m,i)=>{const sel=st.msgPick===i;return{text:`“${m}”`,sel,tagline:sel?'Selected':'Tap to select',bg:sel?T.btnBg:'transparent',fg:sel?T.btnFg:T.ink,pick:()=>this.setState({msgPick:sel?-1:i})};})};
-    const prod=pr?{...T,...mk(pr),sub2:pr.sub,world:T.world,paras:pr.d.map(d=>typeof d==='string'?{t:d,w:400}:{t:d.b,w:600}),meta:pr.meta.map(([k,v])=>({k,v})),back:go(pr.w==='friend'?'friend':'loved-one'),register:go('register/'+pr.slug)}:{kind:'cobble',name:'',sub2:'',priceLabel:'',back:go('friend')};
+    const prod=pr?{...T,...mk(pr),sub2:pr.sub,world:T.world,paras:pr.d.map(d=>typeof d==='string'?{t:d,w:400}:{t:d.b,w:600}),meta:pr.meta.map(([k,v])=>({k,v})),back:go(pr.w==='friend'?'friend':'loved-one'),register:pr.soldOut?()=>{}:go('register/'+pr.slug)}:{kind:'cobble',name:'',sub2:'',priceLabel:'',back:go('friend')};
     const today=fmt(new Date());
     const previewReg={no:st.pendingNo,to:draft.to,by:draft.by,type:pr?pr.name:'',occasion:draft.occasion,message:draft.message,date:today,kind:pr?pr.kind:'cobble'};
     const hasDed=!!(draft.to.trim()&&draft.by.trim());
