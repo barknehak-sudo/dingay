@@ -118,6 +118,17 @@
     "Worth registering": "መመዝገብ ይገባዋል", "Very much": "በጣም", "Diamond (symbolic)": "አልማዝ (ምሳሌያዊ)",
     "Cut": "ቅርጽ", "Classic": "ክላሲክ", "Duration": "ቆይታ", "Forever (approx.)": "ለዘላለም (በግምት)",
     "Selection": "ምርጫ", "Chosen again": "በድጋሚ የተመረጠ", "And again": "ደግሞም", "Yes": "አዎ",
+    /* new: BROKE CITY ADDIS (the GTA VI prank, 89) */
+    "GTA VI · Wasted Edition": "GTA VI · የWASTED እትም", "Prank · Digital": "ቀልድ · ዲጂታል", "GET THE PRANK": "ቀልዱን ግዛ", "Dinguy Pranks · For your friend": "የDinguy ቀልዶች · ለጓደኛዎ",
+    "Too broke to buy you GTA VI. But I got you this.": "GTA VI ልገዛልህ ብሬ አልበቃም። ግን ይሄን ገዛሁልህ።",
+    "They think it’s the game.\nThey open the link.\nWASTED.": "ጨዋታው መስሏቸዋል።\nሊንኩን ይከፍታሉ።\nWASTED።",
+    "A prank gift with a certificate and a WASTED reveal. Not the actual game.": "ሰርተፊኬትና WASTED የሚል መገለጫ ያለው የቀልድ ስጦታ። እውነተኛው ጨዋታ አይደለም።",
+    "Collection": "ስብስብ", "Dinguy Pranks": "የDinguy ቀልዶች", "Format": "ቅርጸት", "CD case (symbolic)": "የሲዲ ሳጥን (ምሳሌያዊ)", "Contains": "የያዘው",
+    "A WASTED reveal": "WASTED መገለጫ", "Actual game": "እውነተኛው ጨዋታ", "Not included": "አልተካተተም", "Friendship status": "የጓደኝነት ሁኔታ", "Active": "ንቁ",
+    "New: Broke City Addis. Your friend thinks it’s GTA VI. It isn’t. Plus three new stones.": "አዲስ፦ Broke City Addis። ጓደኛዎ GTA VI መስሎታል። አይደለም። በተጨማሪም ሶስት አዳዲስ ድንጋዮች።",
+    "Beautiful, meaningful and a little ridiculous. 199 Birr each.": "ውብ፣ ትርጉም ያላቸውና ትንሽ አስቂኝ። እያንዳንዳቸው 199 ብር።",
+    "YOU GOT PLAYED.": "ተሸወድክ።", "Too broke to buy you GTA VI.": "GTA VI ልገዛልህ ብሬ አልበቃም።", "MISSION COMPLETE · YOUR TIME WAS WASTED": "ተልዕኮ ተሳክቷል · ጊዜህ ባከነ",
+    "FRIENDSHIP STATUS: ACTIVE": "የጓደኝነት ሁኔታ፦ ንቁ", "SEE YOUR CERTIFICATE →": "ሰርተፊኬትህን ተመልከት →", "A Dinguy prank gift. Not the actual game.": "የDinguy የቀልድ ስጦታ። እውነተኛው ጨዋታ አይደለም።",
     /* new: የወርቅ ቀሚስ (the gold dress, 280) */
     "The 28 Million Birr Dress": "የ28 ሚሊዮን ብሩ ቀሚስ", "Couture · Symbolic": "ኩቱር · ምሳሌያዊ", "BUY THIS DRESS": "ይህን ቀሚስ ግዛ",
     "Somebody wore a 28,000,000 Birr dress. Here it is for 280. We just took off five zeros.": "አንድ ሰው 28,000,000 ብር የሚያወጣ ቀሚስ ለበሰ። ይኸው በ280። አምስት ዜሮ ብቻ ነው ያነሳነው።",

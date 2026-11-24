@@ -168,6 +168,10 @@ dl.kv dt{color:var(--mut)}dl.kv dd{margin:0;overflow-wrap:anywhere}
 .btn.tg{background:#229ED9;color:#fff;display:inline-flex;align-items:center;gap:6px}
 .warnbar{margin:4px 0 8px;padding:12px 16px;border-radius:18px;background:var(--warn-bg);color:var(--ink);font-size:14px;line-height:1.45;display:flex;gap:8px;align-items:flex-start}
 .warnbar b{color:var(--warn)}
+.rp-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}.rp-side{display:grid;gap:3px;font-size:12.5px;color:var(--ink-2);text-align:right}
+.rp-split{margin-top:14px;height:12px;border-radius:999px;background:var(--card-2);overflow:hidden}.rp-split i{display:block;height:100%;border-radius:999px;background:var(--accent)}
+.rp-bins{margin-top:16px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;height:110px;align-items:end}.rp-bins>div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;min-width:0}
+.rp-bins i{display:block;width:100%;border-radius:8px 8px 3px 3px;background:var(--accent)}.rp-n{font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums}.rp-l{font-size:11px;color:var(--mut)}
 .newhits .nh-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
 .newhits .nh-side{font-size:13px;color:var(--ink-2);text-align:right;line-height:1.6}
 .nh-bars{margin-top:14px;height:64px;display:flex;align-items:flex-end;gap:4px}
@@ -421,6 +425,26 @@ function leaders(r){
 function postText(b,r){const t=b.rows[0];if(!t)return'';
   return `${b.ic} DINGUY ${b.title.toUpperCase()} — ${LB_RANGES[r].toLowerCase()}\n\n${t.name}\n${t.n} ${t.n===1?'Dinguy':'Dinguys'} ${b.unit}\n\nRegister one for someone: dinguy.xyz`;}
 // Interest in new Dinguys: taps on the "NEW" button in the site header.
+// Repeat customers: buyers matched by phone (the partner view gets an opaque id instead), all paid orders, hand-added left out.
+function viewRepeat(){
+  const paid=S.orders.filter(o=>(o.status==='paid'||o.status==='removed')&&!o.manual);
+  const m=new Map();
+  for(const o of paid){const k=o.phone||o.buyer||'n:'+normName(o.by);const e=m.get(k)||{n:0,birr:0,names:{},phone:o.phone};e.n++;e.birr+=o.price||0;const nm=String(o.by||'').trim();if(nm)e.names[nm]=(e.names[nm]||0)+1;m.set(k,e);}
+  const all=[...m.values()],rep=all.filter(e=>e.n>1),one=all.length-rep.length;
+  if(!all.length)return card('Repeat customers','Buyers who came back','<div class="empty">No paid orders yet.</div>','s4');
+  const repOrders=rep.reduce((a,e)=>a+e.n,0),rate=Math.round(rep.length/all.length*100),share=Math.round(repOrders/Math.max(1,paid.length)*100);
+  const repBirr=rep.reduce((a,e)=>a+e.birr,0),totBirr=all.reduce((a,e)=>a+e.birr,0);
+  const bins=[['1',e=>e.n===1],['2',e=>e.n===2],['3',e=>e.n===3],['4',e=>e.n===4],['5+',e=>e.n>=5]].map(([l,f])=>[l,all.filter(f).length]);
+  const bMax=Math.max(1,...bins.map(b=>b[1]));
+  const top=rep.sort((a,b)=>b.n-a.n||b.birr-a.birr).slice(0,5).map(e=>({...e,name:(Object.entries(e.names).sort((a,b)=>b[1]-a[1])[0]||['—'])[0]}));
+  return card('Repeat customers',`${all.length} paying customers · matched by phone number`,`
+    <div class="rp-top"><div><div class="big">${rate}%</div><div class="sub">came back for more</div></div>
+      <div class="rp-side"><div><b>${rep.length}</b> repeat · <b>${one}</b> one-time</div><div>Repeat buyers made <b>${share}%</b> of orders</div><div><b>${num(repBirr)}</b> of ${num(totBirr)} Birr</div></div></div>
+    <div class="rp-split" role="img" aria-label="${rep.length} repeat and ${one} one-time customers"><i style="width:${rate}%"></i></div>
+    <div class="rp-bins" role="img" aria-label="Customers by number of orders">${bins.map(([l,n])=>`<div><span class="rp-n">${n}</span><i style="height:${Math.max(4,n/bMax*100).toFixed(0)}%;${n?'':'opacity:.25'}"></i><span class="rp-l">${l}</span></div>`).join('')}</div>
+    <div class="readout" style="margin-top:6px">Customers by how many orders they paid for.</div>
+    ${top.length?`<ol class="lb-l" style="margin-top:12px">${top.map((x,i)=>`<li${i===0?' class="win"':''}><span class="pos">${i+1}</span><span class="nm">${esc(x.name)}${!P()&&x.phone?`<small>${esc(x.phone)}</small>`:''}</span><span class="ct">${x.n}<small> · ${num(x.birr)} Birr</small></span></li>`).join('')}</ol>`:''}`,'s4');
+}
 function viewNewHits(){
   const h=S.newHits;if(!h)return '';
   const last7=h.days.slice(-7).reduce((a,d)=>a+d.n,0),today=h.days[h.days.length-1].n,max=Math.max(1,...h.days.map(d=>d.n));
@@ -639,6 +663,7 @@ function viewDash(){
 
     ${viewLeaders()}
 
+    ${viewRepeat()}
     ${viewNewHits()}
     ${card('Where people drop off','',`${funnel.map(([l,v])=>`<div class="hbar"><span class="lab" title="${esc(l)}">${l}</span><span class="tr"><i style="width:${Math.min(100,v/fMax*100).toFixed(1)}%"></i></span><span class="val">${v}</span></div>`).join('')}
       <div class="readout" style="margin-top:12px">${st.real?`${Math.max(0,st.real-engaged)} never entered a code or tapped PAY NOW — the help SMS is for them.`:'No orders yet.'}</div>`,'s4')}
@@ -886,7 +911,7 @@ function viewInq(){
     <div class="acts">${h?`<a class="btn" href="${esc(h)}">${h.startsWith('mailto')?'Email':'Call'}</a>`:''}<button class="btn ghost" data-q="${esc(q.id)}" data-qa="${q.status==='done'?'new':'done'}">${q.status==='done'?'Mark as new':'Mark done'}</button></div>
   </div>`;}).join('')}</div>`;
 }
-const STONES=[['cobblestone','COBBLESTONE · 89'],['bloket','ብሎኬት · 89'],['river-stone','የወንዝ ድንጋይ · 89'],['foundation-stone','መሰረት ድንጋይ · 89'],['pebble','ጠጠር · 89'],['alolo','አሎሎ · 89'],['kesel-dingay','ከሰል ድንጋይ · 89'],['gold-dress','የወርቅ ቀሚስ · 280'],['queen-of-sheba','THE QUEEN OF SHEBA · 199'],['mezezo-chocolate-opal','MEZEZO CHOCOLATE OPAL · 199'],['shakiso-emerald','SHAKISO EMERALD · 199'],['diamond','DIAMOND · 199']];
+const STONES=[['cobblestone','COBBLESTONE · 89'],['bloket','ብሎኬት · 89'],['river-stone','የወንዝ ድንጋይ · 89'],['foundation-stone','መሰረት ድንጋይ · 89'],['pebble','ጠጠር · 89'],['alolo','አሎሎ · 89'],['kesel-dingay','ከሰል ድንጋይ · 89'],['broke-city-addis','BROKE CITY ADDIS · 89'],['queen-of-sheba','THE QUEEN OF SHEBA · 199'],['mezezo-chocolate-opal','MEZEZO CHOCOLATE OPAL · 199'],['shakiso-emerald','SHAKISO EMERALD · 199'],['diamond','DIAMOND · 199']];
 function newForm(){
   return `<details class="new"><summary>+ New registration (paid another way, or a gift)</summary>
     <form class="f" id="newform">

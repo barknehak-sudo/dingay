@@ -35,11 +35,16 @@ export function messages(o, site = SITE) {
   const congrats = am
     ? `እንኳን ደስ አለዎት ${o.by}! 🎉 ${o.to} በይፋ በ${o.name} ተመዝግቧል። የምዝገባ ቁ. ${o.id}። ይመልከቱና ሰርተፊኬቱን ያስቀምጡ፦ ${recordLink} — DINGUY`
     : `Congratulations ${o.by}! 🎉 ${o.to} is now officially registered with ${o.name}. Registration No. ${o.id}. See it and save the certificate: ${recordLink} — DINGUY`;
-  // to the recipient, once paid
-  const gift = am
+  // to the recipient, once paid. The prank CD keeps the joke: the text promises GTA VI, the link says WASTED.
+  const prank = o.kind === 'cd';
+  const gift = prank ? (am
+      ? `ሰላም ${o.to}! 🎮 ${o.by} GTA VI ገዝተውልዎታል 😂 እዚህ ይክፈቱት፦ ${recordLink} — DINGUY`
+      : `Hi ${o.to}! 🎮 ${o.by} found GTA VI for you 😂 Open it here: ${recordLink} — DINGUY`)
+    : am
     ? `ሰላም ${o.to}! 🎁 ${o.by} በDINGUY መዝገብ ${o.name}ን በስምዎ አስመዝግበዋል። የምዝገባ ቁ. ${o.id}። መዝገብዎንና ሰርተፊኬትዎን ይመልከቱ፦ ${recordLink} — DINGUY`
     : `Hi ${o.to}! 🎁 ${o.by} has registered ${o.name} in your name with the DINGUY Registry. Registration No. ${o.id}. See your record and certificate: ${recordLink} — DINGUY`;
-  const subject = am ? `${o.to}፣ በስምዎ ድንጋይ ተመዝግቧል` : `${o.to}, a stone has been registered in your name`;
+  const subject = prank ? (am ? `${o.to}፣ GTA VI ደርሶዎታል 🎮` : `${o.to}, your copy of GTA VI is here 🎮`)
+    : am ? `${o.to}፣ በስምዎ ድንጋይ ተመዝግቧል` : `${o.to}, a stone has been registered in your name`;
   const body = am
     ? `ሰላም ${o.to}፣\n\n${o.by} በDINGUY መዝገብ ውስጥ ${o.name}ን በስምዎ አስመዝግበዋል።\n\n${o.message ? `“${o.message}”\n\n` : ''}የምዝገባ ቁ. ${o.id}\nመዝገብዎና ሰርተፊኬትዎ፦ ${recordLink}\n\nDINGUY® — ከልክ በላይ ትርጉም ላላቸው አጋጣሚዎች የተመዘገቡ ድንጋዮች።\nዲጂታል ምዝገባ። አካላዊ ድንጋይ አይካተትም።\n\n—\nDINGUY የSIDEWAYS ስራ ነው።\nSIDEWAYS ሰዎች ቆም ብለው፣ ደግመው አይተው እንዲያስታውሱ የሚያደርጉ ድረ-ገጾችን፣ ዘመቻዎችንና ሀሳቦችን ይሰራል።\nየእርስዎን ሀሳብ እንስራው፦ ${SW_LINK}\n${SW_CONTACT} · 0996 567 218`
     : `Hi ${o.to},\n\n${o.by} has registered ${o.name} in your name with the DINGUY Registry.\n\n${o.message ? `“${o.message}”\n\n` : ''}Registration No. ${o.id}\nYour record and certificate: ${recordLink}\n\nDINGUY® — Registered stones for unreasonably meaningful occasions.\nDigital registration. No physical stone included.\n\n—\nDINGUY is a SIDEWAYS project.\nSIDEWAYS makes websites, campaigns and ideas that make people stop, look twice and remember.\nGot an idea? Let’s make people talk: ${SW_LINK}\n${SW_CONTACT} · 0996 567 218`;

@@ -38,7 +38,7 @@
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:360,&quot;height&quot;:360},&quot;kind&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cobble&quot;,&quot;blocket&quot;,&quot;river&quot;,&quot;foundation&quot;,&quot;pebble&quot;,&quot;iron&quot;,&quot;charcoal&quot;,&quot;opal&quot;,&quot;choc&quot;,&quot;emerald&quot;,&quot;diamond&quot;,&quot;tikimt&quot;,&quot;dress&quot;],&quot;default&quot;:&quot;cobble&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;spin&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:4,&quot;tsType&quot;:&quot;number&quot;},&quot;drag&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;hold&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;gl&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;scrollLink&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:360,&quot;height&quot;:360},&quot;kind&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cobble&quot;,&quot;blocket&quot;,&quot;river&quot;,&quot;foundation&quot;,&quot;pebble&quot;,&quot;iron&quot;,&quot;charcoal&quot;,&quot;opal&quot;,&quot;choc&quot;,&quot;emerald&quot;,&quot;diamond&quot;,&quot;tikimt&quot;,&quot;dress&quot;,&quot;cd&quot;],&quot;default&quot;:&quot;cobble&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;spin&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:4,&quot;tsType&quot;:&quot;number&quot;},&quot;drag&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;hold&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;gl&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;scrollLink&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
 const N=(f,o,s)=>`url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${f}' numOctaves='${o}' seed='${s}' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")`;
 const OCT='polygon(20% 0,80% 0,100% 14%,100% 86%,80% 100%,20% 100%,0 86%,0 14%)';
 const K={
@@ -52,12 +52,13 @@ const K={
   charcoal:{box:['20%','8%','14%','8%'],r:'30% 44% 28% 46% / 40% 30% 50% 36%',base:'radial-gradient(120% 110% at 40% 32%,#3a3735,#1c1a19 55%,#0a0909 100%)',vein:'radial-gradient(14% 10% at 62% 64%,rgba(255,110,30,.85),rgba(255,60,0,0) 100%),radial-gradient(10% 8% at 34% 52%,rgba(255,140,40,.7),rgba(255,60,0,0) 100%)',g:[1.1,4,.5,'overlay'],m:[.05,3,.5,'multiply'],hi:.18,sh:.6,seed:13},
   tikimt:{box:['10%','10%','10%','10%'],clip:'polygon(50.0% 0.0%,52.6% 1.1%,54.8% 4.4%,56.4% 9.8%,56.9% 17.5%,55.2% 30.7%,60.3% 18.4%,64.6% 12.0%,68.7% 8.1%,72.2% 6.4%,75.0% 6.7%,76.7% 8.9%,77.0% 12.9%,75.6% 18.4%,72.2% 25.3%,64.1% 35.9%,74.7% 27.8%,81.6% 24.4%,87.1% 23.0%,91.1% 23.3%,93.3% 25.0%,93.6% 27.8%,91.9% 31.3%,88.0% 35.4%,81.6% 39.7%,69.3% 44.8%,82.5% 43.1%,90.2% 43.6%,95.6% 45.2%,98.9% 47.4%,100.0% 50.0%,98.9% 52.6%,95.6% 54.8%,90.2% 56.4%,82.5% 56.9%,69.3% 55.2%,81.6% 60.3%,88.0% 64.6%,91.9% 68.7%,93.6% 72.2%,93.3% 75.0%,91.1% 76.7%,87.1% 77.0%,81.6% 75.6%,74.7% 72.2%,64.1% 64.1%,72.2% 74.7%,75.6% 81.6%,77.0% 87.1%,76.7% 91.1%,75.0% 93.3%,72.2% 93.6%,68.7% 91.9%,64.6% 88.0%,60.3% 81.6%,55.2% 69.3%,56.9% 82.5%,56.4% 90.2%,54.8% 95.6%,52.6% 98.9%,50.0% 100.0%,47.4% 98.9%,45.2% 95.6%,43.6% 90.2%,43.1% 82.5%,44.8% 69.3%,39.7% 81.6%,35.4% 88.0%,31.3% 91.9%,27.8% 93.6%,25.0% 93.3%,23.3% 91.1%,23.0% 87.1%,24.4% 81.6%,27.8% 74.7%,35.9% 64.1%,25.3% 72.2%,18.4% 75.6%,12.9% 77.0%,8.9% 76.7%,6.7% 75.0%,6.4% 72.2%,8.1% 68.7%,12.0% 64.6%,18.4% 60.3%,30.7% 55.2%,17.5% 56.9%,9.8% 56.4%,4.4% 54.8%,1.1% 52.6%,0.0% 50.0%,1.1% 47.4%,4.4% 45.2%,9.8% 43.6%,17.5% 43.1%,30.7% 44.8%,18.4% 39.7%,12.0% 35.4%,8.1% 31.3%,6.4% 27.8%,6.7% 25.0%,8.9% 23.3%,12.9% 23.0%,18.4% 24.4%,25.3% 27.8%,35.9% 35.9%,27.8% 25.3%,24.4% 18.4%,23.0% 12.9%,23.3% 8.9%,25.0% 6.7%,27.8% 6.4%,31.3% 8.1%,35.4% 12.0%,39.7% 18.4%,44.8% 30.7%,43.1% 17.5%,43.6% 9.8%,45.2% 4.4%,47.4% 1.1%)',base:'radial-gradient(circle at 50% 50%,#6b3a0c 0 13%,#c98a12 14% 19%,#ffd21f 21%,#f5b800 70%,#e9a600 100%)',g:[.6,2,.12,'overlay'],m:[.03,2,.2,'soft-light'],hi:.35,sh:.25,seed:14},
   dress:{box:['3%','14%','3%','14%'],clip:'polygon(38% 0,45% 0,46% 13%,54% 13%,55% 0,62% 0,63% 21%,60% 33%,63% 40%,90% 90%,94% 100%,6% 100%,10% 90%,37% 40%,40% 33%,37% 21%)',base:'linear-gradient(180deg,#e2ad2a 0 36%,#f4ecdc 36% 52%,#d9a01c 66% 100%)',g:[.9,2,.25,'overlay'],m:[.04,2,.2,'soft-light'],hi:.4,sh:.3,gloss:true,seed:15},
+  cd:{box:['14%','6%','14%','6%'],r:'2%',base:'url(assets/broke-city-addis.jpg) center/cover',g:[.9,2,.05,'overlay'],m:[.04,2,.05,'soft-light'],hi:.35,sh:.25,gloss:true,seed:16},
   opal:{box:['18%','10%','16%','10%'],r:'50% 50% 48% 52% / 54% 54% 46% 46%',base:'radial-gradient(100% 100% at 40% 35%,#fdfbff,#dedae8 50%,#b5b0c3 100%)',iris:'conic-gradient(from 0deg at 55% 55%,#7fe3d4,#9aa8ff,#ff9ad5,#ffe38a,#8dffb0,#7fe3d4)',io:.55,ib:'multiply',g:[.7,2,.1,'overlay'],m:[.012,2,.35,'overlay'],hi:.75,sh:.35,gloss:true,seed:2},
   choc:{box:['20%','8%','16%','8%'],r:'48% 52% 50% 50% / 56% 54% 46% 44%',base:'radial-gradient(100% 100% at 40% 35%,#6e4631,#3c2317 50%,#1b0e08 100%)',iris:'conic-gradient(from 40deg at 50% 55%,#ff7a2f,#3fe0a0,#2f7dff,#ffcf3f,#ff5a3f,#ff7a2f)',io:.32,ib:'screen',g:[.7,2,.12,'overlay'],m:[.015,2,.5,'soft-light'],hi:.5,sh:.55,gloss:true,seed:7},
   emerald:{box:['12%','18%','12%','18%'],clip:OCT,base:'linear-gradient(135deg,#27a56d 0%,#0a5a39 34%,#04331f 64%,#0f6e47 100%)',table:{inset:'17% 17%',bg:'linear-gradient(160deg,#35c486,#07402a 58%,#1d9161)',op:.85},iris:'linear-gradient(90deg,transparent 30%,rgba(190,255,220,.35) 50%,transparent 70%)',io:.8,ib:'screen',g:[.8,2,.08,'overlay'],m:[.04,2,.28,'overlay'],hi:.4,sh:.5,seed:4},
   diamond:{box:['12%','12%','12%','12%'],r:'50%',base:'repeating-conic-gradient(from 11deg at 50% 50%,#f8fafc 0deg 11.25deg,#aab2bc 11.25deg 22.5deg,#e4e9ef 22.5deg 33.75deg,#7c858f 33.75deg 45deg)',table:{inset:'27%',bg:'radial-gradient(circle at 45% 40%,#fff,#cdd4dc 60%,#99a2ac)',op:1},iris:'conic-gradient(from 0deg,#ff6b6b,#ffd36b,#6bffb0,#6bc7ff,#b06bff,#ff6b6b)',io:.16,ib:'overlay',g:[.5,1,0,'overlay'],m:[.05,1,0,'overlay'],hi:.7,sh:.3,gloss:true,seed:1}
 };
-const NAMES={pebble:'Pebble specimen',iron:'Iron ball specimen',charcoal:'Charcoal stone specimen',tikimt:'Tikimt flower specimen',dress:'Gold ball gown',cake:'Slice of birthday cake',cobble:'Cobblestone specimen',blocket:'Concrete block specimen',river:'River stone specimen',foundation:'Foundation stone specimen',opal:'Opal specimen',choc:'Chocolate opal specimen',emerald:'Emerald specimen',diamond:'Diamond specimen'};
+const NAMES={pebble:'Pebble specimen',iron:'Iron ball specimen',charcoal:'Charcoal stone specimen',tikimt:'Tikimt flower specimen',dress:'Gold ball gown',cd:'Broke City Addis CD case',cake:'Slice of birthday cake',cobble:'Cobblestone specimen',blocket:'Concrete block specimen',river:'River stone specimen',foundation:'Foundation stone specimen',opal:'Opal specimen',choc:'Chocolate opal specimen',emerald:'Emerald specimen',diamond:'Diamond specimen'};
 
 /* ---------- 3D ---------- */
 const TV='0.170.0';
@@ -110,6 +111,7 @@ let maxAniso=8;
 function texInto(T,url,rep,mat){const p=texCache[url]||(texCache[url]=new Promise(res=>new T.TextureLoader().load(url,res,undefined,()=>res(null))));
   return p.then(base=>{if(!base)return;const t=base.clone();t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.MirroredRepeatWrapping;t.repeat.set(rep[0],rep[1]);t.anisotropy=maxAniso;t.needsUpdate=true;mat.map=t;mat.bumpMap=t;mat.needsUpdate=true;});}
 function simpleMat(T,kind,old,level){
+  if(Array.isArray(old))return old.map(m=>new T.MeshStandardMaterial({map:m.map,color:m.color,roughness:m.roughness,metalness:level===1?m.metalness:0,transparent:m.transparent,opacity:m.opacity,depthWrite:m.depthWrite}));
   const map=old&&old.map||null;
   if(level===1&&(kind==='opal'||kind==='choc'))return new T.MeshPhysicalMaterial({map,color:'#ffffff',roughness:kind==='opal'?.16:.22,clearcoat:1,clearcoatRoughness:.05});
   if(level===1&&(kind==='emerald'||kind==='diamond'))return new T.MeshStandardMaterial({color:kind==='emerald'?'#1c9a62':'#e9eef3',roughness:.08,metalness:.15,flatShading:true,envMapIntensity:2,emissive:kind==='emerald'?'#04331f':'#000000',emissiveIntensity:.4});
@@ -393,6 +395,55 @@ function weaveTex(T){const t=canvasTex(T,x=>{const n=24,c=512/n;x.fillStyle='#5a
   t.colorSpace=T.NoColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.channel=1;return t;}
 // roughness (G) and metalness (B) for silk / gold / pearl, picked by uv.x
 function dressOrm(T){const t=new T.DataTexture(new Uint8Array([255,190,0,255,255,72,255,255,255,48,0,255,255,22,255,255]),4,1);t.magFilter=t.minFilter=T.NearestFilter;t.needsUpdate=true;return t;}
+/* ---------- the CD: a jewel case with the cover art, a disc sliding out of the side and a sticker ----------
+   One mesh, one material per part (groups): 0 art, 1 clear lid, 2 black tray, 3 printed disc, 4 silver, 5 sticker. */
+const CD_ART='assets/broke-city-addis.jpg',CD_W=1.42,CD_H=1.25,DISC_R=.6,DISC_X=.44;
+function cdGeo(T){
+  const parts=[];const add=(g,mi)=>{g=g.index?g.toNonIndexed():g;parts.push([g,mi]);};
+  const box=(w,h,d,x,y,z,mi)=>{const g=new T.BoxGeometry(w,h,d);g.translate(x,y,z);add(g,mi);};
+  // black tray, the hinge on the left (with its ridges) and the clear lid on top
+  box(CD_W-.02,CD_H-.02,.05,0,0,-.03,2);
+  box(.06,CD_H,.1,-CD_W/2+.03,0,-.005,2);
+  for(let i=0;i<9;i++)box(.012,.05,.104,-CD_W/2+.03,-CD_H/2+.16+i*.115,-.005,2);
+  // the cover insert: the square middle of the 4:5 artwork
+  const art=new T.PlaneGeometry(CD_W-.12,CD_H-.05);const ua=art.attributes.uv;
+  // fill the cover without stretching: full width of the art, the middle 74% of its height
+  const vs=(1120/1400)*(CD_H-.05)/(CD_W-.12);for(let i=0;i<ua.count;i++)ua.setXY(i,ua.getX(i),(1-vs)/2+ua.getY(i)*vs);
+  art.translate(.03,0,.021);add(art,0);
+  // back insert (seen when you turn it): the art again, darker side down
+  const back=new T.PlaneGeometry(CD_W-.08,CD_H-.04);back.rotateY(Math.PI);back.translate(0,0,-.056);add(back,2);
+  box(CD_W,CD_H,.02,0,0,.035,1);
+  // the disc, pulled halfway out of the right side: clear hub, silver ring, printed face, silver rim
+  const ring=(r0,r1,z,mi,flip)=>{const g=new T.RingGeometry(r0,r1,128,1);if(flip)g.rotateY(Math.PI);const p=g.attributes.position,u=g.attributes.uv;
+    for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i);u.setXY(i,.5+x/(2*DISC_R)*.8,.5+y/(2*DISC_R)*.64);}g.translate(DISC_X,0,z);add(g,mi);};
+  ring(.075,.19,.016,4);ring(.19,DISC_R-.012,.016,3);ring(DISC_R-.012,DISC_R,.016,4);ring(.075,DISC_R,.01,4,true);
+  const edge=new T.CylinderGeometry(DISC_R,DISC_R,.006,128,1,true);edge.rotateX(Math.PI/2);edge.translate(DISC_X,0,.013);add(edge,4);
+  // the round sticker on the lid: "NOT THE GAME"
+  const st=new T.CircleGeometry(.16,64);st.translate(CD_W/2-.24,-CD_H/2+.24,.0462);add(st,5);
+  // merge
+  let n=0;parts.forEach(([g])=>n+=g.attributes.position.count);
+  const P=new Float32Array(n*3),N=new Float32Array(n*3),U=new Float32Array(n*2);const geo=new T.BufferGeometry();let o=0;
+  parts.forEach(([g,mi])=>{const c=g.attributes.position.count;P.set(g.attributes.position.array,o*3);N.set(g.attributes.normal.array,o*3);if(g.attributes.uv)U.set(g.attributes.uv.array,o*2);geo.addGroup(o,c,mi);o+=c;g.dispose();});
+  geo.setAttribute('position',new T.BufferAttribute(P,3));geo.setAttribute('normal',new T.BufferAttribute(N,3));geo.setAttribute('uv',new T.BufferAttribute(U,2));
+  return geo;
+}
+function cdSticker(T){const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');
+  x.fillStyle='#ffd21f';x.beginPath();x.arc(128,128,128,0,7);x.fill();x.strokeStyle='#111';x.lineWidth=6;x.beginPath();x.arc(128,128,112,0,7);x.stroke();
+  x.fillStyle='#111';x.textAlign='center';x.font='900 46px Arial Black,Impact,sans-serif';x.fillText('NOT',128,100);x.fillText('THE',128,146);x.fillText('GAME',128,192);
+  const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;return t;}
+function cdMats(T){
+  const art=new T.MeshPhysicalMaterial({color:'#ffffff',roughness:.5,metalness:0,clearcoat:.3,clearcoatRoughness:.3});
+  const lid=new T.MeshPhysicalMaterial({color:'#ffffff',roughness:.04,metalness:0,transparent:true,opacity:.16,clearcoat:1,clearcoatRoughness:.02,envMapIntensity:2.2,depthWrite:false});
+  const tray=new T.MeshPhysicalMaterial({color:'#121314',roughness:.32,metalness:0,clearcoat:.5,clearcoatRoughness:.2});
+  const disc=new T.MeshPhysicalMaterial({color:'#ffffff',roughness:.28,metalness:.15,iridescence:.5,iridescenceIOR:1.6,iridescenceThicknessRange:[200,700],clearcoat:.6});
+  const silver=new T.MeshPhysicalMaterial({color:'#dfe3e8',roughness:.12,metalness:1,iridescence:1,iridescenceIOR:1.8,iridescenceThicknessRange:[250,900],side:T.DoubleSide});
+  const sticker=new T.MeshStandardMaterial({map:cdSticker(T),roughness:.55,metalness:0});
+  const mats=[art,lid,tray,disc,silver,sticker];
+  const ready=(texCache[CD_ART]||(texCache[CD_ART]=new Promise(res=>new T.TextureLoader().load(CD_ART,res,undefined,()=>res(null))))).then(b=>{if(!b)return;
+    const t=b.clone();t.colorSpace=T.SRGBColorSpace;t.anisotropy=maxAniso;t.needsUpdate=true;art.map=t;disc.map=t;art.needsUpdate=disc.needsUpdate=true;});
+  return{mats,ready};
+}
+const dispM=m=>[].concat(m).forEach(x=>x&&x.dispose());
 function buildMesh(T,kind){
   let geo,mat,ready=Promise.resolve();
   if(ROCK[kind]){const c=ROCK[kind];geo=rockGeo(T,c);
@@ -410,6 +461,7 @@ function buildMesh(T,kind){
     mat=new T.MeshPhysicalMaterial({vertexColors:true,color:'#d8cbb0',roughness:.62,metalness:0,sheen:.3,sheenColor:'#ffb000',sheenRoughness:.5,envMapIntensity:.35,side:T.DoubleSide});}
   else if(kind==='dress'){geo=dressGeo(T);const orm=dressOrm(T);
     mat=new T.MeshPhysicalMaterial({vertexColors:true,color:'#ffffff',roughness:1,metalness:1,roughnessMap:orm,metalnessMap:orm,bumpMap:weaveTex(T),bumpScale:2.2,sheen:.45,sheenColor:'#fff1d6',sheenRoughness:.6,envMapIntensity:1.3,side:T.DoubleSide});}
+  else if(kind==='cd'){geo=cdGeo(T);const c=cdMats(T);mat=c.mats;ready=c.ready;}
   else if(kind==='cake'){geo=cakeGeo(T);
     // fine crumb on the sponge
     const bump=canvasTex(T,x=>{x.fillStyle='#808080';x.fillRect(0,0,512,512);for(let i=0;i<9000;i++){const v=90+Math.random()*90|0;x.fillStyle=`rgb(${v},${v},${v})`;x.fillRect(Math.random()*512,Math.random()*512,2+Math.random()*3,2+Math.random()*3);}});
@@ -429,6 +481,7 @@ function buildMesh(T,kind){
     mat=new T.MeshPhysicalMaterial({color:'#f2f6ff',roughness:0,metalness:0,transmission:1,thickness:1.6,ior:2.42,dispersion:9,specularIntensity:1,envMapIntensity:1.5,attenuationColor:'#dfe8f5',attenuationDistance:2.5,flatShading:true,side:T.DoubleSide});}
   geo.computeBoundingSphere();const m=new T.Mesh(geo,mat);
   // the dress stands centred: by its box, at a fixed height in frame, so it doesn't sit off to one side
+  if(kind==='cd'){geo.computeBoundingBox();const b=geo.boundingBox,c=b.getCenter(new T.Vector3()),k=2.35/Math.max(b.max.x-b.min.x,b.max.y-b.min.y);m.scale.setScalar(k);m.position.copy(c).multiplyScalar(-k);m.userData.ready=ready;return m;}
   if(kind==='dress'){geo.computeBoundingBox();const b=geo.boundingBox,c=b.getCenter(new T.Vector3()),k=2.15/(b.max.y-b.min.y);m.scale.setScalar(k);m.position.copy(c).multiplyScalar(-k);m.userData.ready=ready;return m;}
   const r=geo.boundingSphere.radius;m.scale.setScalar(1.22/r);
   m.position.sub(geo.boundingSphere.center.clone().multiplyScalar(1.22/r));m.userData.ready=ready;return m;
@@ -441,8 +494,8 @@ function stage(T,Room,renderer){
   scene.add(new T.HemisphereLight('#dfe8ee','#132531',.5));
   return{scene,cam,envT};
 }
-const PITCH={blocket:.5,emerald:.5,diamond:.5,cake:.55,tikimt:1.0,pebble:.35,dress:.05};
-const YAW={dress:.3};
+const PITCH={blocket:.5,emerald:.5,diamond:.5,cake:.55,tikimt:1.0,pebble:.35,dress:.05,cd:.1};
+const YAW={dress:.3,cd:-.42};
 /* reads the centre pixels straight after a render: catches GPUs that "succeed" but draw nothing or pure black */
 function drewOk(renderer,kind){
   if(kind==='blocket')return true;
@@ -458,7 +511,7 @@ function renderChecked(T,renderer,scene,cam,mesh,kind){
   try{renderer.render(scene,cam);}catch(e){err=true;}
   let lv=0;
   for(let level=1;level<=2&&(err||!drewOk(renderer,kind));level++){
-    const old=mesh.material;mesh.material=simpleMat(T,kind,old,level);old.dispose();err=false;lv=level;
+    const old=mesh.material;mesh.material=simpleMat(T,kind,old,level);dispM(old);err=false;lv=level;
     try{renderer.render(scene,cam);}catch(e){err=true;}
   }
   return(err||!drewOk(renderer,kind))?-1:lv;
@@ -481,7 +534,7 @@ function shot(kind){
       grp.rotation.set(PITCH[kind]||.25,YAW[kind]??.7,0);
       const ok=renderChecked(T,shotR,scene,cam,mesh,kind)>=0;
       const url=ok?shotR.domElement.toDataURL('image/png'):null;
-      mesh.geometry.dispose();mesh.material.dispose();envT.dispose();
+      mesh.geometry.dispose();dispM(mesh.material);envT.dispose();
       return url;
     }catch(e){return null;}
   })));
@@ -509,13 +562,13 @@ class Component extends DCLogic {
   // The page reuses this component when you switch collections (Friend ↔ Loved one), so follow kind changes.
   componentDidUpdate(prev){
     const kind=this.props.kind||'cobble';if((prev.kind||'cobble')===kind)return;
-    if(this.gl){const{T,grp,mesh}=this.gl;const m=buildMesh(T,kind);grp.remove(mesh);mesh.geometry.dispose();mesh.material.dispose();grp.add(m);this.gl.mesh=m;
+    if(this.gl){const{T,grp,mesh}=this.gl;const m=buildMesh(T,kind);grp.remove(mesh);mesh.geometry.dispose();dispM(mesh.material);grp.add(m);this.gl.mesh=m;
       this.pitch=this.basePitch=PITCH[kind]||.25;
       const lv=renderChecked(T,this.gl.renderer,this.gl.scene,this.gl.cam,m,kind);if(lv<0)this.glFallback();}
     else if(!this.props.gl){this.setState({shot:null,shotFail:false});shot(kind).then(u=>{if(!this.dead&&(this.props.kind||'cobble')===kind)this.setState(u?{shot:u}:{shotFail:true});});}
   }
   componentWillUnmount(){this.dead=true;cancelAnimationFrame(this.raf);this.io&&this.io.disconnect();this.ro&&this.ro.disconnect();clearTimeout(this.ht);clearTimeout(this.gt);
-    if(this.gl){const{renderer,mesh,envT}=this.gl;mesh.geometry.dispose();mesh.material.dispose();envT&&envT.dispose();renderer.dispose();try{renderer.forceContextLoss()}catch(e){}renderer.domElement.remove();this.gl=null;}}
+    if(this.gl){const{renderer,mesh,envT}=this.gl;mesh.geometry.dispose();dispM(mesh.material);envT&&envT.dispose();renderer.dispose();try{renderer.forceContextLoss()}catch(e){}renderer.domElement.remove();this.gl=null;}}
   glFallback(){if(this.dead)return;if(this.gl){const{renderer}=this.gl;try{renderer.domElement.remove();renderer.dispose();}catch(e){}this.gl=null;}this.setState({glFail:true});}
   async initGL(){
     if(/[?&]nogl\b/.test(location.search)){this.setState({glFail:true});return;}
@@ -541,13 +594,15 @@ class Component extends DCLogic {
   glFrame(t,dt){
     const{renderer,scene,cam,grp}=this.gl;if(renderer.getContext().isContextLost()){this.glFallback();return;}
     // the dress only moves where you can turn it (its own page); everywhere else it stands still, facing front
-    if(this.props.kind==='dress'&&!this.props.drag){grp.rotation.set(PITCH.dress,YAW.dress,0);grp.position.set(0,0,0);renderer.render(scene,cam);return;}const spin=this.reduce?0:(this.props.spin??4);
+    if(this.props.kind==='dress'&&!this.props.drag){grp.rotation.set(PITCH.dress,YAW.dress,0);grp.position.set(0,0,0);renderer.render(scene,cam);return;}
+    // the CD never shows its black back unless you turn it: it sways gently around the front
+    if(this.props.kind==='cd'&&!this.props.drag){const w=this.reduce?0:Math.sin(t/2600);grp.rotation.set(PITCH.cd+(this.reduce?0:Math.sin(t/3700)*.04),YAW.cd+w*.38,0);grp.position.set(0,this.reduce?0:Math.sin(t/1900)*.02,0);renderer.render(scene,cam);return;}const spin=this.reduce?0:(this.props.spin??4);
     if(!this.dragging){this.vel*=.955;this.yaw+=spin*dt/1000*Math.PI/180*3+this.vel;this.pitch+=(this.basePitch-this.pitch)*.03;}
     let ox=0,oy=0;const r=this.wrapRef.current&&this.wrapRef.current.getBoundingClientRect();
     if(r&&this.props.scrollLink!==false){ox=((r.left+r.width/2)/window.innerWidth-.5);oy=((r.top+r.height/2)/window.innerHeight-.5);}
     this.tx+=(this.hx-this.tx)*.08;this.ty+=(this.hy-this.ty)*.08;
     // tall things (the dress) stay upright and still: no scroll tilt, only a slow breath of movement
-    const calm=this.props.kind==='dress';
+    const calm=this.props.kind==='dress'||this.props.kind==='cd';
     grp.rotation.set(this.pitch+(calm?this.ty*.12:oy*.5+this.ty*.35),this.yaw+(calm?ox*.5:ox*2.4)+this.tx*.5,0);
     if(this.state.disturbed){grp.position.set((Math.random()-.5)*.05,(Math.random()-.5)*.05,0);}else grp.position.set(0,calm?Math.sin(t/2600)*.012:Math.sin(t/1400)*.03,0);
     renderer.render(scene,cam);
@@ -556,7 +611,7 @@ class Component extends DCLogic {
     const k=K[this.props.kind]||K.cobble;const spin=this.reduce?0:(this.props.spin??4);
     if(!this.dragging){this.vel*=.94;this.a+=spin*dt/1000+this.vel;}
     let jx=0,jy=0;if(this.state.disturbed){jx=(Math.random()-.5)*5;jy=(Math.random()-.5)*5;}
-    const im=this.shotRef.current;if(im&&this.props.kind==='dress'&&!this.props.drag){im.style.transform='none';return;}
+    const im=this.shotRef.current;if(im&&(this.props.kind==='dress'||this.props.kind==='cd')&&!this.props.drag){im.style.transform='none';return;}
     if(im){im.style.transform=`translate(${jx}px,${jy}px) rotate(${this.a}deg)`;this.tx*=.93;this.ty*=.93;return;}
     if(this.props.kind==='blocket')return;
     const b=this.bodyRef.current;if(!b)return;
@@ -576,7 +631,7 @@ class Component extends DCLogic {
     if(!this.isDown){if(e.pointerType==='mouse'&&this.props.drag!==undefined){const r=e.currentTarget.getBoundingClientRect();this.hx=((e.clientX-r.left)/r.width-.5);this.hy=((e.clientY-r.top)/r.height-.5);}return;}
     const dx=e.clientX-this.lx,dy=e.clientY-this.ly;this.lx=e.clientX;this.ly=e.clientY;
     if(Math.hypot(e.clientX-this.sx,e.clientY-this.sy)>8){this.moved=true;clearTimeout(this.ht);}
-    if(this.dragging){if(this.gl){const lim=this.props.kind==='dress'?.45:1.3;this.yaw+=dx*.022;this.vel=dx*.008;this.pitch=Math.max(-lim,Math.min(lim,this.pitch+dy*.008));}else{this.a+=dx*.5;this.vel=dx*.22;this.tx=Math.max(-1,Math.min(1,(e.clientX-this.sx)*.006));this.ty=Math.max(-1,Math.min(1,-(e.clientY-this.sy)*.006));}}};
+    if(this.dragging){if(this.gl){const lim=(this.props.kind==='dress'||this.props.kind==='cd')?.45:1.3;this.yaw+=dx*.022;this.vel=dx*.008;this.pitch=Math.max(-lim,Math.min(lim,this.pitch+dy*.008));}else{this.a+=dx*.5;this.vel=dx*.22;this.tx=Math.max(-1,Math.min(1,(e.clientX-this.sx)*.006));this.ty=Math.max(-1,Math.min(1,-(e.clientY-this.sy)*.006));}}};
   up=()=>{this.isDown=false;this.dragging=false;clearTimeout(this.ht);};
   leave=()=>{this.up();this.hx=0;this.hy=0;};
   clickCap=e=>{if(this.moved){e.stopPropagation();e.preventDefault();this.moved=false;}};
