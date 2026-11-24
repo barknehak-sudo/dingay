@@ -14,7 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;family=Noto+Sans+Ethiopic:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Oswald:wght@600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Noto+Sans+Ethiopic:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
 html,body{margin:0;background:#000;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 *{box-sizing:border-box}
@@ -68,6 +68,43 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 @media (min-width:760px){.app-feature{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:center;padding:24px 28px}}
 .app-step{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;padding:12px 0;border-top:1px solid rgba(238,242,244,.1)}
 .app-step b{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.08);font-size:15px}
+/* GTA week look (html.gta, see GTA_UNTIL) */
+html.gta body{background:#120b1e}
+html.gta .dg-root{background:linear-gradient(180deg,#2c1b45 0%,#1f1433 45%,#120b1e 100%)!important}
+html.gta header>div{background:rgba(44,27,69,.8)!important;border-color:rgba(255,217,168,.2)!important}
+html.gta .app-btn{background:#ffd9a8;color:#2a1838}
+html.gta .app-btn-ghost{border-color:rgba(255,217,168,.35)}
+html.gta .app-seg{background:rgba(255,217,168,.06);border-color:rgba(255,217,168,.16)}
+html.gta .app-seg button[aria-selected=true]{background:#ffd9a8;color:#2a1838}
+html.gta .app-eyebrow{color:#e9b8c9}
+html.gta .app-step{border-color:rgba(255,217,168,.12)}
+html.gta .app-step b{background:rgba(255,217,168,.14);color:#ffd9a8}
+.gta-hero{position:relative;margin:0 -16px;min-height:clamp(560px,96vh,820px);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;padding:0 20px 26px;overflow:hidden;color:#fff}
+.gta-hero::before{content:"";position:absolute;left:0;right:0;top:0;height:76%;background:url(assets/broke-city-addis.jpg) center 30%/cover;transform-origin:50% 40%;animation:gta-pan 24s ease-in-out infinite alternate}
+.gta-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(44,27,69,0) 0%,rgba(44,27,69,0) 50%,rgba(44,27,69,.85) 70%,#2c1b45 76%)}
+.gta-hero>*{position:relative;z-index:1}
+@media (min-width:760px){.gta-hero{margin:0;border-radius:28px;min-height:clamp(560px,86vh,760px)}.gta-hero::before{background-position:center 34%}}
+.gta-kicker{font-family:'Oswald','Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:15px;letter-spacing:.06em;color:#ffd9a8;text-transform:uppercase}
+.gta-title{margin:8px 0 0;font-size:clamp(30px,7vw,52px);font-weight:700;letter-spacing:-.02em;line-height:1.05;background:linear-gradient(90deg,#ffd9a8,#f6a5a5);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gta-lead{margin:10px auto 0;max-width:34ch;font-size:16px;line-height:1.45;color:#f1e4f0}
+.gta-chev{margin-top:14px;width:22px;height:12px;animation:gta-bob 1.6s ease-in-out infinite}
+@keyframes gta-pan{from{transform:scale(1.06) translateY(0)}to{transform:scale(1.14) translateY(-2%)}}
+@keyframes gta-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+@keyframes gta-spin{to{transform:rotate(1turn)}}
+@keyframes gta-ping{0%{box-shadow:0 0 0 0 rgba(255,217,168,.55)}100%{box-shadow:0 0 0 18px rgba(255,217,168,0)}}
+.gta-load{position:fixed;inset:0;z-index:200;background:#0b0712;overflow:hidden;cursor:pointer;animation:dg-fade .25s ease}
+.gta-load-art{position:absolute;inset:-4%;background:url(assets/broke-city-addis.jpg) center/cover;animation:gta-pan 9s ease-out both}
+.gta-load::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,7,18,0) 55%,rgba(11,7,18,.85) 100%)}
+.gta-load-foot{position:absolute;left:0;right:0;bottom:0;z-index:1;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:0 20px max(22px,env(safe-area-inset-bottom))}
+.gta-tip{max-width:46ch;font-size:13.5px;line-height:1.4;color:#f1e4f0;text-shadow:0 1px 3px #000}
+.gta-tip b{color:#ffd9a8;font-weight:700;letter-spacing:.06em}
+.gta-spin{flex:none;width:30px;height:30px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;animation:gta-spin .8s linear infinite}
+/* the prank intro: start screen, the video full screen (no player chrome), then WASTED */
+.pk-stage{position:fixed;inset:0;z-index:95;background:#000;color:#fff}
+.pk-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+@media (orientation:portrait){.pk-video{object-fit:contain}}
+.pk-gate{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;cursor:pointer;background:linear-gradient(rgba(14,8,24,.84),rgba(0,0,0,.94)),url(assets/broke-city-addis.jpg) center/cover}
+.pk-skip{position:absolute;right:16px;bottom:max(18px,env(safe-area-inset-bottom));z-index:2;min-height:44px;padding:0 16px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(0,0,0,.35);color:#fff;font-size:12px;font-weight:700;letter-spacing:.1em;cursor:pointer;opacity:.75}
 @media (pointer:coarse){
   button,[role=button],[role=option],[role=radio]{min-height:44px;min-width:44px}
   footer a,dd a{display:inline-flex;align-items:center;min-height:44px}
@@ -77,7 +114,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </helmet>
-<div style="font-family:'Neue Haas Grotesk Display Pro','Neue Haas Grotesk Text Pro','Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif;min-height:100vh;min-height:100dvh;background:linear-gradient(180deg,#132531 0%,#0a141b 60%,#000 100%);color:#eef2f4">
+<div class="dg-root" style="font-family:'Neue Haas Grotesk Display Pro','Neue Haas Grotesk Text Pro','Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif;min-height:100vh;min-height:100dvh;background:linear-gradient(180deg,#132531 0%,#0a141b 60%,#000 100%);color:#eef2f4">
 
 <!-- DINGUY HEADER -->
 <sc-if value="{{ isDinguy }}" hint-placeholder-val="{{ true }}">
@@ -149,11 +186,21 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 <!-- ============ HOME ============ -->
 <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
 <main style="max-width:1120px;margin:0 auto;padding:calc(max(10px,env(safe-area-inset-top)) + 78px) 16px 40px;background:transparent">
+  <sc-if value="{{ gtaOn }}">
+  <section class="gta-hero" onClick="{{ feat.open }}" style="cursor:pointer">
+    <div class="gta-kicker">Out now · Dinguy Pranks</div>
+    <h1 class="gta-title">Broke City Addis: The Prank</h1>
+    <p class="gta-lead">Tell your friend they got a free GTA Trial. They press start. They get WASTED. Then a certificate in their name.</p>
+    <svg class="gta-chev" viewBox="0 0 22 12" fill="none" stroke="#fff" stroke-width="2.2" aria-hidden="true"><path d="M2 2l9 8 9-8"/></svg>
+  </section>
+  </sc-if>
+  <sc-if value="{{ classicOn }}">
   <section style="padding:6px 4px 0">
     <div class="app-eyebrow">DINGUY Registry</div>
     <h1 style="margin:8px 0 0;font-size:clamp(34px,8.6vw,60px);line-height:1;letter-spacing:-.04em;font-weight:700;text-wrap:balance;max-width:15ch">Give someone a stone with their name on it.</h1>
     <p style="margin:12px 0 0;font-size:17px;line-height:1.4;color:#b9c9d4;max-width:36ch">A registered Dinguy and a certificate, ready in 1 minute. From 89 Birr.</p>
   </section>
+  </sc-if>
 
   <section aria-label="New" style="margin-top:22px">
     <article onClick="{{ feat.open }}" class="app-feature" style="background:{{ feat.fbg }};box-shadow:{{ feat.fsh }}">
@@ -173,7 +220,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
 
   <section aria-label="Choose your Dinguy" style="margin-top:28px">
     <div role="tablist" aria-label="Who is it for?" class="app-seg">
-      <button role="tab" aria-selected="{{ tabFriendSel }}" onClick="{{ tabFriend }}">For a friend · 89</button>
+      <button role="tab" aria-selected="{{ tabFriendSel }}" onClick="{{ tabFriend }}">For a friend · from 89</button>
       <button role="tab" aria-selected="{{ tabLovedSel }}" onClick="{{ tabLoved }}">For a loved one · 199</button>
     </div>
     <p style="margin:12px 4px 12px;font-size:15px;line-height:1.4;color:#b9c9d4">{{ homeIntro }}</p>
@@ -871,6 +918,28 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
   </footer>
 </sc-if>
 
+<!-- GTA week: the loading scene, once per visit -->
+<sc-if value="{{ gtaLoad }}">
+  <div class="gta-load" role="status" aria-label="Loading" onClick="{{ endGtaLoad }}">
+    <div class="gta-load-art"></div>
+    <div class="gta-load-foot"><div class="gta-tip"><b>TIP</b> &nbsp;{{ gtaTip }}</div><div class="gta-spin" aria-hidden="true"></div></div>
+  </div>
+</sc-if>
+<!-- The prank intro: a start screen (the tap lets sound play), the intro video full screen, then WASTED. -->
+<sc-if value="{{ showIntro }}">
+  <div class="pk-stage">
+    <video ref="{{ introRef }}" class="pk-video" src="assets/gta-intro.mp4" preload="auto" playsinline="true" muted="{{ false }}" disablepictureinpicture="true"></video>
+    <sc-if value="{{ showGate }}">
+      <div class="pk-gate" role="button" aria-label="Start" onClick="{{ startIntro }}">
+        <div class="gta-kicker" style="font-size:13px">★ New mission ★</div>
+        <div style="font-size:clamp(26px,7vw,40px);font-weight:800;letter-spacing:-.02em;line-height:1.1;max-width:16ch">{{ wastedBy }} <span>bought you a free GTA Trial</span></div>
+        <button onClick="{{ startIntro }}" style="margin-top:12px;min-height:58px;padding:0 34px;border:0;border-radius:999px;background:#ffd9a8;color:#2a1838;font-size:15px;font-weight:800;letter-spacing:.12em;cursor:pointer;box-shadow:0 0 0 0 rgba(255,217,168,.6);animation:gta-ping 1.8s ease-out infinite">▶ PRESS START</button>
+        <div style="font-size:12px;letter-spacing:.08em;color:rgba(255,255,255,.7)">🔊 Sound on</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ showSkip }}"><button class="pk-skip" onClick="{{ skipIntro }}">SKIP ›</button></sc-if>
+  </div>
+</sc-if>
 <!-- The prank: whoever opens a Broke City Addis record gets WASTED first, then the certificate. -->
 <sc-if value="{{ showWasted }}">
   <div class="dg-overlay" role="dialog" aria-label="Wasted" onClick="{{ closeWasted }}" style="position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;cursor:pointer;background:radial-gradient(80% 60% at 50% 50%,rgba(40,8,8,.55),rgba(0,0,0,.92)),url(assets/broke-city-addis.jpg) center/cover;color:#fff;animation:dg-fade .5s ease">
@@ -970,7 +1039,7 @@ const P=[
   d:['For the friend who carries the whole team.','Throws their weight around.\nAlways lands somewhere.\nNobody asks where.'],
   meta:[['Specimen No.','F-06'],['Classification','Solid iron, perfectly round'],['Origin','The school sports field'],['Weight','Yes'],['Range','Further than expected'],['Emotional weight','Olympic']]},
  // Dinguy Pranks 001: the friend thinks it's GTA VI, opens the link and gets WASTED. Not the actual game.
- {slug:'broke-city-addis',isNew:true,w:'friend',name:'BROKE CITY ADDIS',sub:'GTA VI · Wasted Edition',kind:'cd',fig:'F-08',cls:'Prank · Digital',
+ {slug:'broke-city-addis',isNew:true,w:'friend',price:199,name:'BROKE CITY ADDIS',sub:'GTA VI · Wasted Edition',kind:'cd',fig:'F-08',cls:'Prank · Digital',
   d:['Tell your friend you bought them GTA VI.','They get the text: “I found GTA VI for you 😂”\nThey open it, already celebrating.\nWASTED.','Then a real certificate in their name, for a game they still don’t have. Not the actual game.'],
   meta:[['Specimen No.','F-08'],['Collection','Dinguy Pranks'],['What they think','GTA VI'],['What they get','WASTED'],['Actual game','Not included'],['Friendship status','Active']]},
  {slug:'kesel-dingay',isNew:true,w:'friend',name:'ከሰል ድንጋይ',sub:'The One Who Keeps the Fire Going',kind:'charcoal',fig:'F-07',cls:'Carbon · Slow Burn',
@@ -1018,10 +1087,21 @@ const MSG_AM={friend:['አንተ በእውነት ድንጋይ ነህ።','ለተ
 const LANG=(window.dgLang&&window.dgLang.lang)||'en';
 const T=s=>(window.dgLang?window.dgLang.t(s):s);
 const MS=LANG==='am'?MSG_AM:MSG;
+/* GTA week. Until GTA_UNTIL the whole site wears the Broke City Addis look: a loading scene, a sunset
+   hero and dusk colours. After that date it goes back to the classic look by itself; nothing is deleted.
+   Preview either look with ?look=gta or ?look=classic. To end it early, set GTA_UNTIL to a past date. */
+const GTA_UNTIL=Date.UTC(2026,11,1,21);   // 2 Dec 2026, 00:00 Addis Ababa time
+const GTA=(()=>{const q=(location.search.match(/[?&]look=(gta|classic)/)||[])[1];return q?q==='gta':Date.now()<GTA_UNTIL;})();
+if(GTA)document.documentElement.classList.add('gta');
+// the loading scene: once per visit, not on a record link (those get the prank intro instead)
+const GTA_LOAD=GTA&&!/^#\/registry\/./.test(location.hash)&&(()=>{try{if(sessionStorage.getItem('dg-gta-load'))return false;sessionStorage.setItem('dg-gta-load','1');}catch(e){}return true;})();
+const GTA_TIPS=['Friends who get WASTED still keep their certificate.','Every Dinguy is registered. None of them are real.','A free GTA Trial is the cheapest way to lose a friend.','Turn your sound on for the full experience.'];
 const THEME={
- friend:{bg:'#d6d6d2',ink:'#0b0b0b',sub:'#3b3b3b',card:'#e8e8e4',line:'rgba(0,0,0,.22)',glow:'linear-gradient(180deg,#f0f0ec,#dcdcd7)',label:'Collection A — Industrial · 89 ETB',heading:'CERTIFIED DINGUYS FOR YOUR DINGUY RAS',intro:['Some friendships need flowers.','Some need chocolate.','Some need a properly registered stone.'],suggestIntro:"We'll help you.",world:'For your friend',hf:"'Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif",hs:'normal',hw:800,hl:'-.055em',r:'0px',btnBg:'#0b0b0b',btnFg:'#f2c230',btnR:'0px',top:'repeating-linear-gradient(-45deg,#0b0b0b 0 10px,#f2c230 10px 20px)',topH:'10px',tape:true,flowers:false},
+ friend:{bg:'#d6d6d2',ink:'#0b0b0b',sub:'#3b3b3b',card:'#e8e8e4',line:'rgba(0,0,0,.22)',glow:'linear-gradient(180deg,#f0f0ec,#dcdcd7)',label:'Collection A — Industrial · from 89 ETB',heading:'CERTIFIED DINGUYS FOR YOUR DINGUY RAS',intro:['Some friendships need flowers.','Some need chocolate.','Some need a properly registered stone.'],suggestIntro:"We'll help you.",world:'For your friend',hf:"'Helvetica Neue',Helvetica,Arial,'Noto Sans Ethiopic',sans-serif",hs:'normal',hw:800,hl:'-.055em',r:'0px',btnBg:'#0b0b0b',btnFg:'#f2c230',btnR:'0px',top:'repeating-linear-gradient(-45deg,#0b0b0b 0 10px,#f2c230 10px 20px)',topH:'10px',tape:true,flowers:false},
  loved:{bg:'radial-gradient(120% 70% at 50% 0%,#435f73 0%,#132531 45%,#000 100%)',ink:'#f4efe9',sub:'#b9c9d4',card:'rgba(255,255,255,.045)',line:'rgba(255,255,255,.14)',glow:'radial-gradient(60% 55% at 50% 50%,rgba(143,179,204,.35),rgba(19,37,49,0) 72%)',label:'Collection B — Precious · 199 ETB',heading:'Beautiful stones for beautiful people.',intro:["A Dinguy doesn't have to be expensive to mean something.",'Sometimes you just need the right one.'],suggestIntro:'Try one of these:',world:'For your loved one',hf:"'Instrument Serif',Georgia,serif",hs:'italic',hw:400,hl:'-.02em',r:'22px',btnBg:'#f4efe9',btnFg:'#132531',btnR:'999px',top:'linear-gradient(90deg,transparent,rgba(207,224,234,.7),transparent)',topH:'1px',tape:false,flowers:true}
 };
+if(GTA){const dusk='radial-gradient(120% 70% at 50% 0%,#6b3f78 0%,#2c1b45 42%,#120b1e 100%)';
+  Object.assign(THEME.loved,{bg:dusk,sub:'#e3cfe6',card:'rgba(255,255,255,.05)',line:'rgba(255,217,168,.18)',glow:'radial-gradient(60% 55% at 50% 50%,rgba(255,170,140,.35),rgba(44,27,69,0) 72%)',btnBg:'#ffd9a8',btnFg:'#2a1838'});}
 const OCC=['Birthday','Anniversary','Graduation','Farewell','Apology','Just because'];
 const FAQ=[['Is DINGUY a real stone registry?','DINGUY is a private, unofficial digital registration experience created for symbolic gifting and entertainment.'],['Do I receive a physical stone?','No. DINGUY registrations are entirely digital. No physical stone is shipped.'],['Do I own the stone?','No. Your registration does not grant ownership of any physical stone, mineral, gemstone, land or other property.'],['What do I actually receive?','You receive a professionally designed digital certificate and a personal registry page with a unique registration number.'],['Can I send it to someone?','Yes. Every registration has a shareable registry link, and the certificate can be downloaded and sent to the recipient.'],['Can I choose the name?','Yes. You can register it to anyone you choose, subject to our terms.'],['Can I write my own message?','Yes. You can write your own dedication or use one of our suggestions.'],['Is this similar to naming a star?','The idea is similar in the sense that it creates a symbolic personal registration for a gift. DINGUY makes no claim to officially name or transfer ownership of a physical object.'],['Is DINGUY associated with an astronomical organization or geological authority?','No. DINGUY is an independent private service.'],['Can I get a refund?','Please see our Terms & Conditions for our refund and cancellation policy.']];
 const TERMS=[['What DINGUY provides',['DINGUY provides a digital, symbolic registration and certificate service intended primarily for gifting, entertainment and personal expression.','A completed registration creates a record within the private DINGUY Registry and generates a digital certificate.']],
@@ -1050,7 +1130,8 @@ const RVT=['DG-004281','SPECIMEN','REGISTERED','ACTIVE','F-01','L-04','SYMBOLIC'
 class Component extends DCLogic {
   heroStoneRef=React.createRef();bridgeRef=React.createRef();starRef=React.createRef();macroRef=React.createRef();bridgeTitleRef=React.createRef();capARef=React.createRef();capBRef=React.createRef();capPRef=React.createRef();carRef=React.createRef();progRef=React.createRef();zoomRef=React.createRef();parRef=React.createRef();bridgeEndRef=React.createRef();bridgeShadeRef=React.createRef();zoomDepthRef=React.createRef();zTxt=[0,1,2,3].map(()=>React.createRef());
   rv=RVT.map((t,i)=>({t,x:Math.random()*90,y:Math.random()*92,dx:(Math.random()-.5)*1400,dy:(Math.random()-.5)*1400,r:(Math.random()-.5)*180}));
-  state={pay:{id:'',key:'',loading:false,order:null,error:'',txn:'',step:1},busy:false,regErr:'',lookupBusy:'',serverRecent:[],search:{q:'',busy:false,results:null,error:''},route:this.parse(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),toPhone:'',email:'',byEmail:''},regs:this.load(),menu:false,sheet:false,toast:'',faqOpen:0,proc:-1,cycleNo:'',stamped:false,archived:false,rvs:0,certOpen:false,carIndex:1,msgPick:-1,lookup:'',lastNo:'',pendingNo:this.newNo(),wide:typeof window!=='undefined'&&window.innerWidth>=900,contact:{name:'',reach:'',need:'Website',msg:''},sent:false};
+  state={pay:{id:'',key:'',loading:false,order:null,error:'',txn:'',step:1},busy:false,regErr:'',lookupBusy:'',serverRecent:[],search:{q:'',busy:false,results:null,error:''},route:this.parse(),draft:{slug:'',to:'',by:'',occasion:'',message:'',agree:false,phone:this.savedPhone(),toPhone:'',email:'',byEmail:''},regs:this.load(),menu:false,sheet:false,toast:'',faqOpen:0,proc:-1,cycleNo:'',stamped:false,archived:false,rvs:0,certOpen:false,carIndex:1,msgPick:-1,lookup:'',lastNo:'',pendingNo:this.newNo(),wide:typeof window!=='undefined'&&window.innerWidth>=900,contact:{name:'',reach:'',need:'Website',msg:''},sent:false,gtaLoad:GTA_LOAD,introNo:'',introPhase:''};
+  introRef=React.createRef();
 
   parse(){const h=(location.hash||'').replace(/^#\/?/,'').replace(/\/$/,'');const p=h.split('/');return{path:h,a:p[0]||'',b:decodeURIComponent(p[1]||''),c:decodeURIComponent(p[2]||'')};}
   load(){try{return{...SEED,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return{...SEED}}}
@@ -1073,7 +1154,28 @@ class Component extends DCLogic {
     this.onResize=()=>{const w=window.innerWidth>=900;if(w!==this.state.wide)this.setState({wide:w});};window.addEventListener('resize',this.onResize);
     this.onScrollH=()=>{if(!this.tk){this.tk=true;requestAnimationFrame(()=>{this.tk=false;this.scrollFx();});}};window.addEventListener('scroll',this.onScrollH,{passive:true});
     this.onRoute(true);
+    if(this.state.gtaLoad)this.later(()=>this.setState({gtaLoad:false}),2900);
   }
+  /* ---- the prank intro: gate → video → WASTED → certificate ----
+     The music (ነብሮ) comes in just before the video ends, plays under WASTED, and fades out as the CD and certificate appear. */
+  fadeTo(a,to,ms,done){if(!a)return;cancelAnimationFrame(this.fadeRaf);const from=a.volume,t0=performance.now();
+    const step=t=>{const k=Math.min(1,(t-t0)/ms);try{a.volume=Math.max(0,Math.min(1,from+(to-from)*k));}catch(e){}if(k<1)this.fadeRaf=requestAnimationFrame(step);else done&&done();};this.fadeRaf=requestAnimationFrame(step);}
+  musicIn(){if(this.musicOn||!this.music)return;this.musicOn=true;const a=this.music;try{a.currentTime=0;a.volume=0;}catch(e){}a.play().catch(()=>{});this.fadeTo(a,1,900);}
+  introStart(no){
+    if(!this.music){this.music=new Audio('assets/nebro.m4a');this.music.preload='auto';}
+    // unlock audio inside the tap, so it can start later without another tap (iPhone)
+    const a=this.music;a.volume=0;a.play().then(()=>{if(!this.musicOn){a.pause();try{a.currentTime=0;}catch(e){}}}).catch(()=>{});this.musicOn=false;
+    this.setState({introNo:no,introPhase:'video'});
+    const v=this.introRef.current;if(!v){this.toWasted(no);return;}
+    v.playsInline=true;v.muted=false;try{v.currentTime=0;}catch(e){}
+    v.ontimeupdate=()=>{if(v.duration&&v.duration-v.currentTime<2.2)this.musicIn();};
+    v.onended=()=>this.toWasted(no);v.onerror=()=>this.toWasted(no);
+    v.play().catch(()=>{v.muted=true;v.play().catch(()=>this.toWasted(no));});
+  }
+  toWasted(no){if(this.state.introPhase==='wasted'||this.state.introPhase==='done')return;const v=this.introRef.current;if(v)try{v.pause();}catch(e){}
+    this.musicIn();this.setState({introNo:no,introPhase:'wasted'});clearTimeout(this.wt);this.wt=setTimeout(()=>this.toCert(no),9000);}
+  toCert(no){clearTimeout(this.wt);const a=this.music;if(a)this.fadeTo(a,0,1500,()=>{a.pause();this.musicOn=false;});
+    this.setState({introNo:no,introPhase:'done'});window.scrollTo(0,0);}
   componentWillUnmount(){clearInterval(this.poll);clearInterval(this.waitTk);window.removeEventListener('hashchange',this.onHash);window.removeEventListener('resize',this.onResize);window.removeEventListener('scroll',this.onScrollH);clearInterval(this.cyc);(this.tm||[]).forEach(clearTimeout);}
   later(fn,ms){(this.tm=this.tm||[]).push(setTimeout(fn,ms));}
   onRoute(first){
@@ -1348,7 +1450,7 @@ class Component extends DCLogic {
     const homeWorld=st.homeTab==='loved'?'loved':'friend';
     const feat0=P.find(p=>p.slug==='broke-city-addis')||P[0],feat={...mk(feat0),forWho:feat0.kind==='cd'?'Dinguy Pranks · For your friend':feat0.w==='friend'?'For your friend':'For your loved one'};
     const homeItems=P.filter(p=>p.w===homeWorld).map(mk);
-    const homeIntro=homeWorld==='friend'?'Funny, heavy, everyday stones. 89 Birr each.':'Beautiful, meaningful and a little ridiculous. 199 Birr each.';
+    const homeIntro=homeWorld==='friend'?'Funny, heavy, everyday stones from 89 Birr, and one prank.':'Beautiful, meaningful and a little ridiculous. 199 Birr each.';
     const cat={...T,price:price(world),items:P.filter(p=>p.w===world).map(mk),
       suggestions:MS[world].map((m,i)=>{const sel=st.msgPick===i;return{text:`“${m}”`,sel,tagline:sel?'Selected':'Tap to select',bg:sel?T.btnBg:'transparent',fg:sel?T.btnFg:T.ink,pick:()=>this.setState({msgPick:sel?-1:i})};})};
     const prod=pr?{...T,...mk(pr),sub2:pr.sub,world:T.world,paras:pr.d.map(d=>typeof d==='string'?{t:d,w:400}:{t:d.b,w:600}),meta:pr.meta.map(([k,v])=>({k,v})),back:go(pr.w==='friend'?'friend':'loved-one'),register:pr.soldOut?()=>{}:go('register/'+pr.slug)}:{kind:'cobble',name:'',sub2:'',priceLabel:'',back:go('friend')};
@@ -1371,7 +1473,12 @@ class Component extends DCLogic {
     const rvs=st.rvs;
     return{
       isDinguy:!isSW,isSW,isHome:a===''&&!isNotFound,isCatalog,isProduct,isRegister,isPay,isLoadingRec,lookupBusy:st.lookupBusy,po:this.payVals(),setTxn:e=>{const v=this.cleanCode(e.target.value);this.setState(s=>({pay:{...s.pay,txn:v,error:''}}));},pasteTxn:this.pasteTxn,sentMoney:()=>this.setPayStep(2),payJami:this.payJami,payAuto:()=>this.setState(s=>({pay:{...s.pay,manual:false,error:''}})),payManual:()=>{clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,manual:true,error:''}}));},jamiRetry:()=>{clearInterval(this.poll);this.setState(s=>({pay:{...s.pay,order:{...s.pay.order,jami:{...s.pay.order.jami,state:'retry'}}}}));},notSentYet:()=>this.setPayStep(1),verifyPay:this.verifyPay,
-      copyPhone:()=>this.copy((st.pay.order&&st.pay.order.payTo.phone)||'0996567218','Number copied.'),copyOrderLink:()=>this.copy(location.href,'Order link copied.'),isSuccess,isRecord,wastedBy:(rr.by||'').trim()||'your friend',showWasted:isRecord&&rr.kind==='cd'&&st.wastedNo!==rr.no,closeWasted:e=>{e&&e.stopPropagation();this.setState({wastedNo:rr.no});},isRegistryIndex,isNotFound,isFaq:a==='faq',isTerms:a==='terms',isSWHome,isWebsites,isGuerrilla,isContact,
+      copyPhone:()=>this.copy((st.pay.order&&st.pay.order.payTo.phone)||'0996567218','Number copied.'),copyOrderLink:()=>this.copy(location.href,'Order link copied.'),isSuccess,isRecord,wastedBy:(rr.by||'').trim()||'Your friend',
+      ...(()=>{const on=isRecord&&rr.kind==='cd',ph=st.introNo===rr.no?st.introPhase:'gate';
+        return{showIntro:on&&(ph==='gate'||ph==='video'),showGate:on&&ph==='gate',showSkip:on&&ph==='video',showWasted:on&&ph==='wasted',
+          introRef:this.introRef,startIntro:e=>{e&&e.stopPropagation();this.introStart(rr.no);},skipIntro:e=>{e&&e.stopPropagation();this.toWasted(rr.no);},
+          closeWasted:e=>{e&&e.stopPropagation();this.toCert(rr.no);}};})(),
+      gtaOn:GTA,classicOn:!GTA,gtaLoad:!!st.gtaLoad,gtaTip:GTA_TIPS[(new Date().getMinutes())%GTA_TIPS.length],endGtaLoad:()=>this.setState({gtaLoad:false}),isRegistryIndex,isNotFound,isFaq:a==='faq',isTerms:a==='terms',isSWHome,isWebsites,isGuerrilla,isContact,
       wide,narrow:!wide,isTouch:typeof window!=='undefined'&&!!window.matchMedia&&matchMedia('(pointer:coarse)').matches,langLabel:LANG==='am'?'English':'አማርኛ',langOther:LANG==='am'?'en':'am',toggleLang:()=>window.dgLang&&window.dgLang.set(LANG==='am'?'en':'am'),swLabel:wide?'MADE BY SIDEWAYS':'SIDEWAYS',progRef:this.progRef,menu:st.menu,sheet:st.sheet,spinRate,heroKind:this.props.heroStone||'cobble',
       feat,featSpin:motion?.8:0,homeItems,homeIntro,tabFriendSel:homeWorld==='friend',tabLovedSel:homeWorld==='loved',
       tabFriend:()=>this.setState({homeTab:'friend'}),tabLoved:()=>this.setState({homeTab:'loved'}),

@@ -38,14 +38,17 @@ export function messages(o, site = SITE) {
   // to the recipient, once paid. The prank CD keeps the joke: the text promises GTA VI, the link says WASTED.
   const prank = o.kind === 'cd';
   const gift = prank ? (am
-      ? `ሰላም ${o.to}! 🎮 ${o.by} GTA VI ገዝተውልዎታል 😂 እዚህ ይክፈቱት፦ ${recordLink} — DINGUY`
-      : `Hi ${o.to}! 🎮 ${o.by} found GTA VI for you 😂 Open it here: ${recordLink} — DINGUY`)
+      ? `★ አዲስ ተልዕኮ ★\n${o.by} ነፃ የGTA ሙከራ ገዝተውልዎታል 🎮\nእዚህ ይጀምሩት፦ ${recordLink}\n— DINGUY`
+      : `★ NEW MISSION ★\n${o.by} bought you a free GTA Trial 🎮\nStart it here: ${recordLink}\n— DINGUY`)
     : am
     ? `ሰላም ${o.to}! 🎁 ${o.by} በDINGUY መዝገብ ${o.name}ን በስምዎ አስመዝግበዋል። የምዝገባ ቁ. ${o.id}። መዝገብዎንና ሰርተፊኬትዎን ይመልከቱ፦ ${recordLink} — DINGUY`
     : `Hi ${o.to}! 🎁 ${o.by} has registered ${o.name} in your name with the DINGUY Registry. Registration No. ${o.id}. See your record and certificate: ${recordLink} — DINGUY`;
-  const subject = prank ? (am ? `${o.to}፣ GTA VI ደርሶዎታል 🎮` : `${o.to}, your copy of GTA VI is here 🎮`)
+  const subject = prank ? (am ? `${o.to}፣ ${o.by} ነፃ የGTA ሙከራ ገዝተውልዎታል 🎮` : `${o.to}, ${o.by} bought you a free GTA Trial 🎮`)
     : am ? `${o.to}፣ በስምዎ ድንጋይ ተመዝግቧል` : `${o.to}, a stone has been registered in your name`;
-  const body = am
+  const body = prank ? (am
+      ? `★ አዲስ ተልዕኮ ★\n\nሰላም ${o.to}፣\n\n${o.by} ነፃ የGTA ሙከራ ገዝተውልዎታል 🎮\n\nተልዕኮ፦ ከማለቁ በፊት ይጀምሩት።\n▶ ${recordLink}\n\n—\nDINGUY · ${SW_CONTACT} · 0996 567 218`
+      : `★ NEW MISSION ★\n\nHi ${o.to},\n\n${o.by} bought you a free GTA Trial 🎮\n\nMission: start it before it runs out.\n▶ ${recordLink}\n\n—\nDINGUY · ${SW_CONTACT} · 0996 567 218`)
+    : am
     ? `ሰላም ${o.to}፣\n\n${o.by} በDINGUY መዝገብ ውስጥ ${o.name}ን በስምዎ አስመዝግበዋል።\n\n${o.message ? `“${o.message}”\n\n` : ''}የምዝገባ ቁ. ${o.id}\nመዝገብዎና ሰርተፊኬትዎ፦ ${recordLink}\n\nDINGUY® — ከልክ በላይ ትርጉም ላላቸው አጋጣሚዎች የተመዘገቡ ድንጋዮች።\nዲጂታል ምዝገባ። አካላዊ ድንጋይ አይካተትም።\n\n—\nDINGUY የSIDEWAYS ስራ ነው።\nSIDEWAYS ሰዎች ቆም ብለው፣ ደግመው አይተው እንዲያስታውሱ የሚያደርጉ ድረ-ገጾችን፣ ዘመቻዎችንና ሀሳቦችን ይሰራል።\nየእርስዎን ሀሳብ እንስራው፦ ${SW_LINK}\n${SW_CONTACT} · 0996 567 218`
     : `Hi ${o.to},\n\n${o.by} has registered ${o.name} in your name with the DINGUY Registry.\n\n${o.message ? `“${o.message}”\n\n` : ''}Registration No. ${o.id}\nYour record and certificate: ${recordLink}\n\nDINGUY® — Registered stones for unreasonably meaningful occasions.\nDigital registration. No physical stone included.\n\n—\nDINGUY is a SIDEWAYS project.\nSIDEWAYS makes websites, campaigns and ideas that make people stop, look twice and remember.\nGot an idea? Let’s make people talk: ${SW_LINK}\n${SW_CONTACT} · 0996 567 218`;
   const tg = TG(), tgLine = tg ? (am ? `\n\nየDINGUY ቴሌግራም ቡድናችንን ይቀላቀሉ፦ ${tg}` : `\n\nJoin the DINGUY Telegram group: ${tg}`) : '';

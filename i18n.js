@@ -53,7 +53,7 @@
     "Certified Heavy": "የተረጋገጠ ከባድ",
 
     /* ---------- catalog / product ---------- */
-    "Collection A — Industrial · 89 ETB": "ስብስብ A — ኢንዱስትሪያል · 89 ብር",
+    "Collection A — Industrial · 89 ETB": "ስብስብ A — ኢንዱስትሪያል · 89 ብር", "Collection A — Industrial · from 89 ETB": "ስብስብ A — ኢንዱስትሪያል · ከ89 ብር ጀምሮ", "For a friend · from 89": "ለጓደኛ · ከ89 ጀምሮ", "Funny, heavy, everyday stones from 89 Birr, and one prank.": "አስቂኝ፣ ከባድ፣ የዕለት ተዕለት ድንጋዮች ከ89 ብር ጀምሮ፣ እና አንድ ቀልድ።",
     "CERTIFIED DINGUYS FOR YOUR DINGUY RAS": "ለድንጋይ ራስ ጓደኛዎ የተረጋገጡ ድንጋዮች",
     "Some friendships need flowers.": "አንዳንድ ጓደኝነቶች አበባ ይፈልጋሉ።", "Some need chocolate.": "አንዳንዶቹ ቸኮሌት።",
     "Some need a properly registered stone.": "አንዳንዶቹ ደግሞ በትክክል የተመዘገበ ድንጋይ።", "We'll help you.": "እኛ እናግዝዎታለን።",
@@ -128,6 +128,11 @@
     "New: Broke City Addis. Tell your friend you bought them GTA VI. They’ll find out. Plus three new stones.": "አዲስ፦ Broke City Addis። ለጓደኛዎ GTA VI እንደገዙላቸው ይንገሯቸው። ይደርሱበታል። በተጨማሪም ሶስት አዳዲስ ድንጋዮች።",
     "Beautiful, meaningful and a little ridiculous. 199 Birr each.": "ውብ፣ ትርጉም ያላቸውና ትንሽ አስቂኝ። እያንዳንዳቸው 199 ብር።",
     "was promised GTA VI and is hereby registered with": "GTA VI ተገብቶላቸው ነበር፤ በዚህም ተመዝግበዋል፦", "Mission failed. Friendship status: active.": "ተልዕኮ አልተሳካም። የጓደኝነት ሁኔታ፦ ንቁ።", "PLAYED": "ተሸውዷል", "Prank grade · Not the game": "የቀልድ ደረጃ · ጨዋታው አይደለም", "PRANK GRADE · NOT THE GAME": "የቀልድ ደረጃ · ጨዋታው አይደለም", "Played": "ተሸውዷል",
+    "Out now · Dinguy Pranks": "አሁን ወጥቷል · የDinguy ቀልዶች", "Broke City Addis: The Prank": "Broke City Addis፦ ቀልዱ",
+    "Tell your friend they got a free GTA Trial. They press start. They get WASTED. Then a certificate in their name.": "ለጓደኛዎ ነፃ የGTA ሙከራ እንደደረሳቸው ይንገሯቸው። START ይጫናሉ። WASTED ይሆናሉ። ከዚያ በስማቸው ሰርተፊኬት።",
+    "★ New mission ★": "★ አዲስ ተልዕኮ ★", "bought you a free GTA Trial": "ነፃ የGTA ሙከራ ገዝተውልዎታል", "▶ PRESS START": "▶ ጀምር", "🔊 Sound on": "🔊 ድምፅ ይክፈቱ", "SKIP ›": "ዝለል ›", "TIP": "ምክር",
+    "Friends who get WASTED still keep their certificate.": "WASTED የሆኑ ጓደኞች ሰርተፊኬታቸውን ይይዛሉ።", "Every Dinguy is registered. None of them are real.": "እያንዳንዱ Dinguy ተመዝግቧል። አንዳቸውም እውነት አይደሉም።",
+    "A free GTA Trial is the cheapest way to lose a friend.": "ነፃ የGTA ሙከራ ጓደኛን ለማጣት በጣም ርካሹ መንገድ ነው።", "Turn your sound on for the full experience.": "ሙሉውን ለማጣጣም ድምፅዎን ይክፈቱ።",
     "YOU GOT PLAYED.": "ተሸወድክ።", "Too broke to buy you GTA VI.": "GTA VI ልገዛልህ ብሬ አልበቃም።", "MISSION COMPLETE · YOUR TIME WAS WASTED": "ተልዕኮ ተሳክቷል · ጊዜህ ባከነ",
     "FRIENDSHIP STATUS: ACTIVE": "የጓደኝነት ሁኔታ፦ ንቁ", "SEE YOUR CERTIFICATE →": "ሰርተፊኬትህን ተመልከት →", "A Dinguy prank gift. Not the actual game.": "የDinguy የቀልድ ስጦታ። እውነተኛው ጨዋታ አይደለም።",
     /* new: የወርቅ ቀሚስ (the gold dress, 280) */
