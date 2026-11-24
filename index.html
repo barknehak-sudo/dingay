@@ -14,7 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Passion+One:wght@700&amp;family=Instrument+Serif:ital@0;1&amp;family=Noto+Sans+Ethiopic:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;family=Noto+Sans+Ethiopic:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
 html,body{margin:0;background:#000;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 *{box-sizing:border-box}
@@ -33,8 +33,6 @@ input::placeholder,textarea::placeholder{color:rgba(11,23,32,.32)}
 @keyframes dg-word{from{transform:translateY(105%) rotate(3deg)}to{transform:none}}
 @keyframes dg-shift{to{background-position:300% 0}}
 @keyframes dg-fade{from{opacity:0}to{opacity:1}}
-/* GTA-style "wasted": Pricedown if it is ever added to assets, else Passion One (closest free match) */
-.dg-wasted{font-family:'Pricedown','Passion One',Impact,sans-serif;font-weight:700;line-height:.92;letter-spacing:.01em;color:#c4261d;-webkit-text-stroke:.045em #000;paint-order:stroke fill;text-shadow:0 .03em 0 #000}
 @keyframes dg-wasted{0%{opacity:0;transform:scale(1.6);filter:blur(8px)}60%{opacity:1;filter:blur(0)}100%{transform:scale(1)}}
 @keyframes dg-slidebg{from{transform:translate3d(0,0,0)}to{transform:translate3d(-66.666%,0,0)}}
 html{-webkit-text-size-adjust:100%}
@@ -878,7 +876,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
   <div class="dg-overlay" role="dialog" aria-label="Wasted" onClick="{{ closeWasted }}" style="position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;cursor:pointer;background:radial-gradient(80% 60% at 50% 50%,rgba(40,8,8,.55),rgba(0,0,0,.92)),url(assets/broke-city-addis.jpg) center/cover;color:#fff;animation:dg-fade .5s ease">
     <div style="position:absolute;inset:0;backdrop-filter:grayscale(1) blur(3px);-webkit-backdrop-filter:grayscale(1) blur(3px);pointer-events:none"></div>
     <div style="position:relative;max-width:560px">
-      <div style="margin:0 -100vw;padding:2vw 100vw;background:rgba(0,0,0,.62);animation:dg-fade .5s .2s both"><div class="dg-wasted" style="font-size:clamp(84px,24vw,190px);animation:dg-wasted 1.4s cubic-bezier(.2,.8,.2,1) both">wasted</div></div>
+      <div style="margin:0 -100vw;padding:2vw 100vw;background:rgba(0,0,0,.62);animation:dg-fade .5s .2s both"><img src="assets/wasted.svg" alt="wasted" style="display:block;margin:0 auto;width:min(86vw,620px);height:auto;animation:dg-wasted 1.4s cubic-bezier(.2,.8,.2,1) both"></div>
       <div style="margin-top:14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;letter-spacing:.18em;font-weight:600;animation:dg-fade .6s 1s both">YOU GOT PLAYED.</div>
       <p style="margin:22px 0 0;font-size:clamp(19px,5vw,24px);line-height:1.3;font-weight:700;animation:dg-fade .6s 1.4s both">Too broke to buy you GTA VI.<br>But {{ wastedBy }} got you this.</p>
       <div style="margin-top:22px;display:grid;gap:6px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.12em;color:#ffd9a0;animation:dg-fade .6s 1.8s both"><span>MISSION COMPLETE · YOUR TIME WAS WASTED</span><span>FRIENDSHIP STATUS: ACTIVE</span></div>
@@ -1224,7 +1222,6 @@ class Component extends DCLogic {
     if(loved&&document.fonts)try{await Promise.race([document.fonts.load('italic 64px "Instrument Serif"'),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
     const F='"Helvetica Neue",Helvetica,Arial,"Noto Sans Ethiopic",sans-serif',M='"IBM Plex Mono",ui-monospace,monospace',S='"Instrument Serif",Georgia,"Noto Serif Ethiopic",serif';
     const party=reg.kind==='cake',prank=reg.kind==='cd',friend=prank||['cobble','blocket','river','foundation','pebble','iron','charcoal'].includes(reg.kind);
-    if(prank&&document.fonts)try{await Promise.race([document.fonts.load('700 200px "Passion One"'),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
     const C=friend?{ink:'#0b0b0b',sub:'#3b3b3b',mut:'#6a6a64',acc:'#0b0b0b',rule:'rgba(11,11,11,.5)',b1:'#0b0b0b',b2:'rgba(11,11,11,.18)',stamp:'#0b0b0b'}
            :party?{ink:'#2b1d2e',sub:'#6b5566',mut:'#8c7488',acc:'#d6336c',rule:'rgba(214,51,108,.4)',b1:'rgba(214,51,108,.65)',b2:'rgba(76,201,240,.6)',stamp:'#d6336c'}
            :loved?{ink:'#3a1f24',sub:'#7a4d55',mut:'#9a6b72',acc:'#a83f58',rule:'rgba(184,146,90,.6)',b1:'rgba(184,146,90,.9)',b2:'rgba(184,146,90,.4)',stamp:'#a83f58'}
@@ -1275,7 +1272,8 @@ class Component extends DCLogic {
     if(friend){x.save();x.translate(R-110,200);x.rotate(-9*Math.PI/180);x.fillStyle='rgba(242,194,48,.62)';x.fillRect(-80,-18,160,36);x.restore();}
     // the prank: a GTA-style "wasted" band across the certificate
     if(prank){x.save();x.translate(W/2,890);x.rotate(-5*Math.PI/180);x.fillStyle='rgba(0,0,0,.66)';x.fillRect(-W,-85,W*2,170);
-      x.textAlign='center';x.textBaseline='middle';x.font=`700 185px "Pricedown","Passion One",Impact,sans-serif`;x.lineJoin='round';x.lineWidth=22;x.strokeStyle='#000';x.strokeText('wasted',0,12);x.fillStyle='#c4261d';x.fillText('wasted',0,6);x.restore();}
+      // "wasted" is a fixed image made with Pricedown (the font file itself is not on the site)
+      const wi=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src='assets/wasted.svg';});if(wi){const ww=760,wh=ww*wi.naturalHeight/wi.naturalWidth;x.drawImage(wi,-ww/2,-wh/2,ww,wh);}x.restore();}
     const url=c.toDataURL('image/png'),fname=`DINGUY-${reg.no}.png`;
     // On phones, hand the image to the share sheet — it has "Save Image" (iPhone) / "Save to gallery" (Android).
     if(window.matchMedia&&matchMedia('(pointer:coarse)').matches&&navigator.canShare){try{const b=atob(url.split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
