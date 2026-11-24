@@ -14,7 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;family=Noto+Sans+Ethiopic:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Passion+One:wght@700&amp;family=Instrument+Serif:ital@0;1&amp;family=Noto+Sans+Ethiopic:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
 html,body{margin:0;background:#000;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 *{box-sizing:border-box}
@@ -33,6 +33,8 @@ input::placeholder,textarea::placeholder{color:rgba(11,23,32,.32)}
 @keyframes dg-word{from{transform:translateY(105%) rotate(3deg)}to{transform:none}}
 @keyframes dg-shift{to{background-position:300% 0}}
 @keyframes dg-fade{from{opacity:0}to{opacity:1}}
+/* GTA-style "wasted": Pricedown if it is ever added to assets, else Passion One (closest free match) */
+.dg-wasted{font-family:'Pricedown','Passion One',Impact,sans-serif;font-weight:700;line-height:.92;letter-spacing:.01em;color:#c4261d;-webkit-text-stroke:.045em #000;paint-order:stroke fill;text-shadow:0 .03em 0 #000}
 @keyframes dg-wasted{0%{opacity:0;transform:scale(1.6);filter:blur(8px)}60%{opacity:1;filter:blur(0)}100%{transform:scale(1)}}
 @keyframes dg-slidebg{from{transform:translate3d(0,0,0)}to{transform:translate3d(-66.666%,0,0)}}
 html{-webkit-text-size-adjust:100%}
@@ -876,7 +878,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
   <div class="dg-overlay" role="dialog" aria-label="Wasted" onClick="{{ closeWasted }}" style="position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;cursor:pointer;background:radial-gradient(80% 60% at 50% 50%,rgba(40,8,8,.55),rgba(0,0,0,.92)),url(assets/broke-city-addis.jpg) center/cover;color:#fff;animation:dg-fade .5s ease">
     <div style="position:absolute;inset:0;backdrop-filter:grayscale(1) blur(3px);-webkit-backdrop-filter:grayscale(1) blur(3px);pointer-events:none"></div>
     <div style="position:relative;max-width:560px">
-      <div style="font-family:'Pricedown','Anton',Impact,'Arial Black',sans-serif;font-size:clamp(64px,19vw,150px);line-height:.9;letter-spacing:.02em;color:#c8102e;text-shadow:0 0 2px #000,3px 3px 0 #000,0 0 30px rgba(200,16,46,.55);animation:dg-wasted 1.4s cubic-bezier(.2,.8,.2,1) both">WASTED</div>
+      <div style="margin:0 -100vw;padding:2vw 100vw;background:rgba(0,0,0,.62);animation:dg-fade .5s .2s both"><div class="dg-wasted" style="font-size:clamp(84px,24vw,190px);animation:dg-wasted 1.4s cubic-bezier(.2,.8,.2,1) both">wasted</div></div>
       <div style="margin-top:14px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;letter-spacing:.18em;font-weight:600;animation:dg-fade .6s 1s both">YOU GOT PLAYED.</div>
       <p style="margin:22px 0 0;font-size:clamp(19px,5vw,24px);line-height:1.3;font-weight:700;animation:dg-fade .6s 1.4s both">Too broke to buy you GTA VI.<br>But {{ wastedBy }} got you this.</p>
       <div style="margin-top:22px;display:grid;gap:6px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.12em;color:#ffd9a0;animation:dg-fade .6s 1.8s both"><span>MISSION COMPLETE · YOUR TIME WAS WASTED</span><span>FRIENDSHIP STATUS: ACTIVE</span></div>
@@ -899,7 +901,7 @@ button,a,input,textarea,label,[role=button]{touch-action:manipulation;-webkit-ta
     <div style="border-radius:22px;background:radial-gradient(120% 80% at 50% 0%,#24394a 0%,#0e1a23 60%,#060b0f 100%);color:#eef2f4;padding:22px 20px 20px">
       <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#a9bccb"><span>Registry · Just added</span><button onClick="{{ closeNew }}" aria-label="Close" style="background:none;border:0;width:40px;height:40px;margin:-10px -10px -10px 0;font-size:22px;cursor:pointer;color:#eef2f4">×</button></div>
       <h2 style="margin:10px 0 0;font-size:clamp(30px,8vw,40px);line-height:1;letter-spacing:-.035em;font-weight:800">New Dinguys are here.</h2>
-      <p style="margin:12px 0 0;font-size:16px;line-height:1.45;color:#b9c9d4">New: Broke City Addis. Your friend thinks it’s GTA VI. It isn’t. Plus three new stones.</p>
+      <p style="margin:12px 0 0;font-size:16px;line-height:1.45;color:#b9c9d4">New: Broke City Addis. Tell your friend you bought them GTA VI. They’ll find out. Plus three new stones.</p>
       <div style="margin-top:18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
         <sc-for list="{{ newItems }}" as="n" hint-placeholder-count="4"><button onClick="{{ n.open }}" style="min-width:0;border-radius:14px;border:1px solid rgba(238,242,244,.16);background:radial-gradient(60% 50% at 50% 38%,rgba(255,195,113,.22),rgba(0,0,0,0) 72%),rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:8px 10px 12px;text-align:left;color:#eef2f4;cursor:pointer;animation:dg-fade .5s ease both;animation-delay:{{ n.delay }}">
           <div style="width:78%;margin:0 auto"><dc-import name="Stone" kind="{{ n.kind }}" spin="{{ spinRate }}" hint-size="100%,100px"></dc-import></div>
@@ -971,8 +973,8 @@ const P=[
   meta:[['Specimen No.','F-06'],['Classification','Solid iron, perfectly round'],['Origin','The school sports field'],['Weight','Yes'],['Range','Further than expected'],['Emotional weight','Olympic']]},
  // Dinguy Pranks 001: the friend thinks it's GTA VI, opens the link and gets WASTED. Not the actual game.
  {slug:'broke-city-addis',isNew:true,w:'friend',name:'BROKE CITY ADDIS',sub:'GTA VI · Wasted Edition',kind:'cd',fig:'F-08',cls:'Prank · Digital',
-  d:['Too broke to buy you GTA VI. But I got you this.','They think it’s the game.\nThey open the link.\nWASTED.','A prank gift with a certificate and a WASTED reveal. Not the actual game.'],
-  meta:[['Specimen No.','F-08'],['Collection','Dinguy Pranks'],['Format','CD case (symbolic)'],['Contains','A WASTED reveal'],['Actual game','Not included'],['Friendship status','Active']]},
+  d:['Tell your friend you bought them GTA VI.','They get the text: “I found GTA VI for you 😂”\nThey open it, already celebrating.\nWASTED.','Then a real certificate in their name, for a game they still don’t have. Not the actual game.'],
+  meta:[['Specimen No.','F-08'],['Collection','Dinguy Pranks'],['What they think','GTA VI'],['What they get','WASTED'],['Actual game','Not included'],['Friendship status','Active']]},
  {slug:'kesel-dingay',isNew:true,w:'friend',name:'ከሰል ድንጋይ',sub:'The One Who Keeps the Fire Going',kind:'charcoal',fig:'F-07',cls:'Carbon · Slow Burn',
   d:['For the friend behind every coffee ceremony and every late-night talk.','Quiet on the outside.\nWarm on the inside.\nStill glowing at 2 a.m.'],
   meta:[['Specimen No.','F-07'],['Classification','Carbon, slow burn'],['Origin','Next to the ጀበና'],['Temperature','Warm'],['Burn time','All night'],['Emotional weight','Glowing']]},
@@ -1008,11 +1010,11 @@ const P=[
 // Price in Birr: 89 for friends, 199 for loved ones, unless a Dinguy has its own.
 P.forEach(p=>{p.price=p.price||(p.w==='friend'?89:199);});
 const MSG={friend:['አንተ በእውነት ድንጋይ ነህ።',"For the weight you've carried and the weight you've become.",'Some people get stars. You get this.','I saw this and immediately thought of you.','በስምህ የተመዘገበ ድንጋይ እንኳን አይበቃህም።','ሁሉም ሰው ኮከብ አይኖረውም። አንተ ግን ድንጋይ አለህ። 😂','Congratulations. You are now the proud owner of absolutely nothing, but this stone has your name on it.','I spent 89 birr to make our friendship legally unnecessary.','Some people get flowers. You got a professionally registered stone.'],
- cd:['Bro, I got you GTA VI. 😂','Too broke to buy you GTA. But I got you this.','Mission failed: your friend thought you deserved GTA.','$0 bounty. Your friendship is priceless. Your gift isn’t.','Still waiting for you to buy me something.','Respect +1. At least someone remembered your birthday.','You got played. Friendship status: ACTIVE.','WASTED. Happy birthday anyway.'],
+ cd:['Bro, I got you GTA VI. Happy birthday 🎮','You always wanted GTA VI. It’s finally yours.','Told you I’d get you GTA VI one day.','Too broke to buy you GTA. But I got you this.','Mission passed. Respect +1.','$0 bounty. Your friendship is priceless. Your gift isn’t.','You got played. Friendship status: ACTIVE.','WASTED. Happy birthday anyway.'],
  loved:['You make ordinary days feel like a celebration.','Proof, on paper, that you are my favourite person.',"I can't give you the world, so I registered a small, shiny piece of it in your name.",'For the one who makes my coffee taste better just by being there.','You are rare. Now it is official.','My heart picked you a long time ago. This is just the paperwork.','Some people get flowers. You get something that never wilts.','Beautiful, a little ridiculous, and completely yours. Just like us.'],
  dress:['Someone wore a 28 million Birr dress. You deserve one too. Here it is.','You look like a million Birr. Twenty-eight million, actually.','The red carpet called. They are waiting for you.','Your size? Perfect. Your price? 280. Your look? Priceless.',"I couldn't afford the dress, so I bought you the certificate.",'Gold suits you. Honestly, everything suits you.','For the queen of every wedding hall.','Five zeros removed. Zero love removed.']};
 const MSG_AM={friend:['አንተ በእውነት ድንጋይ ነህ።','ለተሸከምከው ክብደትና ለሆንከው ክብደት።','አንዳንዶች ኮከብ ያገኛሉ። አንተ ይሄን አገኘህ።','ይሄን ሳይ ወዲያው አንተ ትዝ አልከኝ።','በስምህ የተመዘገበ ድንጋይ እንኳን አይበቃህም።','ሁሉም ሰው ኮከብ አይኖረውም። አንተ ግን ድንጋይ አለህ። 😂','እንኳን ደስ አለህ። አሁን የምንም ነገር ኩሩ ባለቤት ነህ፤ ግን ይህ ድንጋይ ስምህን ይዟል።','ጓደኝነታችንን በሕግ አላስፈላጊ ለማድረግ 89 ብር አውጥቻለሁ።','አንዳንዶች አበባ ይሰጣቸዋል። አንተ በባለሙያ የተመዘገበ ድንጋይ ተሰጠህ።'],
- cd:['ብሮ፣ GTA VI ገዛሁልህ። 😂','GTA ልገዛልህ ብሬ አልበቃም። ግን ይሄን ገዛሁልህ።','ተልዕኮ አልተሳካም፤ GTA ይገባኛል ብለህ ነበር።','ጓደኝነትህ ዋጋ የለውም። ስጦታህም እንደዛው።','አንተ የሆነ ነገር እስክትገዛልኝ ድረስ እየጠበቅኩ ነው።','ክብር +1። ቢያንስ ልደትህን ያስታወሰ ሰው አለ።','ተሸወድክ። የጓደኝነት ሁኔታ፦ ንቁ።','WASTED። ቢሆንም መልካም ልደት።'],
+ cd:['ብሮ፣ GTA VI ገዛሁልህ። መልካም ልደት 🎮','ሁሌም GTA VI ትፈልግ ነበር። በመጨረሻ የአንተ ሆነ።','አንድ ቀን GTA VI እገዛልሃለሁ ብዬህ ነበር።','GTA ልገዛልህ ብሬ አልበቃም። ግን ይሄን ገዛሁልህ።','ተልዕኮ ተሳክቷል። ክብር +1።','ጓደኝነትህ ዋጋ የለውም። ስጦታህም እንደዛው።','ተሸወድክ። የጓደኝነት ሁኔታ፦ ንቁ።','WASTED። ቢሆንም መልካም ልደት።'],
  loved:['ተራ ቀኖችን በዓል ታደርጊያቸዋለሽ።','በጣም የምወድሽ ሰው መሆንሽ፣ በወረቀት የተረጋገጠ።','ዓለምን ልሰጥሽ አልችልም፤ ስለዚህ ትንሽ የሚያብረቀርቅ ቁራጩን በስምሽ አስመዘገብኩ።','አጠገቤ በመሆንሽ ብቻ ቡናዬን የምታጣፍጪው።','ብርቅ ነሽ። አሁን በይፋ ተረጋግጧል።','ልቤ ድሮ መርጦሻል። ይሄ ወረቀቱ ብቻ ነው።','አንዳንዶች አበባ ያገኛሉ። አንቺ የማይጠወልግ ነገር አገኘሽ።','ውብ፣ ትንሽ አስቂኝ፣ ሙሉ በሙሉ ያንቺ። ልክ እንደኛ።'],
  dress:['አንድ ሰው 28 ሚሊዮን ብር የሚያወጣ ቀሚስ ለበሰ። አንቺም ይገባሻል። ይኸው።','ሚሊዮን ብር ትመስያለሽ። እንዲያውም 28 ሚሊዮን።','ቀይ ምንጣፉ ደውሎ ነበር። እየጠበቁሽ ነው።','ልክሽ? ፍጹም። ዋጋው? 280። ውበትሽ? ዋጋ የለውም።','ቀሚሱን መግዛት አልቻልኩም፤ ስለዚህ ሰርተፊኬቱን ገዛሁልሽ።','ወርቅ ያምርብሻል። እውነቱን ለመናገር ሁሉም ያምርብሻል።','ለእያንዳንዱ የሰርግ አዳራሽ ንግሥት።','አምስት ዜሮ ተነሳ። ከፍቅሬ ግን ምንም አልተነሳም።']};
 const LANG=(window.dgLang&&window.dgLang.lang)||'en';
@@ -1221,7 +1223,8 @@ class Component extends DCLogic {
     const loved=['opal','choc','emerald','diamond','tikimt','dress'].includes(reg.kind);
     if(loved&&document.fonts)try{await Promise.race([document.fonts.load('italic 64px "Instrument Serif"'),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
     const F='"Helvetica Neue",Helvetica,Arial,"Noto Sans Ethiopic",sans-serif',M='"IBM Plex Mono",ui-monospace,monospace',S='"Instrument Serif",Georgia,"Noto Serif Ethiopic",serif';
-    const party=reg.kind==='cake',friend=['cobble','blocket','river','foundation','pebble','iron','charcoal'].includes(reg.kind);
+    const party=reg.kind==='cake',prank=reg.kind==='cd',friend=prank||['cobble','blocket','river','foundation','pebble','iron','charcoal'].includes(reg.kind);
+    if(prank&&document.fonts)try{await Promise.race([document.fonts.load('700 200px "Passion One"'),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
     const C=friend?{ink:'#0b0b0b',sub:'#3b3b3b',mut:'#6a6a64',acc:'#0b0b0b',rule:'rgba(11,11,11,.5)',b1:'#0b0b0b',b2:'rgba(11,11,11,.18)',stamp:'#0b0b0b'}
            :party?{ink:'#2b1d2e',sub:'#6b5566',mut:'#8c7488',acc:'#d6336c',rule:'rgba(214,51,108,.4)',b1:'rgba(214,51,108,.65)',b2:'rgba(76,201,240,.6)',stamp:'#d6336c'}
            :loved?{ink:'#3a1f24',sub:'#7a4d55',mut:'#9a6b72',acc:'#a83f58',rule:'rgba(184,146,90,.6)',b1:'rgba(184,146,90,.9)',b2:'rgba(184,146,90,.4)',stamp:'#a83f58'}
@@ -1251,25 +1254,28 @@ class Component extends DCLogic {
     x.fillStyle=C.rule;x.fillRect(L,178,R-L,1.5);x.fillStyle=ink;
     if(loved){x.font=`italic 400 64px ${S}`;wrap(T('Certificate of Dinguy Registration'),262,66,R-L-270);x.fillStyle=C.acc;x.font=`500 20px ${M}`;x.fillText(T('♥ GIVEN WITH LOVE ♥'),L,372);}
     else{x.font=`${friend?800:600} 44px ${F}`;wrap(T('CERTIFICATE OF DINGUY REGISTRATION'),262,52,R-L-260);
-      if(friend){x.font=`600 20px ${M}`;const tag=T('FRIEND GRADE · LOAD-BEARING'),tw=x.measureText(tag).width;x.fillStyle='#f2c230';x.fillRect(L,330,tw+28,36);x.fillStyle='#0b0b0b';x.fillText(tag,L+14,355);}
+      if(friend){x.font=`600 20px ${M}`;const tag=T(prank?'PRANK GRADE · NOT THE GAME':'FRIEND GRADE · LOAD-BEARING'),tw=x.measureText(tag).width;x.fillStyle='#f2c230';x.fillRect(L,330,tw+28,36);x.fillStyle='#0b0b0b';x.fillText(tag,L+14,355);}
       if(party){x.fillStyle=C.acc;x.font=`500 22px ${M}`;x.fillText(T('🎂 HAPPY BIRTHDAY 🎂'),L,355);}}
     x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(party?'Happy birthday! This certifies that':loved?'With love, this certifies that':'This certifies that'),L,loved?432:(party||friend)?422:380);
     const nm=loved?reg.to:reg.to.toUpperCase();x.fillStyle=ink;if(loved)fit(nm,R-L,170,'italic 400',S);else fit(nm,R-L,140,600);x.fillText(nm,L,loved?580:(party||friend)?555:510);
-    x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(friend?'has been found structurally sound and is hereby registered with':party?'has been given a slice of birthday cake, registered as':loved?'has been given a little piece of forever, registered as':'has been assigned and ceremonially registered with'),L,loved?650:(party||friend)?630:590);
+    x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(prank?'was promised GTA VI and is hereby registered with':friend?'has been found structurally sound and is hereby registered with':party?'has been given a slice of birthday cake, registered as':loved?'has been given a little piece of forever, registered as':'has been assigned and ceremonially registered with'),L,loved?650:(party||friend)?630:590);
     x.fillStyle=C.acc;const ty=T(reg.type).toUpperCase();if(loved)fit(ty,R-L,72,'italic 400',S);else fit(ty,R-L,66,600);x.fillText(ty,L,loved?740:(party||friend)?720:680);
-    x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(friend?'under the DINGUY Registry. Handle with care.':party?'in the DINGUY Registry. Make a wish.':loved?'in the DINGUY Registry, for always.':'under the DINGUY Registry.'),L,loved?796:(party||friend)?780:740);
+    x.fillStyle=C.sub;x.font=`400 32px ${F}`;x.fillText(T(prank?'Mission failed. Friendship status: active.':friend?'under the DINGUY Registry. Handle with care.':party?'in the DINGUY Registry. Make a wish.':loved?'in the DINGUY Registry, for always.':'under the DINGUY Registry.'),L,loved?796:(party||friend)?780:740);
     x.fillStyle=C.rule;x.fillRect(L,960,R-L,1.5);
     const cells=[[T('REGISTRATION NO.'),reg.no],[T('DEDICATED BY'),reg.by||T('Private')],[T('OCCASION'),T(reg.occasion||'—')],[T('DATE OF REGISTRATION'),T(reg.date)]];
     cells.forEach(([k,v],i)=>{const cx=L+(i%2)*((R-L)/2),cy=1010+Math.floor(i/2)*110;x.fillStyle=mut;x.font=`400 20px ${M}`;x.fillText(k,cx,cy);x.fillStyle=ink;x.font=`500 36px ${F}`;x.fillText(v,cx,cy+48);});
     if(reg.message){x.fillStyle=mut;x.font=`400 20px ${M}`;x.fillText(T('DEDICATION'),L,1270);x.fillStyle=ink;x.font=loved?`italic 400 48px ${S}`:`400 40px ${F}`;wrap(`“${reg.message}”`,1325,loved?56:52,780);}
     x.fillStyle=mut;x.font=`400 20px ${F}`;wrap(T('This certificate records a symbolic digital registration only. It does not represent ownership of a physical stone or any legal, scientific, mineralogical or property right.'),H-150,28,860);
     x.save();x.translate(R-150,H-400);x.rotate(-12*Math.PI/180);x.strokeStyle=C.stamp;x.fillStyle=C.stamp;x.lineWidth=7;x.beginPath();x.arc(0,0,130,0,Math.PI*2);x.stroke();x.lineWidth=2;x.beginPath();x.arc(0,0,112,0,Math.PI*2);x.stroke();
-    x.textAlign='center';x.font=`500 20px ${M}`;x.fillText(T('DG REGISTRY'),0,-36);x.font=`600 ${party?24:loved?28:34}px ${M}`;x.fillText(T(friend?'CERTIFIED':party?'HAPPY BIRTHDAY':loved?'WITH LOVE':'REGISTERED'),0,12);x.font=`400 18px ${M}`;x.fillText(new Date(reg.ts||Date.now()).toLocaleDateString('en-GB'),0,50);
+    x.textAlign='center';x.font=`500 20px ${M}`;x.fillText(T('DG REGISTRY'),0,-36);x.font=`600 ${party?24:loved?28:34}px ${M}`;x.fillText(T(prank?'PLAYED':friend?'CERTIFIED':party?'HAPPY BIRTHDAY':loved?'WITH LOVE':'REGISTERED'),0,12);x.font=`400 18px ${M}`;x.fillText(new Date(reg.ts||Date.now()).toLocaleDateString('en-GB'),0,50);
     if(loved)heart(0,82,22,C.stamp);x.restore();
     // the stone, top right — the same 3D still the on-screen certificate shows
     const stone=await Promise.race([window.dgStoneShot?window.dgStoneShot(reg.kind):Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),5000))])||(reg.kind==='blocket'?'assets/blocket.png':null);
     if(stone){const im=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=stone;});if(im)x.drawImage(im,R-215,186,225,225);}
     if(friend){x.save();x.translate(R-110,200);x.rotate(-9*Math.PI/180);x.fillStyle='rgba(242,194,48,.62)';x.fillRect(-80,-18,160,36);x.restore();}
+    // the prank: a GTA-style "wasted" band across the certificate
+    if(prank){x.save();x.translate(W/2,890);x.rotate(-5*Math.PI/180);x.fillStyle='rgba(0,0,0,.66)';x.fillRect(-W,-85,W*2,170);
+      x.textAlign='center';x.textBaseline='middle';x.font=`700 185px "Pricedown","Passion One",Impact,sans-serif`;x.lineJoin='round';x.lineWidth=22;x.strokeStyle='#000';x.strokeText('wasted',0,12);x.fillStyle='#c4261d';x.fillText('wasted',0,6);x.restore();}
     const url=c.toDataURL('image/png'),fname=`DINGUY-${reg.no}.png`;
     // On phones, hand the image to the share sheet — it has "Save Image" (iPhone) / "Save to gallery" (Android).
     if(window.matchMedia&&matchMedia('(pointer:coarse)').matches&&navigator.canShare){try{const b=atob(url.split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
@@ -1323,7 +1329,7 @@ class Component extends DCLogic {
     // The prank CD gets the cover's sunset: deep purple into orange, white ink, a black button with yellow type.
     const SUNSET={tbg:'linear-gradient(170deg,#2b1648 0%,#7a2a6b 48%,#e0663a 100%)',tborder:'1px solid rgba(255,200,120,.55)',tink:'#ffffff',tsub:'#ffe2c4',shadow:'0 24px 50px -24px rgba(224,102,58,.7)',btnBg:'#0b0b0b',btnFg:'#ffc83d',eye:'#ffc83d',ghost:'rgba(255,255,255,.35)',edge:'linear-gradient(120deg,#ffc83d,#ff6a3d,#8a3cff)'};
     const mk=(p)=>{const Th=THEME[p.w],nw=!!p.isNew,lt=p.kind==='dress'?LIGHT:p.kind==='cd'?SUNSET:null;return{light:!!lt,slug:p.slug,name:p.name,sub:p.sub,kind:p.kind,fig:p.fig,cls:p.cls,isNew:nw,tag:typeof p.d[0]==='string'?p.d[0]:'',priceLabel:p.soldOut?'':priceOf(p),soldOut:!!p.soldOut,
-      buyWord:p.soldOut?'OUT OF STOCK':'BUY',buyLabel:p.soldOut?'OUT OF STOCK':p.kind==='cd'?'GET THE PRANK':'BUY THIS STONE',
+      buyWord:p.soldOut?'OUT OF STOCK':'BUY',buyLabel:p.soldOut?'OUT OF STOCK':p.kind==='cd'?'PRANK A FRIEND':'BUY THIS STONE',
       cardBg:nw?`linear-gradient(${p.w==='friend'?'#f3f2ee,#f3f2ee':'#17293a,#0d1a24'}) padding-box,${RAINBOW} border-box`:Th.card,
       cardBorder:nw?'2px solid transparent':`1px solid ${Th.line}`,cardShadow:lt?lt.shadow:nw?'0 24px 50px -24px rgba(200,107,255,.55),0 10px 30px -18px rgba(255,95,109,.45)':'none',
       top:nw?'':Th.top,topH:nw?'6px':Th.topH,topClass:nw?'sw-pill':'',

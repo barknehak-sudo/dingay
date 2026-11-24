@@ -35,7 +35,7 @@
     </div>
     <div style="height:1px;background:{{ t.rule }};margin:2.4cqw 0 4.4cqw"></div>
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4cqw">
-      <div style="max-width:60cqw"><div style="font-size:{{ t.titleSize }};font-weight:{{ t.titleWeight }};font-family:{{ t.titleFont }};font-style:{{ t.serifStyle }};letter-spacing:.01em;line-height:1.1;text-transform:{{ t.titleCase }}">{{ title }}</div><sc-if value="{{ loved }}"><div style="margin-top:1.2cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.7cqw;letter-spacing:.14em;text-transform:uppercase;color:#b0485f">♥ Given with love ♥</div></sc-if><sc-if value="{{ friend }}"><div style="margin-top:1.4cqw;display:inline-block;padding:.5cqw 1.2cqw;background:#f2c230;color:#0b0b0b;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.7cqw;font-weight:600;letter-spacing:.12em;text-transform:uppercase">Friend grade · Load-bearing</div></sc-if><sc-if value="{{ party }}"><div style="margin-top:1.2cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.14em;text-transform:uppercase;color:#d6336c">🎂 Happy birthday 🎂</div></sc-if></div>
+      <div style="max-width:60cqw"><div style="font-size:{{ t.titleSize }};font-weight:{{ t.titleWeight }};font-family:{{ t.titleFont }};font-style:{{ t.serifStyle }};letter-spacing:.01em;line-height:1.1;text-transform:{{ t.titleCase }}">{{ title }}</div><sc-if value="{{ loved }}"><div style="margin-top:1.2cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.7cqw;letter-spacing:.14em;text-transform:uppercase;color:#b0485f">♥ Given with love ♥</div></sc-if><sc-if value="{{ friend }}"><div style="margin-top:1.4cqw;display:inline-block;padding:.5cqw 1.2cqw;background:#f2c230;color:#0b0b0b;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.7cqw;font-weight:600;letter-spacing:.12em;text-transform:uppercase">{{ grade }}</div></sc-if><sc-if value="{{ party }}"><div style="margin-top:1.2cqw;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:1.8cqw;letter-spacing:.14em;text-transform:uppercase;color:#d6336c">🎂 Happy birthday 🎂</div></sc-if></div>
       <div style="width:17cqw;flex:none;margin-top:-2cqw"><dc-import name="Stone" kind="{{ kind }}" spin="{{ 0 }}" hint-size="100%,100%"></dc-import></div>
     </div>
     <div style="font-size:2.8cqw;margin-top:4cqw;color:{{ t.sub }}">{{ line1 }}</div>
@@ -55,6 +55,12 @@
       <div style="font-size:3.4cqw;line-height:1.25;margin-top:1cqw;color:{{ msgColor }};overflow-wrap:anywhere">{{ message }}</div>
     </div></sc-if>
     <div style="margin-top:4cqw;font-size:1.65cqw;line-height:1.45;color:{{ t.mut }};max-width:70cqw">This certificate records a symbolic digital registration only. It does not represent ownership of a physical stone or any legal, scientific, mineralogical or property right.</div>
+    <!-- the prank: a GTA-style "wasted" band across the certificate -->
+    <sc-if value="{{ prank }}">
+      <div aria-label="Wasted" style="position:absolute;left:-10cqw;right:-10cqw;top:58.5%;transform:translateY(-50%) rotate(-6deg);background:rgba(0,0,0,.66);padding:1.6cqw 0;text-align:center;z-index:3;pointer-events:none">
+        <span style="font-family:'Pricedown','Passion One',Impact,sans-serif;font-weight:700;font-size:17cqw;line-height:.9;letter-spacing:.01em;color:#c4261d;-webkit-text-stroke:.9cqw #000;paint-order:stroke fill">wasted</span>
+      </div>
+    </sc-if>
     <sc-if value="{{ pending }}">
       <div style="position:absolute;right:7cqw;bottom:13cqw;width:21cqw;height:21cqw;border-radius:50%;border:.4cqw dashed rgba(22,20,15,.35);display:flex;align-items:center;justify-content:center;transform:rotate(-12deg);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:2.2cqw;letter-spacing:.1em;color:rgba(22,20,15,.45)">PENDING</div>
     </sc-if>
@@ -83,7 +89,7 @@ class Component extends DCLogic {
     // Loved-one stones get a romantic certificate: blush paper, gold hairlines, serif italics, rose accents.
     const loved=['opal','choc','emerald','diamond','tikimt','dress'].includes(r.kind);
     const SERIF="'Instrument Serif',Georgia,'Noto Serif Ethiopic',serif";
-    const party=r.kind==='cake',friend=['cobble','blocket','river','foundation','pebble','iron','charcoal'].includes(r.kind);
+    const party=r.kind==='cake',prank=r.kind==='cd',friend=prank||['cobble','blocket','river','foundation','pebble','iron','charcoal'].includes(r.kind);
     const t=friend
       ?{paper:'linear-gradient(rgba(11,11,11,.045) 1px,transparent 1px) 0 0/4cqw 4cqw,linear-gradient(90deg,rgba(11,11,11,.045) 1px,transparent 1px) 0 0/4cqw 4cqw,#f4f3ee',
         ink:'#0b0b0b',sub:'#3b3b3b',mut:'#6a6a64',accent:'#0b0b0b',rule:'rgba(11,11,11,.5)',
@@ -108,12 +114,12 @@ class Component extends DCLogic {
       shortDate:r.date?new Date(r.ts||Date.now()).toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}):'',
       message:r.message?`“${r.message}”`:'“Your dedication will appear here.”',
       msgColor:r.message?t.ink:'rgba(22,20,15,.3)',
-      kind:r.kind||'cobble',pending,loved:loved&&!party,party,friend,t,confetti:party?CONFETTI:[],
+      kind:r.kind||'cobble',pending,prank:prank&&!pending,grade:prank?'Prank grade · Not the game':'Friend grade · Load-bearing',loved:loved&&!party,party,friend,t,confetti:party?CONFETTI:[],
       title:'Certificate of Dinguy Registration',
       line1:friend?'This certifies that':party?'Happy birthday! This certifies that':loved?'With love, this certifies that':'This certifies that',
-      line2:friend?'has been found structurally sound and is hereby registered with':party?'has been given a slice of birthday cake, registered as':loved?'has been given a little piece of forever, registered as':'has been assigned and ceremonially registered with',
-      line3:friend?'under the DINGUY Registry. Handle with care.':party?'in the DINGUY Registry. Make a wish.':loved?'in the DINGUY Registry, for always.':'under the DINGUY Registry.',
-      stampWord:friend?'Certified':party?'Happy birthday':loved?'With love':'Registered',stampSize:party?'1.9cqw':loved?'2.3cqw':'2.7cqw',stampAnim:!pending&&!!this.props.stamp,stampStatic:!pending&&!this.props.stamp&&!this.props.hideStamp
+      line2:prank?'was promised GTA VI and is hereby registered with':friend?'has been found structurally sound and is hereby registered with':party?'has been given a slice of birthday cake, registered as':loved?'has been given a little piece of forever, registered as':'has been assigned and ceremonially registered with',
+      line3:prank?'Mission failed. Friendship status: active.':friend?'under the DINGUY Registry. Handle with care.':party?'in the DINGUY Registry. Make a wish.':loved?'in the DINGUY Registry, for always.':'under the DINGUY Registry.',
+      stampWord:prank?'Played':friend?'Certified':party?'Happy birthday':loved?'With love':'Registered',stampSize:party?'1.9cqw':loved?'2.3cqw':'2.7cqw',stampAnim:!pending&&!!this.props.stamp,stampStatic:!pending&&!this.props.stamp&&!this.props.hideStamp
     };
   }
 }

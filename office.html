@@ -427,7 +427,9 @@ function postText(b,r){const t=b.rows[0];if(!t)return'';
 // Interest in new Dinguys: taps on the "NEW" button in the site header.
 // Repeat customers: buyers matched by phone (the partner view gets an opaque id instead), all paid orders, hand-added left out.
 function viewRepeat(){
-  const paid=S.orders.filter(o=>(o.status==='paid'||o.status==='removed')&&!o.manual);
+  // test orders (a buyer named Test) don't count
+  const isTest=o=>/^test\b/.test(normName(o.by));
+  const paid=S.orders.filter(o=>(o.status==='paid'||o.status==='removed')&&!o.manual&&!isTest(o));
   const m=new Map();
   for(const o of paid){const k=o.phone||o.buyer||'n:'+normName(o.by);const e=m.get(k)||{n:0,birr:0,names:{},phone:o.phone};e.n++;e.birr+=o.price||0;const nm=String(o.by||'').trim();if(nm)e.names[nm]=(e.names[nm]||0)+1;m.set(k,e);}
   const all=[...m.values()],rep=all.filter(e=>e.n>1),one=all.length-rep.length;
@@ -437,7 +439,7 @@ function viewRepeat(){
   const bins=[['1',e=>e.n===1],['2',e=>e.n===2],['3',e=>e.n===3],['4',e=>e.n===4],['5+',e=>e.n>=5]].map(([l,f])=>[l,all.filter(f).length]);
   const bMax=Math.max(1,...bins.map(b=>b[1]));
   const top=rep.sort((a,b)=>b.n-a.n||b.birr-a.birr).slice(0,5).map(e=>({...e,name:(Object.entries(e.names).sort((a,b)=>b[1]-a[1])[0]||['—'])[0]}));
-  return card('Repeat customers',`${all.length} paying customers · matched by phone number`,`
+  return card('Repeat customers',`${all.length} paying customers · matched by phone number · test orders left out`,`
     <div class="rp-top"><div><div class="big">${rate}%</div><div class="sub">came back for more</div></div>
       <div class="rp-side"><div><b>${rep.length}</b> repeat · <b>${one}</b> one-time</div><div>Repeat buyers made <b>${share}%</b> of orders</div><div><b>${num(repBirr)}</b> of ${num(totBirr)} Birr</div></div></div>
     <div class="rp-split" role="img" aria-label="${rep.length} repeat and ${one} one-time customers"><i style="width:${rate}%"></i></div>
