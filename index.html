@@ -84,6 +84,9 @@ html.gta .app-step b{background:rgba(255,217,168,.14);color:#ffd9a8}
 .gta-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(44,27,69,0) 0%,rgba(44,27,69,0) 50%,rgba(44,27,69,.85) 70%,#2c1b45 76%)}
 .gta-hero>*{position:relative;z-index:1}
 @media (min-width:760px){.gta-hero{margin:0;border-radius:28px;min-height:clamp(560px,86vh,760px)}.gta-hero::before{background-position:center 34%}}
+.gta-buy{display:inline-flex;align-items:center;gap:12px;min-height:52px;margin-bottom:16px;padding:0 8px 0 24px;border:0;border-radius:999px;background:#ffd9a8;color:#2a1838;font-size:14px;font-weight:800;letter-spacing:.08em;cursor:pointer;box-shadow:0 10px 30px -10px rgba(255,170,140,.7);transition:transform .12s}
+.gta-buy:active{transform:scale(.97)}
+.gta-buy-p{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border-radius:999px;background:#2a1838;color:#ffd9a8;font-size:13px;letter-spacing:.04em}
 .gta-kicker{font-family:'Oswald','Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:15px;letter-spacing:.06em;color:#ffd9a8;text-transform:uppercase}
 .gta-title{margin:8px 0 0;font-size:clamp(30px,7vw,52px);font-weight:700;letter-spacing:-.02em;line-height:1.05;background:linear-gradient(90deg,#ffd9a8,#f6a5a5);-webkit-background-clip:text;background-clip:text;color:transparent}
 .gta-lead{margin:10px auto 0;max-width:34ch;font-size:16px;line-height:1.45;color:#f1e4f0}
@@ -188,6 +191,7 @@ html.gta .app-step b{background:rgba(255,217,168,.14);color:#ffd9a8}
 <main style="max-width:1120px;margin:0 auto;padding:calc(max(10px,env(safe-area-inset-top)) + 78px) 16px 40px;background:transparent">
   <sc-if value="{{ gtaOn }}">
   <section class="gta-hero" onClick="{{ feat.open }}" style="cursor:pointer">
+    <button onClick="{{ feat.register }}" class="gta-buy"><span>PRANK A FRIEND</span><span class="gta-buy-p">{{ feat.priceLabel }}</span></button>
     <div class="gta-kicker">Out now · Dinguy Pranks</div>
     <h1 class="gta-title">Broke City Addis: The Prank</h1>
     <p class="gta-lead">Tell your friend they got a free GTA Trial. They press start. They get WASTED. Then a certificate in their name.</p>
@@ -1101,6 +1105,7 @@ const THEME={
  loved:{bg:'radial-gradient(120% 70% at 50% 0%,#435f73 0%,#132531 45%,#000 100%)',ink:'#f4efe9',sub:'#b9c9d4',card:'rgba(255,255,255,.045)',line:'rgba(255,255,255,.14)',glow:'radial-gradient(60% 55% at 50% 50%,rgba(143,179,204,.35),rgba(19,37,49,0) 72%)',label:'Collection B — Precious · 199 ETB',heading:'Beautiful stones for beautiful people.',intro:["A Dinguy doesn't have to be expensive to mean something.",'Sometimes you just need the right one.'],suggestIntro:'Try one of these:',world:'For your loved one',hf:"'Instrument Serif',Georgia,serif",hs:'italic',hw:400,hl:'-.02em',r:'22px',btnBg:'#f4efe9',btnFg:'#132531',btnR:'999px',top:'linear-gradient(90deg,transparent,rgba(207,224,234,.7),transparent)',topH:'1px',tape:false,flowers:true}
 };
 if(GTA){const dusk='radial-gradient(120% 70% at 50% 0%,#6b3f78 0%,#2c1b45 42%,#120b1e 100%)';
+  Object.assign(THEME.friend,{bg:dusk,ink:'#fbf4fa',sub:'#e3cfe6',card:'rgba(255,255,255,.05)',line:'rgba(255,217,168,.2)',glow:'radial-gradient(60% 55% at 50% 50%,rgba(255,170,140,.32),rgba(44,27,69,0) 72%)',btnBg:'#ffd9a8',btnFg:'#2a1838',top:'repeating-linear-gradient(-45deg,#2a1838 0 10px,#ffd9a8 10px 20px)'});
   Object.assign(THEME.loved,{bg:dusk,sub:'#e3cfe6',card:'rgba(255,255,255,.05)',line:'rgba(255,217,168,.18)',glow:'radial-gradient(60% 55% at 50% 50%,rgba(255,170,140,.35),rgba(44,27,69,0) 72%)',btnBg:'#ffd9a8',btnFg:'#2a1838'});}
 const OCC=['Birthday','Anniversary','Graduation','Farewell','Apology','Just because'];
 const FAQ=[['Is DINGUY a real stone registry?','DINGUY is a private, unofficial digital registration experience created for symbolic gifting and entertainment.'],['Do I receive a physical stone?','No. DINGUY registrations are entirely digital. No physical stone is shipped.'],['Do I own the stone?','No. Your registration does not grant ownership of any physical stone, mineral, gemstone, land or other property.'],['What do I actually receive?','You receive a professionally designed digital certificate and a personal registry page with a unique registration number.'],['Can I send it to someone?','Yes. Every registration has a shareable registry link, and the certificate can be downloaded and sent to the recipient.'],['Can I choose the name?','Yes. You can register it to anyone you choose, subject to our terms.'],['Can I write my own message?','Yes. You can write your own dedication or use one of our suggestions.'],['Is this similar to naming a star?','The idea is similar in the sense that it creates a symbolic personal registration for a gift. DINGUY makes no claim to officially name or transfer ownership of a physical object.'],['Is DINGUY associated with an astronomical organization or geological authority?','No. DINGUY is an independent private service.'],['Can I get a refund?','Please see our Terms & Conditions for our refund and cancellation policy.']];
@@ -1428,7 +1433,10 @@ class Component extends DCLogic {
     const LIGHT={tbg:'linear-gradient(180deg,#fffdf8,#f5eddf)',tborder:'1px solid rgba(201,150,46,.45)',tink:'#1c1609',tsub:'#7a6844',shadow:'0 22px 44px -26px rgba(201,150,46,.6)',btnBg:'#1c1609',btnFg:'#f2c25a'};
     // The prank CD gets the cover's sunset: deep purple into orange, white ink, a black button with yellow type.
     const SUNSET={tbg:'linear-gradient(170deg,#2b1648 0%,#7a2a6b 48%,#e0663a 100%)',tborder:'1px solid rgba(255,200,120,.55)',tink:'#ffffff',tsub:'#ffe2c4',shadow:'0 24px 50px -24px rgba(224,102,58,.7)',btnBg:'#0b0b0b',btnFg:'#ffc83d',eye:'#ffc83d',ghost:'rgba(255,255,255,.35)',edge:'linear-gradient(120deg,#ffc83d,#ff6a3d,#8a3cff)'};
-    const mk=(p)=>{const Th=THEME[p.w],nw=!!p.isNew,lt=p.kind==='dress'?LIGHT:p.kind==='cd'?SUNSET:null;return{light:!!lt,slug:p.slug,name:p.name,sub:p.sub,kind:p.kind,fig:p.fig,cls:p.cls,isNew:nw,tag:typeof p.d[0]==='string'?p.d[0]:'',priceLabel:p.soldOut?'':priceOf(p),soldOut:!!p.soldOut,
+    // GTA week: friend tiles go dusk purple too (the classic look keeps them light grey)
+    const GTA_TILE={tbg:'linear-gradient(180deg,#3a2456,#24163a)',tborder:'1px solid rgba(255,217,168,.18)',tink:'#fbf4fa',tsub:'#d9c4dd',tbtnBg:'#ffd9a8',tbtnFg:'#2a1838',btnBg:'#ffd9a8',btnFg:'#2a1838'};
+    const mk=p=>{const o=mk0(p);if(GTA&&p.w==='friend'&&p.kind!=='cd'&&!p.soldOut)Object.assign(o,GTA_TILE,p.isNew?{tbg:`linear-gradient(180deg,#3a2456,#24163a) padding-box,${RAINBOW} border-box`,tborder:'2px solid transparent',cardBg:`linear-gradient(#2c1b45,#2c1b45) padding-box,${RAINBOW} border-box`,glow:'radial-gradient(70% 60% at 50% 50%,rgba(255,170,140,.35),rgba(44,27,69,0) 72%)'}:{});return o;};
+    const mk0=(p)=>{const Th=THEME[p.w],nw=!!p.isNew,lt=p.kind==='dress'?LIGHT:p.kind==='cd'?SUNSET:null;return{light:!!lt,slug:p.slug,name:p.name,sub:p.sub,kind:p.kind,fig:p.fig,cls:p.cls,isNew:nw,tag:typeof p.d[0]==='string'?p.d[0]:'',priceLabel:p.soldOut?'':priceOf(p),soldOut:!!p.soldOut,
       buyWord:p.soldOut?'OUT OF STOCK':'BUY',buyLabel:p.soldOut?'OUT OF STOCK':p.kind==='cd'?'PRANK A FRIEND':'BUY THIS STONE',
       cardBg:nw?`linear-gradient(${p.w==='friend'?'#f3f2ee,#f3f2ee':'#17293a,#0d1a24'}) padding-box,${RAINBOW} border-box`:Th.card,
       cardBorder:nw?'2px solid transparent':`1px solid ${Th.line}`,cardShadow:lt?lt.shadow:nw?'0 24px 50px -24px rgba(200,107,255,.55),0 10px 30px -18px rgba(255,95,109,.45)':'none',
